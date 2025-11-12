@@ -13,5 +13,14 @@ namespace Zealand_Booking_System_Library.Models
         public string Size {  get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
+
+        public Room() { }
+        public Room(string name, string size, string description, string location)
+        {
+            Name = name;
+            Size = size;
+            Description = description;
+            Location = location;
+        }
     }
 }

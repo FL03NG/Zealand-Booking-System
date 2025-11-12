@@ -9,5 +9,7 @@ namespace Zealand_Booking_System_Library.Models
     public class Admin
     {
         public string RoleDescription { get; set; }
+
+        public Admin() { }
     }
 }
