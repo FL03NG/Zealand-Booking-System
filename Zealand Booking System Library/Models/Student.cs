@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Zealand_Booking_System_Library.Models
 {
-    public class Student
+    public class Student : Account
     {
-        public string StudentNumber { get; set; }
+        public int StudentID { get; set; }
 
         public Student () { }
     }

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Zealand_Booking_System_Library.Models
 {
-    public class Admin
+    public class Administrator : Account
     {
-        public string RoleDescription { get; set; }
+        public int AdministratorID { get; set; }
 
-        public Admin() { }
+        public Administrator() { }
     }
 }

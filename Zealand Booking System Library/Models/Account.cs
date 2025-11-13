@@ -6,16 +6,16 @@ using System.Threading.Tasks;
 
 namespace Zealand_Booking_System_Library.Models
 {
-    public class User
+    public class Account
     {
-        public int UserID { get; set; }
+        public int AccountID { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
 
-        public User() { }
-        public User(int userID, string username, string passwordHash)
+        public Account() { }
+        public Account(int accountID, string username, string passwordHash)
         {
-            UserID = userID;
+            AccountID = accountID;
             Username = username;
             PasswordHash = passwordHash;
         }

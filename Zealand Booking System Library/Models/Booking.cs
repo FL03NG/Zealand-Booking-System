@@ -24,9 +24,9 @@ namespace Zealand_Booking_System_Library.Models
         public string BookingDescription { get; set; }
         public int RoomID { get; set; }
         public Room Room { get; set; }
-        public int UserID { get; set; }
-        public User User { get; set; }
-        public DateTime Date {  get; set; }
+        public int AccountID { get; set; }
+        public Account Account { get; set; }
+        public DateTime BookingDate {  get; set; }
         public TimeSlot TimeSlot { get; set; }
 
         public Booking() { }
