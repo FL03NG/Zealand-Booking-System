@@ -11,7 +11,7 @@ namespace Zealand_Booking_System_Library.Models
         public int RoomID { get; set; }
         public string Name { get; set; }
         public string Size {  get; set; }
-        public string Description { get; set; }
+        public string RoomDescription { get; set; }
         public string Location { get; set; }
 
         public Room() { }
@@ -19,7 +19,7 @@ namespace Zealand_Booking_System_Library.Models
         {
             Name = name;
             Size = size;
-            Description = description;
+            RoomDescription = description;
             Location = location;
         }
     }
