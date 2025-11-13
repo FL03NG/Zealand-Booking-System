@@ -9,6 +9,7 @@ namespace Zealand_Booking_System_Library.Models
     public class Booking
     {
         public int BookingID {  get; set; }
+        public string BookingDescription { get; set; }
         public int RoomID { get; set; }
         public Room Room { get; set; }
         public int UserID { get; set; }
