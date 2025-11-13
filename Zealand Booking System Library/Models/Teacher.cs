@@ -9,5 +9,6 @@ namespace Zealand_Booking_System_Library.Models
     public class Teacher
     {
         public string Department {  get; set; }
+        public Teacher() { }
     }
 }

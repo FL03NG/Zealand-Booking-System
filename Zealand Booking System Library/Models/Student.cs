@@ -9,5 +9,7 @@ namespace Zealand_Booking_System_Library.Models
     public class Student
     {
         public string StudentNumber { get; set; }
+
+        public Student () { }
     }
 }

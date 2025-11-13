@@ -12,6 +12,7 @@ namespace Zealand_Booking_System_Library.Models
         public string Username { get; set; }
         public string PasswordHash { get; set; }
 
+        public User() { }
         public User(int userID, string username, string passwordHash)
         {
             UserID = userID;
