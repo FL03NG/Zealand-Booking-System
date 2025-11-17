@@ -2,3 +2,27 @@
 @model Zealand_Booking_System.Pages.RoomModel
 @{
 }
+<body>
+    @foreach (var room in Model.Room)
+    {
+        <div class="card">
+            <div class="card__bg">
+                <img src="~/img/@animal.ImagePath" alt="Billede af @animal.Name" class="card-img-top" />
+                <div class="card-body">
+                    <h5 class="card-title">@animal.Name</h5>
+                    <p class="card-text">
+                        Art: @animal.Species<br />
+                        Race: @animal.Race<br />
+                        <span>
+                            Størrelse: @animal.Size Kg<span /><br />
+                            Køn: @animal.Gender
+                    </p>
+                    <form method="post" asp-page-handler="Delete">
+                        <input type="hidden" name="animalID" value="@animal.AnimalID" />
+                        <button type="submit">Slet</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+</body>
