@@ -19,20 +19,26 @@ namespace Zealand_Booking_System_Library.Repository
         }
         public List<Booking> GetAll()
         {
-            List<Booking > bookings = new List<Booking>();
+            List<Booking> bookings = new List<Booking>();
 
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 string query = @"
-                    SELECT 
-                        b.BookingID, 
-                        b.BookingDate, 
-                        b.AccountID,  
-                        b.TimeSlot,
-                        r.ResidentName, 
-                    FROM Bookings b
-                    LEFT JOIN Resident r ON b.ResidentID = r.ResidentID
-                    LEFT JOIN Machine m ON b.MachineID = m.MachineID";
+            SELECT 
+                b.BookingID,
+                b.BookingDescription,
+                b.BookingDate,
+                b.TimeSlot,
+                b.AccountID,
+                b.RoomID,
+                a.Username,
+                r.RoomName,
+                r.Size,
+                r.RoomDescription,
+                r.RoomLocation
+            FROM Booking b
+            INNER JOIN Account a ON b.AccountID = a.AccountID
+            INNER JOIN Room r ON b.RoomID = r.RoomID";
 
                 SqlCommand command = new SqlCommand(query, connection);
                 connection.Open();
@@ -40,24 +46,33 @@ namespace Zealand_Booking_System_Library.Repository
 
                 while (reader.Read())
                 {
-                    Booking b = new Booking();
-                    b.BookingID = (int)reader["BookingID"];
-                    b.BookingDate = (DateTime)reader["BookingDate"];
-                    b.AccountID = (int)reader["AccountID"];
-                    b.TimeSlot = Enum.Parse<TimeSlot>(reader["TimeSlot"].ToString());
+                    Booking booking = new Booking();
+                    booking.BookingID = (int)reader["BookingID"];
+                    booking.BookingDescription = reader["BookingDescription"] != DBNull.Value
+                        ? reader["BookingDescription"].ToString()
+                        : "";
+                    booking.BookingDate = (DateTime)reader["BookingDate"];
+                    booking.TimeSlot = (TimeSlot)reader["TimeSlot"];
+                    booking.AccountID = (int)reader["AccountID"];
+                    booking.RoomID = (int)reader["RoomID"];
 
-                    // Fyld beboer
-                    Account res = new Account();
-                    res.AccountID = b.AccountID;
-                    res.Username = reader["Username"] != DBNull.Value ? reader["Username"].ToString() : "";
+                    Account account = new Account();
+                    account.AccountID = booking.AccountID;
+                    account.Username = reader["Username"].ToString();
+                    booking.Account = account;
 
-                    b.Account = res;
+                    Room room = new Room();
+                    room.RoomID = booking.RoomID;
+                    room.RoomName = reader["RoomName"].ToString();
+                    room.Size = reader["Size"].ToString();
+                    room.RoomDescription = reader["RoomDescription"].ToString();
+                    room.RoomLocation = reader["RoomLocation"].ToString();
+                    booking.Room = room;
 
-                    // Fyld maskine
-                    string Rooms = reader["Room"] != DBNull.Value ? reader["Room"].ToString() : "";
-
+                    bookings.Add(booking);
                 }
             }
+
             return bookings;
         }
         // Opret booking
