@@ -20,6 +20,9 @@
                         <input type="hidden" name="roomID" value="@room.RoomID" />
                         <button type="submit">Slet</button>
                     </form>
+                    <a asp-page="/Booking" asp-route-id="@room.RoomID" class="btn btn-success" style="margin-top:10px;">
+                        Book lokalet
+                    </a>
                 </div>
             </div>
         </div>
