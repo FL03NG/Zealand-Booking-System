@@ -10,29 +10,29 @@
     <thead>
         <tr>
             <th>Booking ID</th>
-            <th>Beboer</th>
-            <th>Maskine</th>
+            <th>Account</th>
+            <th>Room</th>
             <th>Dato</th>
             <th>Tidsrum</th>
             <th>Handling</th>
         </tr>
     </thead>
     <tbody>
-        @if (Model.Booking != null && Model.Booking.Count > 0)
+        @if (Model.Bookings != null && Model.Bookings.Count > 0)
         {
-            foreach (var booking in Model.Booking)
+            foreach (var booking in Model.Bookings)
             {
                 <tr>
                     <td>@booking.BookingID</td>
                     <td>
-                        @(booking.Resident != null
-                                        ? booking.Resident.ResidentName
-                                        : $"ID: {booking.ResidentID}")
+                        @(booking.Account != null
+                            ? booking.Account.Username
+                            : $"ID: {booking.AccountID}")
                                                                   </td>
                                                                   <td>
-                        @(booking.Machine != null
-                                        ? booking.Machine.MachineName
-                                        : $"ID: {booking.MachineID}")
+                        @(booking.Room != null
+                            ? booking.Room.RoomName
+                            : $"ID: {booking.RoomID}")
             </td>
             <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
             <td>@booking.TimeSlot</td>

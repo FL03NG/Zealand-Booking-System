@@ -8,7 +8,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Zealand_Booking_System_Library.Repository
 {
-    internal class RoomCollectionRepo : IRoomRepository
+    public class RoomCollectionRepo : IRoomRepository
     {
         private readonly string _connectionString;
 
