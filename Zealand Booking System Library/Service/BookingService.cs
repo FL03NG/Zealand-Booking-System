@@ -8,7 +8,7 @@ using Zealand_Booking_System_Library.Repository;
 
 namespace Zealand_Booking_System_Library.Service
 {
-    internal class BookingService
+    public class BookingService
     {
         private readonly IBookingRepository _bookingRepo;
         public BookingService(IBookingRepository bookingRepo)

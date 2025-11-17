@@ -1,0 +1,55 @@
+﻿@page
+@model Zealand_Booking_System.Pages.Shared.BookingListModel
+@{
+    ViewData["Title"] = "Opret booking";
+}
+<h2>Lokale bookinger</h2>
+
+<!-- Liste over eksisterende bookinger -->
+<table class="table table-bordered" style="width:70%; margin-bottom:20px;">
+    <thead>
+        <tr>
+            <th>Booking ID</th>
+            <th>Account</th>
+            <th>Room</th>
+            <th>Dato</th>
+            <th>Tidsrum</th>
+            <th>Handling</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Bookings != null && Model.Bookings.Count > 0)
+        {
+            foreach (var booking in Model.Bookings)
+            {
+                <tr>
+                    <td>@booking.BookingID</td>
+                    <td>
+                        @(booking.Account != null
+                            ? booking.Account.Username
+                            : $"ID: {booking.AccountID}")
+                                                                  </td>
+                                                                  <td>
+                        @(booking.Room != null
+                            ? booking.Room.RoomName
+                            : $"ID: {booking.RoomID}")
+            </td>
+            <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
+            <td>@booking.TimeSlot</td>
+            <td>
+                <form method="post" asp-page-handler="Delete" class="d-inline">
+                    <input type="hidden" name="bookingID" value="@booking.BookingID" />
+                    <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+                </form>
+            </td>
+        </tr>
+                }
+        }
+        else
+        {
+            <tr>
+                <td colspan="6" style="text-align:center;">Ingen bookinger fundet</td>
+            </tr>
+        }
+    </tbody>
+</table>

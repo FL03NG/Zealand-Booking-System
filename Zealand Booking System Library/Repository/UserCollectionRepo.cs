@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Zealand_Booking_System_Library.Repository
 {
-    internal class UserCollectionRepo
+    public class UserCollectionRepo
     {
     }
 }
