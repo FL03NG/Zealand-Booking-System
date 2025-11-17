@@ -17,11 +17,38 @@
                             @room.RoomDescription<span /><br />
                     </p>
                     <form method="post" asp-page-handler="Delete">
-                        <input type="hidden" name="animalID" value="@room.RoomID" />
+                        <input type="hidden" name="roomID" value="@room.RoomID" />
                         <button type="submit">Slet</button>
                     </form>
                 </div>
             </div>
         </div>
     }
-</body>
+
+    <!-- FORMULAR TIL AT OPRETTE NYT LOKALE -->
+    <h3>Opret nyt lokale</h3>
+
+    <form method="post" style="width:50%; margin-bottom: 30px;">
+        <div style="margin-bottom:10px;">
+            <label for="RoomName">Lokalenavn:</label><br />
+            <input asp-for="NewRoom.RoomName" id="RoomName" required />
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <label for="RoomLocation">Lokation:</label><br />
+            <input asp-for="NewRoom.RoomLocation" id="RoomLocation" required />
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <label for="Size">Størrelse:</label><br />
+            <input asp-for="NewRoom.Size" id="Size" type="number" required />
+        </div>
+
+        <div style="margin-bottom:10px;">
+            <label for="RoomDescription">Beskrivelse:</label><br />
+            <textarea asp-for="NewRoom.RoomDescription" id="RoomDescription"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Opret lokale</button>
+    </form>
+   </body>

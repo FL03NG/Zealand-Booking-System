@@ -1,8 +1,9 @@
+using System.Reflection.PortableExecutable;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Zealand_Booking_System_Library.Models;
-using Zealand_Booking_System_Library.Service;
 using Zealand_Booking_System_Library.Repository;
+using Zealand_Booking_System_Library.Service;
 
 namespace Zealand_Booking_System.Pages
 {
@@ -78,5 +79,6 @@ namespace Zealand_Booking_System.Pages
             // Genindlæser siden for at vise opdateret liste
             return RedirectToPage();
         }
+
     }
 }
