@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Zealand_Booking_System_Library.Models;
+using Zealand_Booking_System_Library.Service;
+using Zealand_Booking_System_Library.Repository;
 
 namespace Zealand_Booking_System.Pages
 {
@@ -10,28 +12,28 @@ namespace Zealand_Booking_System.Pages
            "Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;";
 
         // Liste som indeholder alle beboere
-        public List<Room> Resident { get; set; } = new List<Resident>();
+        public List<Room> Room { get; set; } = new List<Room>();
 
         // Service som håndterer CRUD-operationer for beboere
-        private ResidentService _residentService;
+        private RoomService _roomService;
 
         // Property som bruges til at modtage nye beboerdata fra formularen
         [BindProperty]
-        public Resident NewResident { get; set; } = new Resident();
+        public Room NewRoom { get; set; } = new Room();
 
         // Constructor – initialiserer repository og service så vi kan forbinde til databasen
-        public ResidentGridModel()
+        public RoomModel()
         {
             // Opretter repository og sender det videre til service-laget
-            ResidentCollectionRepo repo = new ResidentCollectionRepo(_connectionString);
-            _residentService = new ResidentService(repo);
+            RoomCollectionRepo repo = new RoomCollectionRepo(_connectionString);
+            _roomService = new RoomService(repo);
         }
 
         // GET-metode – kaldes når siden hentes første gang
         // Henter alle eksisterende beboere fra databasen
         public void OnGet()
         {
-            Resident = _residentService.GetAll();
+            Room = _roomService.GetAllRooms();
         }
 
         // POST-metode – kaldes når brugeren indsender formularen for at oprette en ny beboer
@@ -40,10 +42,10 @@ namespace Zealand_Booking_System.Pages
             try
             {
                 // Forsøger at tilføje den nye beboer til databasen
-                _residentService.Add(NewResident);
+                _roomService.AddRoom(NewRoom);
 
                 // Viser besked på siden hvis oprettelsen lykkes
-                TempData["Message"] = "Beboer oprettet!";
+                TempData["Message"] = "Lokale oprettet!";
             }
             catch (System.Exception ex)
             {
@@ -57,15 +59,15 @@ namespace Zealand_Booking_System.Pages
 
         // POST-metode – kaldes når brugeren trykker på "Slet" knappen
         // Denne metode modtager et ID på den beboer der skal slettes
-        public IActionResult OnPostDelete(int residentID)
+        public IActionResult OnPostDelete(int roomID)
         {
             try
             {
                 // Forsøger at slette beboeren fra databasen
-                _residentService.Delete(residentID);
+                _roomService.DeleteRoom(roomID);
 
                 // Viser besked hvis sletningen lykkes
-                TempData["Message"] = "Beboer slettet!";
+                TempData["Message"] = "Lokale slettet!";
             }
             catch (System.Exception ex)
             {

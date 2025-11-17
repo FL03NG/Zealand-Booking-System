@@ -7,18 +7,17 @@
     {
         <div class="card">
             <div class="card__bg">
-                <img src="~/img/@animal.ImagePath" alt="Billede af @animal.Name" class="card-img-top" />
+                @* <img src="~/img/@animal.ImagePath" alt="Billede af @animal.Name" class="card-img-top" /> *@
                 <div class="card-body">
-                    <h5 class="card-title">@animal.Name</h5>
+                    <h5 class="card-title">@room.RoomName</h5>
                     <p class="card-text">
-                        Art: @animal.Species<br />
-                        Race: @animal.Race<br />
+                        Størrelse: @room.Size<br />
+                        Lokation: @room.RoomLocation<br />
                         <span>
-                            Størrelse: @animal.Size Kg<span /><br />
-                            Køn: @animal.Gender
+                            @room.RoomDescription<span /><br />
                     </p>
                     <form method="post" asp-page-handler="Delete">
-                        <input type="hidden" name="animalID" value="@animal.AnimalID" />
+                        <input type="hidden" name="animalID" value="@room.RoomID" />
                         <button type="submit">Slet</button>
                     </form>
                 </div>
