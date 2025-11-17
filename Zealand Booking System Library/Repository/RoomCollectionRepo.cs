@@ -18,7 +18,7 @@ namespace Zealand_Booking_System_Library.Repository
         }
         public void AddRoom(Room room)
         {
-            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=VaskEnTidDataBase;Trusted_Connection=True;TrustServerCertificate=True;"))
+            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;"))
             {
                 SqlCommand cmd = new SqlCommand(
                     "INSERT INTO Room (RoomName, Size, RoomDescription, RoomLocation) " +
@@ -37,7 +37,7 @@ namespace Zealand_Booking_System_Library.Repository
         {
             List<Room> rooms = new List<Room>();
 
-            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=VaskEnTidDataBase;Trusted_Connection=True;TrustServerCertificate=True;"))
+            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;"))
             {
                 SqlCommand cmd = new SqlCommand("SELECT * FROM Room", conn);
                 conn.Open();
@@ -46,16 +46,13 @@ namespace Zealand_Booking_System_Library.Repository
                 {
                     while (reader.Read())
                     {
-                        Resident r = new Resident
+                        Room r = new Room
                         {
-                            ResidentID = (int)reader["ResidentID"],
-                            PhoneNumber = (string)reader["PhoneNumber"],
-                            ResidentName = (string)reader["ResidentName"],
-                            City = (string)reader["City"],
-                            Email = (string)reader["Email"],
-                            PostNr = (string)reader["PostNr"],
-                            ApartmentNr = (string)reader["ApartmentNr"],
-                            FloorNr = (int)reader["FloorNr"]
+                            RoomID = (int)reader["RoomID"],
+                            RoomName = (string)reader["RoomName"],
+                            Size = (string)reader["Size"],
+                            RoomDescription = (string)reader["RoomDescription"],
+                            RoomLocation = (string)reader["RoomLocation"],
                         };
                         rooms.Add(r);
                     }
@@ -66,20 +63,16 @@ namespace Zealand_Booking_System_Library.Repository
 
         public void UpdateRoom(Room room)
         {
-            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=VaskEnTidDataBase;Trusted_Connection=True;TrustServerCertificate=True;"))
+            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;"))
             {
                 SqlCommand cmd = new SqlCommand(
-                    "UPDATE Resident SET ResidentID=@ResidentId, PhoneNumber=@PhoneNumber, ResidentName = @ResidentName, City=@City, PostNr=@PostNr, Email=@Email, " +
-                    "ApartmentNr=@ApartmentNr, ApartmentNr=@ApartmentNr, FloorNr=@FloorNr", conn);
+                    "UPDATE Room SET RoomID=@RoomID, RoomName=@RoomName, Size = @Size, RoomDescription=@RoomDescription, RoomLocation=@RoomLocation", conn);
 
-                cmd.Parameters.AddWithValue("@ResidentID", resident.ResidentID);
-                cmd.Parameters.AddWithValue("@PhoneNumber", resident.PhoneNumber);
-                cmd.Parameters.AddWithValue("@ResidentName", resident.ResidentName);
-                cmd.Parameters.AddWithValue("@City", resident.City);
-                cmd.Parameters.AddWithValue("@PostNr", resident.PostNr);
-                cmd.Parameters.AddWithValue("@Email", resident.Email);
-                cmd.Parameters.AddWithValue("@ApartmentNr", resident.ApartmentNr);
-                cmd.Parameters.AddWithValue("@FloorNr", resident.FloorNr);
+                cmd.Parameters.AddWithValue("@RoomID", room.RoomID);
+                cmd.Parameters.AddWithValue("@RoomName", room.RoomName);
+                cmd.Parameters.AddWithValue("@Size", room.Size);
+                cmd.Parameters.AddWithValue("@RoomDescription", room.RoomDescription);
+                cmd.Parameters.AddWithValue("@RoomLocation", room.RoomLocation);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
@@ -89,7 +82,7 @@ namespace Zealand_Booking_System_Library.Repository
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                SqlCommand cmd = new SqlCommand("DELETE FROM Resident WHERE ResidentID=@id", conn);
+                SqlCommand cmd = new SqlCommand("DELETE FROM Room WHERE RoomID=@id", conn);
                 cmd.Parameters.AddWithValue("@id", id);
                 conn.Open();
                 cmd.ExecuteNonQuery();
