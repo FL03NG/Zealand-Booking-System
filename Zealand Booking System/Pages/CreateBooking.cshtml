@@ -1,0 +1,42 @@
+﻿@page
+@model Zealand_Booking_System.Pages.BookingModel
+@{
+}
+<!-- Formular til at oprette en ny booking -->
+<h3>Opret ny booking</h3>
+
+<form method="post" style="width:50%;">
+    <!-- Beboer dropdown -->
+    <div style="margin-bottom:10px;">
+        <label for="UserID">Vælg beboer:</label><br />
+        <select asp-for="NewBooking.AccountID" id="AccountID" required>
+            <option value="">-- Vælg beboer --</option>
+            @if (Model.User != null)
+            {
+                foreach (var r in Model.Users)
+                {
+                    <option value="@r.AccountID">@r.Username ()</option>
+                }
+            }
+        </select>
+    </div>
+
+    <!-- Dato -->
+    <div style="margin-bottom:10px;">
+        <label for="BookingDate">Dato:</label><br />
+        <input asp-for="NewBooking.BookingDate" type="date" id="BookingDate" required />
+    </div>
+
+    <!-- Tidsrum -->
+    <div style="margin-bottom:10px;">
+        <label for="TimeSlot">Tidsrum:</label><br />
+        <select asp-for="NewBooking.TimeSlot" id="TimeSlot" required>
+            <option value="Morning">Morgen (08-10)</option>
+            <option value="Afternoon">Eftermiddag (12-14)</option>
+            <option value="Evening">Aften (16-18)</option>
+            <option value="Night">Nat (20-22)</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Book tid</button>
+</form>
