@@ -1,21 +1,44 @@
 ﻿@page
-@model Zealand_Booking_System.Pages.BookingModel
+@using Zealand_Booking_System_Library.Models
+@using Zealand_Booking_System_Library.Repository
+@using Zealand_Booking_System_Library.Service
+@model Zealand_Booking_System.Pages.Shared.BookingListModel
 @{
+    ViewData["Title"] = "Opret booking";
 }
-<!-- Formular til at oprette en ny booking -->
 <h3>Opret ny booking</h3>
 
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info">@Model.Message</div>
+}
+
 <form method="post" style="width:50%;">
-    <!-- Beboer dropdown -->
+    <!-- Account dropdown -->
     <div style="margin-bottom:10px;">
-        <label for="UserID">Vælg beboer:</label><br />
+        <label for="AccountID">Vælg Account:</label><br />
         <select asp-for="NewBooking.AccountID" id="AccountID" required>
-            <option value="">-- Vælg beboer --</option>
-            @if (Model.User != null)
+            <option value="">-- Vælg Account --</option>
+            @if (Model.Users != null)
             {
-                foreach (var r in Model.Users)
+                foreach (Account user in Model.Users)
                 {
-                    <option value="@r.AccountID">@r.Username ()</option>
+                    <option value="@user.AccountID">@user.Username</option>
+                }
+            }
+        </select>
+    </div>
+
+    <!-- Room dropdown -->
+    <div style="margin-bottom:10px;">
+        <label for="RoomID">Vælg Room:</label><br />
+        <select asp-for="NewBooking.RoomID" id="RoomID" required>
+            <option value="">-- Vælg Room --</option>
+            @if (Model.Rooms != null)
+            {
+                foreach (Room r in Model.Rooms)
+                {
+                    <option value="@r.RoomID">@r.RoomDescription</option>
                 }
             }
         </select>

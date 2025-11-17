@@ -4,6 +4,10 @@
     ViewData["Title"] = "Opret booking";
 }
 <h2>Lokale bookinger</h2>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info">@Model.Message</div>
+}
 
 <!-- Liste over eksisterende bookinger -->
 <table class="table table-bordered" style="width:70%; margin-bottom:20px;">
@@ -28,22 +32,22 @@
                         @(booking.Account != null
                             ? booking.Account.Username
                             : $"ID: {booking.AccountID}")
-                                                                  </td>
-                                                                  <td>
+                    </td>
+                    <td>
                         @(booking.Room != null
                             ? booking.Room.RoomName
                             : $"ID: {booking.RoomID}")
-            </td>
-            <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
-            <td>@booking.TimeSlot</td>
-            <td>
-                <form method="post" asp-page-handler="Delete" class="d-inline">
-                    <input type="hidden" name="bookingID" value="@booking.BookingID" />
-                    <button type="submit" class="btn btn-danger btn-sm">Slet</button>
-                </form>
-            </td>
-        </tr>
-                }
+                    </td>
+                    <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
+                    <td>@booking.TimeSlot</td>
+                    <td>
+                        <form method="post" asp-page-handler="Delete" class="d-inline">
+                            <input type="hidden" name="bookingID" value="@booking.BookingID" />
+                            <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+                        </form>
+                    </td>
+                </tr>
+            }
         }
         else
         {

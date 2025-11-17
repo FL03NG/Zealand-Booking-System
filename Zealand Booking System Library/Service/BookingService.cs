@@ -19,16 +19,19 @@ namespace Zealand_Booking_System_Library.Service
         {
             List<Booking> allbookings = _bookingRepo.GetAll();
 
-            foreach (Booking existing in allbookings) 
+            // Tjek: samme bruger samme dato
+            foreach (Booking existing in allbookings)
             {
                 bool sameUser = existing.AccountID == booking.AccountID;
-                bool futureOrSameDay = existing.BookingDate == booking.BookingDate;
+                bool sameDay = existing.BookingDate.Date == booking.BookingDate.Date;
 
-                if (sameUser && futureOrSameDay) 
+                if (sameUser && sameDay)
                 {
-                    throw new Exception("Denne user har allerede en aktiv booking");
+                    throw new Exception("Denne user har allerede en aktiv booking på denne dato");
                 }
             }
+
+            // Tjek: samme room + dato + tidsrum
             foreach (Booking existing in allbookings)
             {
                 bool sameRoom = existing.RoomID == booking.RoomID;
@@ -37,11 +40,12 @@ namespace Zealand_Booking_System_Library.Service
 
                 if (sameRoom && sameDate && sameSlot)
                 {
-                    throw new Exception("Dette rum er allrede booket i dette tidsrum");
+                    throw new Exception("Dette rum er allerede booket i dette tidsrum");
                 }
             }
-
+            _bookingRepo.Add(booking);
         }
+
         public void Delete(int id)
         {
             _bookingRepo.Delete(id);

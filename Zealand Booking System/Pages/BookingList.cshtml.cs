@@ -26,7 +26,7 @@ namespace Zealand_Booking_System.Pages.Shared
         {
             LoadData();
         }
-        public void OnPost()    
+        public void OnPost()
         {
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
             BookingService bookingService = new BookingService(bookingRepo);
@@ -72,8 +72,8 @@ namespace Zealand_Booking_System.Pages.Shared
             RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
             Rooms = roomRepo.GetAllRooms();
 
-            //UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
-            //Users = userRepo.GetAll();
+            UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
+            Users = userRepo.GetAllUsers();
         }
 
     }

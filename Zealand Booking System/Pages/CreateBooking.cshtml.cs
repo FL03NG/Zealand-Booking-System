@@ -70,8 +70,8 @@ namespace Zealand_Booking_System.Pages
             RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
             Rooms = roomRepo.GetAllRooms();
 
-            //UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
-            //Users = userRepo.GetAll();
+            UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
+            Users = userRepo.GetAllUsers();
         }
 
     }

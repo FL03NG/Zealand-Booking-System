@@ -13,7 +13,7 @@ namespace Zealand_Booking_System_Library.Repository
     public class BookingCollectionRepo : IBookingRepository
     {
         private readonly string _connectionString;
-        public BookingCollectionRepo(string connectionString)    
+        public BookingCollectionRepo(string connectionString)
         {
             _connectionString = connectionString;
         }
@@ -52,7 +52,10 @@ namespace Zealand_Booking_System_Library.Repository
                         ? reader["BookingDescription"].ToString()
                         : "";
                     booking.BookingDate = (DateTime)reader["BookingDate"];
-                    booking.TimeSlot = (TimeSlot)reader["TimeSlot"];
+
+                    int timeSlotValue = (int)reader["TimeSlot"];
+                    booking.TimeSlot = (TimeSlot)timeSlotValue;
+
                     booking.AccountID = (int)reader["AccountID"];
                     booking.RoomID = (int)reader["RoomID"];
 
@@ -69,24 +72,29 @@ namespace Zealand_Booking_System_Library.Repository
                     room.RoomLocation = reader["RoomLocation"].ToString();
                     booking.Room = room;
 
-                    bookings.Add(booking);
+                    bookings.Add(booking); // vigtigt!
                 }
             }
 
             return bookings;
         }
+
         // Opret booking
         public void Add(Booking booking)
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand(
-                    "INSERT INTO Bookings (BookingDate, AccountID, TimeSlot) VALUES (@BookingDate, @AccountID, @TimeSlot)",
+                    "INSERT INTO Booking (BookingDescription, RoomID, AccountID, BookingDate, TimeSlot) " +
+                    "VALUES (@BookingDescription, @RoomID, @AccountID, @BookingDate, @TimeSlot)",
                     connection);
 
-                command.Parameters.AddWithValue("@BookingDate", booking.BookingDate);
+                command.Parameters.AddWithValue("@BookingDescription",
+                    string.IsNullOrEmpty(booking.BookingDescription) ? "" : booking.BookingDescription);
+                command.Parameters.AddWithValue("@RoomID", booking.RoomID);
                 command.Parameters.AddWithValue("@AccountID", booking.AccountID);
-                command.Parameters.AddWithValue("@TimeSlot", booking.TimeSlot.ToString());
+                command.Parameters.AddWithValue("@BookingDate", booking.BookingDate);
+                command.Parameters.AddWithValue("@TimeSlot", (int)booking.TimeSlot);
 
                 connection.Open();
                 command.ExecuteNonQuery();
@@ -97,7 +105,7 @@ namespace Zealand_Booking_System_Library.Repository
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand(
-                    "UPDATE Bookings SET BookingDate = @BookingDate, AccountID = @AccountID, TimeSlot = @TimeSlot WHERE BookingID = @BookingID",
+                    "UPDATE Booking SET BookingDate = @BookingDate, AccountID = @AccountID, TimeSlot = @TimeSlot WHERE BookingID = @BookingID",
                     connection);
 
                 command.Parameters.AddWithValue("@BookingID", booking.BookingID);
@@ -114,7 +122,7 @@ namespace Zealand_Booking_System_Library.Repository
         {
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                SqlCommand command = new SqlCommand("DELETE FROM Bookings WHERE BookingID = @BookingID", connection);
+                SqlCommand command = new SqlCommand("DELETE FROM Booking WHERE BookingID = @BookingID", connection);
                 command.Parameters.AddWithValue("@BookingID", id);
                 connection.Open();
                 command.ExecuteNonQuery();
