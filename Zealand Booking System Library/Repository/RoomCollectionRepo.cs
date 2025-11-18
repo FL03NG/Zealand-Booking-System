@@ -63,15 +63,20 @@ namespace Zealand_Booking_System_Library.Repository
 
         public void UpdateRoom(Room room)
         {
-            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;"))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 SqlCommand cmd = new SqlCommand(
-                    "UPDATE Room SET RoomID=@RoomID, RoomName=@RoomName, Size = @Size, RoomDescription=@RoomDescription, RoomLocation=@RoomLocation", conn);
+                    @"UPDATE Room 
+              SET RoomName=@RoomName,
+                  Size=@Size,
+                  RoomDescription=@RoomDescription,
+                  RoomLocation=@RoomLocation
+              WHERE RoomID=@RoomID", conn);
 
                 cmd.Parameters.AddWithValue("@RoomID", room.RoomID);
                 cmd.Parameters.AddWithValue("@RoomName", room.RoomName);
                 cmd.Parameters.AddWithValue("@Size", room.Size);
-                cmd.Parameters.AddWithValue("@RoomDescription", room.RoomDescription);
+                cmd.Parameters.AddWithValue("@RoomDescription", room.RoomDescription ?? "");
                 cmd.Parameters.AddWithValue("@RoomLocation", room.RoomLocation);
 
                 conn.Open();
@@ -87,6 +92,37 @@ namespace Zealand_Booking_System_Library.Repository
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
+        }
+        public Room GetRoomById(int roomID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string sql = "SELECT RoomID, RoomName, RoomLocation, Size, RoomDescription FROM Room WHERE RoomID = @RoomID";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@RoomID", roomID);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new Room
+                            {
+                                RoomID = (int)reader["RoomID"],
+                                RoomName = reader["RoomName"].ToString(),
+                                RoomLocation = reader["RoomLocation"].ToString(),
+                                Size = (string)reader["Size"],
+                                RoomDescription = reader["RoomDescription"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+
+            return null; // hvis ingen fundet
         }
     }
 }

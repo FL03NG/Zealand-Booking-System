@@ -5,25 +5,57 @@
 <body>
     @foreach (var room in Model.Room)
     {
-        <div class="card">
-            <div class="card__bg">
-                @* <img src="~/img/@animal.ImagePath" alt="Billede af @animal.Name" class="card-img-top" /> *@
-                <div class="card-body">
+        <div class="card" style="padding: 15px; margin-bottom: 20px;">
+            <div class="card-body">
+
+                @if (Model.EditRoomID == room.RoomID)
+                {
+                    <!-- 🚧 REDIGERINGSTILSTAND -->
+                    <form method="post" asp-page-handler="SaveEdit">
+
+                        <input type="hidden" asp-for="EditRoom.RoomID" />
+
+                        <label>Lokalenavn:</label>
+                        <input asp-for="EditRoom.RoomName" class="form-control" />
+
+                        <label>Lokation:</label>
+                        <input asp-for="EditRoom.RoomLocation" class="form-control" />
+
+                        <label>Størrelse:</label>
+                        <input asp-for="EditRoom.Size" class="form-control" type="number" />
+
+                        <label>Beskrivelse:</label>
+                        <textarea asp-for="EditRoom.RoomDescription" class="form-control"></textarea>
+
+                        <button type="submit" class="btn btn-success" style="margin-top:10px;">Gem</button>
+
+                        <a href="/Room" class="btn btn-secondary" style="margin-top:10px;">Fortryd</a>
+                    </form>
+                }
+                else
+                {
+                    <!-- 👀 VISNINGSTILSTAND -->
                     <h5 class="card-title">@room.RoomName</h5>
-                    <p class="card-text">
-                        Størrelse: @room.Size<br />
-                        Lokation: @room.RoomLocation<br />
-                        <span>
-                            @room.RoomDescription<span /><br />
+                    <p>
+                        Størrelse: @room.Size <br />
+                        Lokation: @room.RoomLocation <br />
+                        @room.RoomDescription
                     </p>
+
                     <form method="post" asp-page-handler="Delete">
                         <input type="hidden" name="roomID" value="@room.RoomID" />
-                        <button type="submit">Slet</button>
+                        <button type="submit" class="btn btn-danger">Slet</button>
                     </form>
-                    <a asp-page="/Booking" asp-route-id="@room.RoomID" class="btn btn-success" style="margin-top:10px;">
+
+                    <form method="post" asp-page-handler="StartEdit" style="display:inline;">
+                        <input type="hidden" name="roomID" value="@room.RoomID" />
+                        <button type="submit" class="btn btn-warning">Rediger</button>
+                    </form>
+
+                    <a asp-page="/Booking" asp-route-id="@room.RoomID" class="btn btn-success">
                         Book lokalet
                     </a>
-                </div>
+                }
             </div>
         </div>
     }

@@ -12,13 +12,18 @@ namespace Zealand_Booking_System.Pages
         private readonly string _connectionString =
            "Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;";
 
-        // Liste som indeholder alle beboere
+        [BindProperty]
+        public int EditRoomID { get; set; }
+
+        [BindProperty]
+        public Room EditRoom { get; set; }
+        // Liste som indeholder alle lokaler
         public List<Room> Room { get; set; } = new List<Room>();
 
-        // Service som håndterer CRUD-operationer for beboere
+        // Service som håndterer CRUD-operationer for lokaler
         private RoomService _roomService;
 
-        // Property som bruges til at modtage nye beboerdata fra formularen
+        // Property som bruges til at modtage nye lokaledata fra formularen
         [BindProperty]
         public Room NewRoom { get; set; } = new Room();
 
@@ -31,18 +36,18 @@ namespace Zealand_Booking_System.Pages
         }
 
         // GET-metode – kaldes når siden hentes første gang
-        // Henter alle eksisterende beboere fra databasen
+        // Henter alle eksisterende lokaler fra databasen
         public void OnGet()
         {
             Room = _roomService.GetAllRooms();
         }
 
-        // POST-metode – kaldes når brugeren indsender formularen for at oprette en ny beboer
+        // POST-metode – kaldes når brugeren indsender formularen for at oprette et nyt lokale
         public IActionResult OnPost()
         {
             try
             {
-                // Forsøger at tilføje den nye beboer til databasen
+                // Forsøger at tilføje det nye lokale til databasen
                 _roomService.AddRoom(NewRoom);
 
                 // Viser besked på siden hvis oprettelsen lykkes
@@ -59,12 +64,12 @@ namespace Zealand_Booking_System.Pages
         }
 
         // POST-metode – kaldes når brugeren trykker på "Slet" knappen
-        // Denne metode modtager et ID på den beboer der skal slettes
+        // Denne metode modtager et ID på det lokale der skal slettes
         public IActionResult OnPostDelete(int roomID)
         {
             try
             {
-                // Forsøger at slette beboeren fra databasen
+                // Forsøger at slette lokalet fra databasen
                 _roomService.DeleteRoom(roomID);
 
                 // Viser besked hvis sletningen lykkes
@@ -78,6 +83,19 @@ namespace Zealand_Booking_System.Pages
 
             // Genindlæser siden for at vise opdateret liste
             return RedirectToPage();
+        }
+        public IActionResult OnPostStartEdit(int roomID)
+        {
+            EditRoomID = roomID;
+            EditRoom = _roomService.GetRoomById(roomID);
+            Room = _roomService.GetAllRooms(); // reload list
+            return Page();
+        }
+        public IActionResult OnPostSaveEdit()
+        {
+            _roomService.UpdateRoom(EditRoom);
+            TempData["Message"] = "Lokalet er ændret!";
+            return RedirectToPage(); // reload
         }
 
     }

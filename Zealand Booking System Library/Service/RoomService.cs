@@ -16,7 +16,10 @@ namespace Zealand_Booking_System_Library.Service
         {
             _roomRepo = roomRepo;
         }
-
+        public Room GetRoomById(int roomID)
+        {
+            return _roomRepo.GetRoomById(roomID);
+        }
         public void AddRoom(Room room)
         {
             _roomRepo.AddRoom(room);
