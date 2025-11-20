@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Reflection.PortableExecutable;
-using Microsoft.AspNetCore.Components.Forms;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
@@ -21,19 +18,13 @@ namespace Zealand_Booking_System.Pages.Shared
         public List<Booking> Bookings { get; private set; }
         public List<Room> Rooms { get; private set; }
         public List<Account> Users { get; private set; }
-        [BindProperty]
-        public int EditBookingID { get; set; }
 
-        [BindProperty]
-        public Booking EditBooking { get; set; }
         [BindProperty]
         public Booking NewBooking { get; set; }
 
-        // 🔎 søgetekst
+        // søgetekst
         [BindProperty]
         public string SearchName { get; set; }
-
-        private BookingService _bookingService;
 
         public string Message { get; private set; }
         public BookingListModel()
