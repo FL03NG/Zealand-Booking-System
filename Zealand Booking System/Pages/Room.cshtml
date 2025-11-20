@@ -2,6 +2,7 @@
 @model Zealand_Booking_System.Pages.RoomModel
 @{
 }
+
 <body>
     @foreach (var room in Model.Room)
         @if (Model.EditRoomID == room.RoomID)
@@ -60,28 +61,28 @@
 
     <!-- FORMULAR TIL AT OPRETTE NYT LOKALE -->
     <h3>Opret nyt lokale</h3>
-
     <form method="post" style="width:50%; margin-bottom: 30px;">
-        <div style="margin-bottom:10px;">
+        @Html.AntiForgeryToken()
+        <div class="mb-2">
             <label for="RoomName">Lokalenavn:</label><br />
-            <input asp-for="NewRoom.RoomName" id="RoomName" required />
+            <input asp-for="NewRoom.RoomName" id="RoomName" required class="form-control" />
         </div>
 
-        <div style="margin-bottom:10px;">
+        <div class="mb-2">
             <label for="RoomLocation">Lokation:</label><br />
-            <input asp-for="NewRoom.RoomLocation" id="RoomLocation" required />
+            <input asp-for="NewRoom.RoomLocation" id="RoomLocation" required class="form-control" />
         </div>
 
-        <div style="margin-bottom:10px;">
+        <div class="mb-2">
             <label for="Size">Størrelse:</label><br />
-            <input asp-for="NewRoom.Size" id="Size" type="number" required />
+            <input asp-for="NewRoom.Size" id="Size" type="number" required class="form-control" />
         </div>
 
-        <div style="margin-bottom:10px;">
+        <div class="mb-2">
             <label for="RoomDescription">Beskrivelse:</label><br />
-            <textarea asp-for="NewRoom.RoomDescription" id="RoomDescription"></textarea>
+            <textarea asp-for="NewRoom.RoomDescription" id="RoomDescription" class="form-control"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary">Opret lokale</button>
+        <button type="submit" class="btn btn-primary mt-2">Opret lokale</button>
     </form>
-   </body>
+</body>

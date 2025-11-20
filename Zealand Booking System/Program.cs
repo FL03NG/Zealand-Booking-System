@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.DataProtection;
+using Zealand_Booking_System_Library.Repository;
+using Zealand_Booking_System_Library.Service;
 namespace Zealand_Booking_System
 {
     public class Program
@@ -6,8 +9,18 @@ namespace Zealand_Booking_System
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
             builder.Services.AddRazorPages();
+
+            // Hent connection string fra konfiguration
+            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+            // Registrer repository og service
+            builder.Services.AddScoped<IRoomRepository>(provider => new RoomCollectionRepo(connectionString));
+            builder.Services.AddScoped<RoomService>();
+            // Add services to the container.
+            builder.Services.AddDataProtection()
+      .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Dataprotection-Keys"))
+      .SetApplicationName("ZealandBookingSystem");
 
             var app = builder.Build();
 

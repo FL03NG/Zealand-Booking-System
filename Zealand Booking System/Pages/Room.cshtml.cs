@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection.PortableExecutable;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -50,13 +51,13 @@ namespace Zealand_Booking_System.Pages
                 // Forsøger at tilføje det nye lokale til databasen
                 _roomService.AddRoom(NewRoom);
 
-                // Viser besked på siden hvis oprettelsen lykkes
-                TempData["Message"] = "Lokale oprettet!";
+                // Viser besked hvis oprettelsen lykkes
+                Debug.WriteLine("Lokale oprettet!");
             }
             catch (System.Exception ex)
             {
-                // Hvis der sker en fejl, vises en fejlbesked til brugeren
-                TempData["Message"] = "Fejl under oprettelse: " + ex.Message;
+                // Hvis der sker en fejl, vises en fejlbesked
+                Debug.WriteLine("Fejl under oprettelse: " + ex.Message);
             }
 
             // Genindlæser siden så brugeren ser den opdaterede liste
