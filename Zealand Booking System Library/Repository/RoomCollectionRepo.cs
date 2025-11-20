@@ -87,10 +87,19 @@ namespace Zealand_Booking_System_Library.Repository
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                SqlCommand cmd = new SqlCommand("DELETE FROM Room WHERE RoomID=@id", conn);
-                cmd.Parameters.AddWithValue("@id", id);
                 conn.Open();
-                cmd.ExecuteNonQuery();
+
+                // Først: slet alle bookinger for det lokale
+                string deleteBookingsSql = "DELETE FROM Booking WHERE RoomID = @id";
+                SqlCommand cmdBookings = new SqlCommand(deleteBookingsSql, conn);
+                cmdBookings.Parameters.AddWithValue("@id", id);
+                cmdBookings.ExecuteNonQuery();
+
+                // Så: slet selve lokalet
+                string deleteRoomSql = "DELETE FROM Room WHERE RoomID = @id";
+                SqlCommand cmdRoom = new SqlCommand(deleteRoomSql, conn);
+                cmdRoom.Parameters.AddWithValue("@id", id);
+                cmdRoom.ExecuteNonQuery();
             }
         }
         public Room GetRoomById(int roomID)

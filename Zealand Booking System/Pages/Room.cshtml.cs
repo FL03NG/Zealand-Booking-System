@@ -69,21 +69,17 @@ namespace Zealand_Booking_System.Pages
         {
             try
             {
-                // Forsøger at slette lokalet fra databasen
                 _roomService.DeleteRoom(roomID);
-
-                // Viser besked hvis sletningen lykkes
                 TempData["Message"] = "Lokale slettet!";
             }
             catch (System.Exception ex)
             {
-                // Hvis der sker fejl, vis besked på siden
                 TempData["Message"] = "Fejl under sletning: " + ex.Message;
             }
 
-            // Genindlæser siden for at vise opdateret liste
             return RedirectToPage();
         }
+
         public IActionResult OnPostStartEdit(int roomID)
         {
             EditRoomID = roomID;
@@ -91,12 +87,21 @@ namespace Zealand_Booking_System.Pages
             Room = _roomService.GetAllRooms(); // reload list
             return Page();
         }
-        public IActionResult OnPostSaveEdit()
-        {
-            _roomService.UpdateRoom(EditRoom);
-            TempData["Message"] = "Lokalet er ændret!";
-            return RedirectToPage(); // reload
-        }
+       public IActionResult OnPostSaveEdit()
+{
+    try
+    {
+        _roomService.UpdateRoom(EditRoom);
+        TempData["Message"] = "Lokalet er ændret!";
+    }
+    catch (System.Exception ex)
+    {
+        TempData["Message"] = "Fejl under redigering: " + ex.Message;
+    }
+
+    return RedirectToPage(); // reload
+}
+
 
     }
 }

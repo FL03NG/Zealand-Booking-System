@@ -4,61 +4,59 @@
 }
 <body>
     @foreach (var room in Model.Room)
-    {
-        <div class="card" style="padding: 15px; margin-bottom: 20px;">
-            <div class="card-body">
+        @if (Model.EditRoomID == room.RoomID)
+        {
+            <!-- REDIGERINGSTILSTAND -->
+            <form method="post" asp-page-handler="SaveEdit">
 
-                @if (Model.EditRoomID == room.RoomID)
-                {
-                    <!-- 🚧 REDIGERINGSTILSTAND -->
-                    <form method="post" asp-page-handler="SaveEdit">
+                <!-- SKJULT FELT MED ID BUNDET TIL EditRoom.RoomID -->
+                <input asp-for="EditRoom.RoomID" type="hidden" />
 
-                        <input type="hidden" name="roomID" value="@room.RoomID" />
+                <label>Lokalenavn:</label>
+                <input asp-for="EditRoom.RoomName" class="form-control" />
 
-                        <label>Lokalenavn:</label>
-                        <input asp-for="EditRoom.RoomName" class="form-control" />
+                <label>Lokation:</label>
+                <input asp-for="EditRoom.RoomLocation" class="form-control" />
 
-                        <label>Lokation:</label>
-                        <input asp-for="EditRoom.RoomLocation" class="form-control" />
+                <label>Størrelse:</label>
+                <input asp-for="EditRoom.Size" class="form-control" type="number" />
 
-                        <label>Størrelse:</label>
-                        <input asp-for="EditRoom.Size" class="form-control" type="number" />
+                <label>Beskrivelse:</label>
+                <textarea asp-for="EditRoom.RoomDescription" class="form-control"></textarea>
 
-                        <label>Beskrivelse:</label>
-                        <textarea asp-for="EditRoom.RoomDescription" class="form-control"></textarea>
+                <button type="submit" class="btn btn-success" style="margin-top:10px;">Gem</button>
 
-                        <button type="submit" class="btn btn-success" style="margin-top:10px;">Gem</button>
+                <a href="/Room" class="btn btn-secondary" style="margin-top:10px;">Fortryd</a>
+            </form>
+        }
+        else
+        {
+            <!-- VISNINGSTILSTAND -->
+            <h5 class="card-title">@room.RoomName</h5>
+            <p>
+                Størrelse: @room.Size <br />
+                Lokation: @room.RoomLocation <br />
+                @room.RoomDescription
+            </p>
 
-                        <a href="/Room" class="btn btn-secondary" style="margin-top:10px;">Fortryd</a>
-                    </form>
-                }
-                else
-                {
-                    <!-- 👀 VISNINGSTILSTAND -->
-                    <h5 class="card-title">@room.RoomName</h5>
-                    <p>
-                        Størrelse: @room.Size <br />
-                        Lokation: @room.RoomLocation <br />
-                        @room.RoomDescription
-                    </p>
+            <!-- SLET -->
+            <form method="post" asp-page-handler="Delete" style="display:inline;">
+                <input type="hidden" name="roomID" value="@room.RoomID" />
+                <button type="submit" class="btn btn-danger">Slet</button>
+            </form>
 
-                    <form method="post" asp-page-handler="Delete">
-                        <input type="hidden" name="roomID" value="@room.RoomID" />
-                        <button type="submit" class="btn btn-danger">Slet</button>
-                    </form>
+            <!-- REDIGER -->
+            <form method="post" asp-page-handler="StartEdit" style="display:inline;">
+                <input type="hidden" name="roomID" value="@room.RoomID" />
+                <button type="submit" class="btn btn-warning">Rediger</button>
+            </form>
 
-                    <form method="post" asp-page-handler="StartEdit" style="display:inline;">
-                        <input type="hidden" name="roomID" value="@room.RoomID" />
-                        <button type="submit" class="btn btn-warning">Rediger</button>
-                    </form>
+            <!-- BOOK -->
+            <a asp-page="/Booking" asp-route-id="@room.RoomID" class="btn btn-success">
+                Book lokalet
+            </a>
+        }
 
-                    <a asp-page="/Booking" asp-route-id="@room.RoomID" class="btn btn-success">
-                        Book lokalet
-                    </a>
-                }
-            </div>
-        </div>
-    }
 
     <!-- FORMULAR TIL AT OPRETTE NYT LOKALE -->
     <h3>Opret nyt lokale</h3>
