@@ -21,6 +21,10 @@ namespace Zealand_Booking_System.Pages
         // Liste som indeholder alle lokaler
         public List<Room> Room { get; set; } = new List<Room>();
 
+        // Property til søgning
+        [BindProperty(SupportsGet = true)]
+        public string SearchString { get; set; } = string.Empty;
+
         // Service som håndterer CRUD-operationer for lokaler
         private RoomService _roomService;
 
@@ -40,7 +44,18 @@ namespace Zealand_Booking_System.Pages
         // Henter alle eksisterende lokaler fra databasen
         public void OnGet()
         {
-            Room = _roomService.GetAllRooms();
+            var allRooms = _roomService.GetAllRooms();
+            if (!string.IsNullOrEmpty(SearchString))
+            {
+                // Filtrerer lokaler baseret på søgeteksten
+                Room = allRooms
+                    .Where(r => r.RoomName.Contains(SearchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+            else
+            {
+                Room = allRooms;
+            }
         }
 
         // POST-metode – kaldes når brugeren indsender formularen for at oprette et nyt lokale

@@ -4,6 +4,12 @@
 }
 
 <body>
+    <!-- SØGEFELT -->
+    <form method="get" class="mb-3" style="width:50%;">
+        <input type="text" name="SearchString" value="@Model.SearchString" placeholder="Søg efter lokaler..." class="form-control" />
+        <button type="submit" class="btn btn-primary mt-2">Søg</button>
+    </form>
+
     @foreach (var room in Model.Room)
         @if (Model.EditRoomID == room.RoomID)
         {
