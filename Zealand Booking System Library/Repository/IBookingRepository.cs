@@ -10,6 +10,7 @@ namespace Zealand_Booking_System_Library.Repository
     public interface IBookingRepository
     {
         public void Add(Booking booking);
+        public Booking GetBookingById(int bookingID);
         public void Delete(int id);
         public List<Booking> GetAll();
         public void Update(Booking booking);

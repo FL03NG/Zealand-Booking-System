@@ -128,6 +128,70 @@ namespace Zealand_Booking_System_Library.Repository
                 command.ExecuteNonQuery();
             }
         }
+        public Booking GetBookingById(int bookingID)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
 
+                string sql = @"
+            SELECT 
+                b.BookingID,
+                b.BookingDescription,
+                b.BookingDate,
+                b.TimeSlot,
+                b.AccountID,
+                b.RoomID,
+                a.Username,
+                r.RoomName,
+                r.Size,
+                r.RoomDescription,
+                r.RoomLocation
+            FROM Booking b
+            INNER JOIN Account a ON b.AccountID = a.AccountID
+            INNER JOIN Room r ON b.RoomID = r.RoomID
+            WHERE b.BookingID = @BookingID";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@BookingID", bookingID);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            Booking booking = new Booking
+                            {
+                                BookingID = (int)reader["BookingID"],
+                                BookingDescription = reader["BookingDescription"] != DBNull.Value
+                                    ? reader["BookingDescription"].ToString()
+                                    : "",
+                                BookingDate = (DateTime)reader["BookingDate"],
+                                TimeSlot = (TimeSlot)(int)reader["TimeSlot"],
+                                AccountID = (int)reader["AccountID"],
+                                RoomID = (int)reader["RoomID"],
+                                Account = new Account
+                                {
+                                    AccountID = (int)reader["AccountID"],
+                                    Username = reader["Username"].ToString()
+                                },
+                                Room = new Room
+                                {
+                                    RoomID = (int)reader["RoomID"],
+                                    RoomName = reader["RoomName"].ToString(),
+                                    Size = reader["Size"].ToString(),
+                                    RoomDescription = reader["RoomDescription"].ToString(),
+                                    RoomLocation = reader["RoomLocation"].ToString()
+                                }
+                            };
+
+                            return booking;
+                        }
+                    }
+                }
+            }
+
+            return null; // Hvis ingen booking findes med det ID
+        }
     }
 }

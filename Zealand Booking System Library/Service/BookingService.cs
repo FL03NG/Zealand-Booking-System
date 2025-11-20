@@ -45,7 +45,10 @@ namespace Zealand_Booking_System_Library.Service
             }
             _bookingRepo.Add(booking);
         }
-
+        public Booking GetBookingById(int bookingID)
+        {
+            return _bookingRepo.GetBookingById(bookingID);
+        }
         public void Delete(int id)
         {
             _bookingRepo.Delete(id);

@@ -1,7 +1,8 @@
+using System.Collections.Generic;
+using System.Reflection.PortableExecutable;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using System.Reflection.PortableExecutable;
-using System.Collections.Generic;
 using Zealand_Booking_System_Library.Models;
 using Zealand_Booking_System_Library.Repository;
 using Zealand_Booking_System_Library.Service;
@@ -17,9 +18,15 @@ namespace Zealand_Booking_System.Pages.Shared
         public List<Booking> Bookings { get; private set; }
         public List<Room> Rooms { get; private set; }
         public List<Account> Users { get; private set; }
+        [BindProperty]
+        public int EditBookingID { get; set; }
 
         [BindProperty]
+        public Booking EditBooking { get; set; }
+        [BindProperty]
         public Booking NewBooking { get; set; }
+
+        private BookingService _bookingService;
 
         public string Message { get; private set; }
         public void OnGet()
@@ -75,6 +82,27 @@ namespace Zealand_Booking_System.Pages.Shared
             UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
             Users = userRepo.GetAllUsers();
         }
+        public IActionResult OnPostStartEdit(int bookingID)
+        {
+            EditBookingID = bookingID;
+            EditBooking = _bookingService.GetBookingById(bookingID);
+            Bookings = _bookingService.GetAll(); // reload list
+            return Page();
+        }
+        public IActionResult OnPostSaveEdit()
+        {
+            try
+            {
+                _bookingService.Update(EditBooking);
+                TempData["Message"] = "Booking er ændret!";
+            }
+            catch (System.Exception ex)
+            {
+                TempData["Message"] = "Fejl under redigering: " + ex.Message;
+            }
 
+            return RedirectToPage(); // reload
+
+        }
     }
 }
