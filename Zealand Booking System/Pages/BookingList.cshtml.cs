@@ -161,18 +161,26 @@ namespace Zealand_Booking_System.Pages.Shared
         }
         public IActionResult OnPostSaveEdit()
         {
+            if (!ModelState.IsValid)
+            {
+                LoadData();
+                return Page();
+            }
+
             try
             {
+                // Update booking i databasen
                 _bookingService.Update(EditBooking);
                 TempData["Message"] = "Booking er ændret!";
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 TempData["Message"] = "Fejl under redigering: " + ex.Message;
+                LoadData();
+                return Page();
             }
 
-            return RedirectToPage(); // reload
-
+            return RedirectToPage(); // reload siden med opdaterede data
         }
     }
 }
