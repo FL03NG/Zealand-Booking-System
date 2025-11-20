@@ -105,18 +105,23 @@ namespace Zealand_Booking_System_Library.Repository
             using (SqlConnection connection = new SqlConnection(_connectionString))
             {
                 SqlCommand command = new SqlCommand(
-                    "UPDATE Booking SET BookingDate = @BookingDate, AccountID = @AccountID, TimeSlot = @TimeSlot WHERE BookingID = @BookingID",
+                    "UPDATE Booking " +
+                    "SET BookingDate = @BookingDate, " +
+                    "    AccountID   = @AccountID, " +
+                    "    TimeSlot    = @TimeSlot " +
+                    "WHERE BookingID = @BookingID",
                     connection);
 
                 command.Parameters.AddWithValue("@BookingID", booking.BookingID);
                 command.Parameters.AddWithValue("@BookingDate", booking.BookingDate);
                 command.Parameters.AddWithValue("@AccountID", booking.AccountID);
-                command.Parameters.AddWithValue("@TimeSlot", booking.TimeSlot.ToString());
+                command.Parameters.AddWithValue("@TimeSlot", (int)booking.TimeSlot);
 
                 connection.Open();
                 command.ExecuteNonQuery();
             }
         }
+
         // Slet booking
         public void Delete(int id)
         {

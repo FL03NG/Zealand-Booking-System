@@ -10,48 +10,50 @@ namespace Zealand_Booking_System.Pages.Shared
 {
     public class BookingListModel : PageModel
     {
-        // forbindelse til database
         private readonly string _connectionString =
             "Server =(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True";
 
-        // Lister som bruges på siden
+        // Lister til visning
         public List<Booking> Bookings { get; private set; }
         public List<Room> Rooms { get; private set; }
         public List<Account> Users { get; private set; }
+
+        // Ny booking (formular i bunden – hvis du bruger den)
+        [BindProperty]
+        public Booking NewBooking { get; set; }
+
+        // 🔎 søgning
+        [BindProperty]
+        public string SearchName { get; set; }
+
+        // ✏ redigering
         [BindProperty]
         public int EditBookingID { get; set; }
 
         [BindProperty]
         public Booking EditBooking { get; set; }
 
-        private BookingService _bookingService;
-        [BindProperty]
-        public Booking NewBooking { get; set; }
-
-        // søgetekst
-        [BindProperty]
-        public string SearchName { get; set; }
+        private readonly BookingService _bookingService;
 
         public string Message { get; private set; }
+
         public BookingListModel()
         {
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
             _bookingService = new BookingService(bookingRepo);
         }
+
         public void OnGet()
         {
             LoadData();
         }
 
-        // standard POST → opret booking
+        // Opret booking (hvis du bruger formularen nederst)
         public void OnPost()
         {
-            BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
-            BookingService bookingService = new BookingService(bookingRepo);
-
             try
             {
-                bookingService.Add(NewBooking);
+                _bookingService.Add(NewBooking);
                 Message = "Booking oprettet!";
             }
             catch (Exception ex)
@@ -62,17 +64,14 @@ namespace Zealand_Booking_System.Pages.Shared
             LoadData();
         }
 
-        // 🔎 POST: søg på brugernavn
+        // 🔎 Søg på brugernavn
         public void OnPostSearch()
         {
             LoadData(); // henter Bookings + Users
 
-            Message = "Søgning udført."; // bare så du kan se at handleren bliver ramt
-
             if (string.IsNullOrWhiteSpace(SearchName))
             {
-                // tom søgning → vis alle
-                return;
+                return; // tom søgning → behold alle
             }
 
             string searchLower = SearchName.ToLower();
@@ -83,22 +82,18 @@ namespace Zealand_Booking_System.Pages.Shared
                 return;
             }
 
-            int i;
-            for (i = 0; i < Bookings.Count; i++)
+            for (int i = 0; i < Bookings.Count; i++)
             {
                 Booking booking = Bookings[i];
-
                 string username = null;
 
-                // prøv først via navigation property
                 if (booking.Account != null)
                 {
                     username = booking.Account.Username;
                 }
                 else if (Users != null)
                 {
-                    int j;
-                    for (j = 0; j < Users.Count; j++)
+                    for (int j = 0; j < Users.Count; j++)
                     {
                         if (Users[j].AccountID == booking.AccountID)
                         {
@@ -109,8 +104,7 @@ namespace Zealand_Booking_System.Pages.Shared
 
                 if (!string.IsNullOrEmpty(username))
                 {
-                    string usernameLower = username.ToLower();
-                    if (usernameLower.Contains(searchLower))
+                    if (username.ToLower().Contains(searchLower))
                     {
                         filtered.Add(booking);
                     }
@@ -120,15 +114,12 @@ namespace Zealand_Booking_System.Pages.Shared
             Bookings = filtered;
         }
 
-        // slet booking
+        // 🗑 Slet booking
         public IActionResult OnPostDelete(int bookingID)
         {
-            BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
-            BookingService bookingService = new BookingService(bookingRepo);
-
             try
             {
-                bookingService.Delete(bookingID);
+                _bookingService.Delete(bookingID);
                 Message = "Booking slettet!";
             }
             catch (Exception ex)
@@ -140,7 +131,37 @@ namespace Zealand_Booking_System.Pages.Shared
             return Page();
         }
 
-        // Hjælpefunktion til at hente data
+        // ✏ Start redigering
+        public IActionResult OnPostStartEdit(int bookingID)
+        {
+            Message = "StartEdit ramte: " + bookingID;
+            EditBookingID = bookingID;
+            EditBooking = _bookingService.GetBookingById(bookingID);
+            LoadData();
+            return Page();
+        }
+
+        // 💾 Gem redigering
+        public IActionResult OnPostSaveEdit()
+        {
+            try
+            {
+                _bookingService.Update(EditBooking);
+                Message = "Booking er ændret!";
+            }
+            catch (Exception ex)
+            {
+                Message = "Fejl under redigering: " + ex.Message;
+                LoadData();
+                return Page();
+            }
+
+            // Hent de opdaterede data og bliv på siden
+            LoadData();
+            return Page();
+        }
+
+        // Fælles load
         private void LoadData()
         {
             Bookings = _bookingService.GetAll();
@@ -150,37 +171,6 @@ namespace Zealand_Booking_System.Pages.Shared
 
             UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
             Users = userRepo.GetAllUsers();
-        }
-        public IActionResult OnPostStartEdit(int bookingID)
-        {
-            EditBookingID = bookingID;
-            EditBooking = _bookingService.GetBookingById(bookingID);
-            Bookings = _bookingService.GetAll(); // reload list
-            LoadData();
-            return Page();
-        }
-        public IActionResult OnPostSaveEdit()
-        {
-            if (!ModelState.IsValid)
-            {
-                LoadData();
-                return Page();
-            }
-
-            try
-            {
-                // Update booking i databasen
-                _bookingService.Update(EditBooking);
-                TempData["Message"] = "Booking er ændret!";
-            }
-            catch (Exception ex)
-            {
-                TempData["Message"] = "Fejl under redigering: " + ex.Message;
-                LoadData();
-                return Page();
-            }
-
-            return RedirectToPage(); // reload siden med opdaterede data
         }
     }
 }
