@@ -2,6 +2,7 @@
 @model Zealand_Booking_System.Pages.RoomModel
 @{
 }
+
 <body>
     @foreach (var room in Model.Room)
     {
@@ -10,9 +11,9 @@
 
                 @if (Model.EditRoomID == room.RoomID)
                 {
-                    <!-- 🚧 REDIGERINGSTILSTAND -->
+                    <!-- REDIGERINGSTILSTAND -->
                     <form method="post" asp-page-handler="SaveEdit">
-
+                        @Html.AntiForgeryToken()
                         <input type="hidden" name="roomID" value="@room.RoomID" />
 
                         <label>Lokalenavn:</label>
@@ -27,14 +28,13 @@
                         <label>Beskrivelse:</label>
                         <textarea asp-for="EditRoom.RoomDescription" class="form-control"></textarea>
 
-                        <button type="submit" class="btn btn-success" style="margin-top:10px;">Gem</button>
-
-                        <a href="/Room" class="btn btn-secondary" style="margin-top:10px;">Fortryd</a>
+                        <button type="submit" class="btn btn-success mt-2">Gem</button>
+                        <a href="/Room" class="btn btn-secondary mt-2">Fortryd</a>
                     </form>
                 }
                 else
                 {
-                    <!-- 👀 VISNINGSTILSTAND -->
+                    <!-- VISNINGSTILSTAND -->
                     <h5 class="card-title">@room.RoomName</h5>
                     <p>
                         Størrelse: @room.Size <br />
@@ -42,19 +42,22 @@
                         @room.RoomDescription
                     </p>
 
-                    <form method="post" asp-page-handler="Delete">
+                    <!-- Delete -->
+                    <form method="post" asp-page-handler="Delete" style="display:inline;">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" name="roomID" value="@room.RoomID" />
-                        <button type="submit" class="btn btn-danger">Slet</button>
+                        <button type="submit" class="btn btn-danger btn-sm">Slet</button>
                     </form>
 
+                    <!-- StartEdit -->
                     <form method="post" asp-page-handler="StartEdit" style="display:inline;">
+                        @Html.AntiForgeryToken()
                         <input type="hidden" name="roomID" value="@room.RoomID" />
-                        <button type="submit" class="btn btn-warning">Rediger</button>
+                        <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
                     </form>
 
-                    <a asp-page="/Booking" asp-route-id="@room.RoomID" class="btn btn-success">
-                        Book lokalet
-                    </a>
+                    <!-- Book knap -->
+                    <a asp-page="/CreateBooking" class="btn btn-success btn-sm">Book lokalet</a>
                 }
             </div>
         </div>
@@ -62,28 +65,28 @@
 
     <!-- FORMULAR TIL AT OPRETTE NYT LOKALE -->
     <h3>Opret nyt lokale</h3>
-
     <form method="post" style="width:50%; margin-bottom: 30px;">
-        <div style="margin-bottom:10px;">
+        @Html.AntiForgeryToken()
+        <div class="mb-2">
             <label for="RoomName">Lokalenavn:</label><br />
-            <input asp-for="NewRoom.RoomName" id="RoomName" required />
+            <input asp-for="NewRoom.RoomName" id="RoomName" required class="form-control" />
         </div>
 
-        <div style="margin-bottom:10px;">
+        <div class="mb-2">
             <label for="RoomLocation">Lokation:</label><br />
-            <input asp-for="NewRoom.RoomLocation" id="RoomLocation" required />
+            <input asp-for="NewRoom.RoomLocation" id="RoomLocation" required class="form-control" />
         </div>
 
-        <div style="margin-bottom:10px;">
+        <div class="mb-2">
             <label for="Size">Størrelse:</label><br />
-            <input asp-for="NewRoom.Size" id="Size" type="number" required />
+            <input asp-for="NewRoom.Size" id="Size" type="number" required class="form-control" />
         </div>
 
-        <div style="margin-bottom:10px;">
+        <div class="mb-2">
             <label for="RoomDescription">Beskrivelse:</label><br />
-            <textarea asp-for="NewRoom.RoomDescription" id="RoomDescription"></textarea>
+            <textarea asp-for="NewRoom.RoomDescription" id="RoomDescription" class="form-control"></textarea>
         </div>
 
-        <button type="submit" class="btn btn-primary">Opret lokale</button>
+        <button type="submit" class="btn btn-primary mt-2">Opret lokale</button>
     </form>
-   </body>
+</body>

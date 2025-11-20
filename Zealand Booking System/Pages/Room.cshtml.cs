@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection.PortableExecutable;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -50,13 +51,13 @@ namespace Zealand_Booking_System.Pages
                 // Forsøger at tilføje det nye lokale til databasen
                 _roomService.AddRoom(NewRoom);
 
-                // Viser besked på siden hvis oprettelsen lykkes
-                TempData["Message"] = "Lokale oprettet!";
+                // Viser besked hvis oprettelsen lykkes
+                Debug.WriteLine("Lokale oprettet!");
             }
             catch (System.Exception ex)
             {
-                // Hvis der sker en fejl, vises en fejlbesked til brugeren
-                TempData["Message"] = "Fejl under oprettelse: " + ex.Message;
+                // Hvis der sker en fejl, vises en fejlbesked
+                Debug.WriteLine("Fejl under oprettelse: " + ex.Message);
             }
 
             // Genindlæser siden så brugeren ser den opdaterede liste
@@ -73,12 +74,13 @@ namespace Zealand_Booking_System.Pages
                 _roomService.DeleteRoom(roomID);
 
                 // Viser besked hvis sletningen lykkes
-                TempData["Message"] = "Lokale slettet!";
+                Debug.WriteLine("lokale slettet");
             }
             catch (System.Exception ex)
             {
-                // Hvis der sker fejl, vis besked på siden
-                TempData["Message"] = "Fejl under sletning: " + ex.Message;
+                // Hvis der sker fejl, vis besked
+                Debug.WriteLine("Fejl under sletning: " + ex.Message);
+                
             }
 
             // Genindlæser siden for at vise opdateret liste
@@ -94,7 +96,7 @@ namespace Zealand_Booking_System.Pages
         public IActionResult OnPostSaveEdit()
         {
             _roomService.UpdateRoom(EditRoom);
-            TempData["Message"] = "Lokalet er ændret!";
+            Debug.WriteLine("Lokale er ændret!");
             return RedirectToPage(); // reload
         }
 
