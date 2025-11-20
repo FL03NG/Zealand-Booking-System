@@ -13,7 +13,7 @@
                     <!-- 🚧 REDIGERINGSTILSTAND -->
                     <form method="post" asp-page-handler="SaveEdit">
 
-                        <input type="hidden" asp-for="EditRoom.RoomID" />
+                        <input type="hidden" name="roomID" value="@room.RoomID" />
 
                         <label>Lokalenavn:</label>
                         <input asp-for="EditRoom.RoomName" class="form-control" />

@@ -22,7 +22,7 @@ namespace Zealand_Booking_System.Pages.Shared
         public Booking NewBooking { get; set; }
 
         public string Message { get; private set; }
-        public void OnGet()
+        public void OnGet(int id)
         {
             LoadData();
         }
