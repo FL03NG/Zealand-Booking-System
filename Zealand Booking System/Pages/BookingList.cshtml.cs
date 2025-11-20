@@ -18,7 +18,13 @@ namespace Zealand_Booking_System.Pages.Shared
         public List<Booking> Bookings { get; private set; }
         public List<Room> Rooms { get; private set; }
         public List<Account> Users { get; private set; }
+        [BindProperty]
+        public int EditBookingID { get; set; }
 
+        [BindProperty]
+        public Booking EditBooking { get; set; }
+
+        private BookingService _bookingService;
         [BindProperty]
         public Booking NewBooking { get; set; }
 
