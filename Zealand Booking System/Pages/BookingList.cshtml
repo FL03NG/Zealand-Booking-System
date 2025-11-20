@@ -87,7 +87,7 @@
                         <td>@(booking.Account != null ? booking.Account.Username : $"ID: {booking.AccountID}")</td>
                         <td>@(booking.Room != null ? booking.Room.RoomName : $"ID: {booking.RoomID}")</td>
                         <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
-                        <td>@booking.TimeSlot</td>
+                        <td>@Html.DisplayFor(_ => booking.TimeSlot)</td>
                         <td>
                             <!-- SLET -->
                             <form method="post" asp-page-handler="Delete" class="d-inline">
