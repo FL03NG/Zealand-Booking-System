@@ -36,7 +36,11 @@ namespace Zealand_Booking_System.Pages.Shared
         private BookingService _bookingService;
 
         public string Message { get; private set; }
-
+        public BookingListModel()
+        {
+            BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
+            _bookingService = new BookingService(bookingRepo);
+        }
         public void OnGet()
         {
             LoadData();
@@ -142,9 +146,7 @@ namespace Zealand_Booking_System.Pages.Shared
         // Hjælpefunktion til at hente data
         private void LoadData()
         {
-            BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
-            BookingService bookingService = new BookingService(bookingRepo);
-            Bookings = bookingService.GetAll();
+            Bookings = _bookingService.GetAll();
 
             RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
             Rooms = roomRepo.GetAllRooms();
@@ -157,6 +159,7 @@ namespace Zealand_Booking_System.Pages.Shared
             EditBookingID = bookingID;
             EditBooking = _bookingService.GetBookingById(bookingID);
             Bookings = _bookingService.GetAll(); // reload list
+            LoadData();
             return Page();
         }
         public IActionResult OnPostSaveEdit()
