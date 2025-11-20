@@ -1,12 +1,108 @@
 ﻿@page
+@using Zealand_Booking_System_Library.Models
 @model Zealand_Booking_System.Pages.Shared.BookingListModel
 @{
     ViewData["Title"] = "Opret booking";
 }
+
 <h2>Lokale bookinger</h2>
+
 @if (!string.IsNullOrEmpty(Model.Message))
 {
     <div class="alert alert-info">@Model.Message</div>
+}
+
+<!-- 🔎 SØG EFTER BOOKING BASERET PÅ BRUGERNAVN -->
+<form method="post" asp-page-handler="Search" style="margin-bottom:20px; width:50%;">
+    <label for="SearchName">Søg efter booking (brugernavn):</label><br />
+    <input asp-for="SearchName" id="SearchName" class="form-control" placeholder="Skriv fx 'lars'" />
+    <button type="submit" class="btn btn-secondary" style="margin-top:5px;">Søg</button>
+</form>
+@foreach (var booking in Model.Bookings)
+{
+    if (Model.EditBookingID == booking.BookingID)
+    {
+        <!-- 🔧 REDIGERINGSTILSTAND -->
+        <tr>
+            <td>@booking.BookingID</td>
+            <td>
+                @(booking.Account != null
+                        ? booking.Account.Username
+                        : $"ID: {booking.AccountID}")
+                                                 </td>
+                                                 <td>
+                @(booking.Room != null
+                        ? booking.Room.RoomName
+                        : $"ID: {booking.RoomID}")
+    </td>
+    <td colspan="3">
+        <form method="post" asp-page-handler="SaveEdit" class="d-inline">
+
+                    <!-- Skjult felt med ID bundet til EditBooking.BookingID -->
+                    <input asp-for="EditBooking.BookingID" type="hidden" />
+
+                    <!-- Hvis du ikke vil ændre room/account, så send dem med som hidden -->
+                    <input asp-for="EditBooking.RoomID" type="hidden" />
+                    <input asp-for="EditBooking.AccountID" type="hidden" />
+
+                    <div style="margin-bottom:5px;">
+                        <label for="EditBooking_BookingDate">Dato:</label>
+                        <input asp-for="EditBooking.BookingDate" type="date" class="form-control" />
+                    </div>
+
+                    <div style="margin-bottom:5px;">
+                        <label for="EditBooking_TimeSlot">Tidsrum:</label>
+                        <select asp-for="EditBooking.TimeSlot" class="form-control">
+                            <option value="Slot08_10">08:00 - 10:00</option>
+                            <option value="Slot10_12">10:00 - 12:00</option>
+                            <option value="Slot12_14">12:00 - 14:00</option>
+                            <option value="Slot14_16">14:00 - 16:00</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-success btn-sm" style="margin-top:5px;">
+                        Gem
+                    </button>
+
+                    <a asp-page="/Booking" class="btn btn-secondary btn-sm" style="margin-top:5px;">
+                        Fortryd
+                    </a>
+                </form>
+            </td>
+        </tr>
+    }
+    else
+    {
+        <!-- 👀 VISNINGSTILSTAND -->
+        <tr>
+            <td>@booking.BookingID</td>
+            <td>
+                @(booking.Account != null
+                        ? booking.Account.Username
+                        : $"ID: {booking.AccountID}")
+                                                 </td>
+                                                 <td>
+                @(booking.Room != null
+                        ? booking.Room.RoomName
+                        : $"ID: {booking.RoomID}")
+    </td>
+    <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
+    <td>@booking.TimeSlot</td>
+    <td>
+        <!-- SLET -->
+        <form method="post" asp-page-handler="Delete" class="d-inline">
+            <input type="hidden" name="bookingID" value="@booking.BookingID" />
+            <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+        </form>
+
+                <!-- REDIGER -->
+                <form method="post" asp-page-handler="StartEdit" class="d-inline">
+                    <input type="hidden" name="bookingID" value="@booking.BookingID" />
+                    <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
+                </form>
+            </td>
+        </tr>
+    }
 }
 
 <!-- Liste over eksisterende bookinger -->
@@ -24,30 +120,30 @@
     <tbody>
         @if (Model.Bookings != null && Model.Bookings.Count > 0)
         {
-            foreach (var booking in Model.Bookings)
+            foreach (Booking booking in Model.Bookings)
             {
                 <tr>
                     <td>@booking.BookingID</td>
                     <td>
                         @(booking.Account != null
-                            ? booking.Account.Username
-                            : $"ID: {booking.AccountID}")
-                    </td>
-                    <td>
+                                        ? booking.Account.Username
+                                        : $"ID: {booking.AccountID}")
+                                                                 </td>
+                                                                 <td>
                         @(booking.Room != null
-                            ? booking.Room.RoomName
-                            : $"ID: {booking.RoomID}")
-                    </td>
-                    <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
-                    <td>@booking.TimeSlot</td>
-                    <td>
-                        <form method="post" asp-page-handler="Delete" class="d-inline">
-                            <input type="hidden" name="bookingID" value="@booking.BookingID" />
-                            <button type="submit" class="btn btn-danger btn-sm">Slet</button>
-                        </form>
-                    </td>
-                </tr>
-            }
+                                        ? booking.Room.RoomName
+                                        : $"ID: {booking.RoomID}")
+            </td>
+            <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
+            <td>@booking.TimeSlot</td>
+            <td>
+                <form method="post" asp-page-handler="Delete" class="d-inline">
+                    <input type="hidden" name="bookingID" value="@booking.BookingID" />
+                    <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+                </form>
+            </td>
+        </tr>
+                }
         }
         else
         {

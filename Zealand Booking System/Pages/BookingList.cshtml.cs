@@ -1,8 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Reflection.PortableExecutable;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
 using Zealand_Booking_System_Library.Models;
 using Zealand_Booking_System_Library.Repository;
 using Zealand_Booking_System_Library.Service;
@@ -11,10 +13,11 @@ namespace Zealand_Booking_System.Pages.Shared
 {
     public class BookingListModel : PageModel
     {
-        //forbindelse til database
+        // forbindelse til database
         private readonly string _connectionString =
             "Server =(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True";
-        // Lister som bruges p� siden
+
+        // Lister som bruges på siden
         public List<Booking> Bookings { get; private set; }
         public List<Room> Rooms { get; private set; }
         public List<Account> Users { get; private set; }
@@ -26,13 +29,20 @@ namespace Zealand_Booking_System.Pages.Shared
         [BindProperty]
         public Booking NewBooking { get; set; }
 
+        // 🔎 søgetekst
+        [BindProperty]
+        public string SearchName { get; set; }
+
         private BookingService _bookingService;
 
         public string Message { get; private set; }
+
         public void OnGet()
         {
             LoadData();
         }
+
+        // standard POST → opret booking
         public void OnPost()
         {
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
@@ -43,14 +53,73 @@ namespace Zealand_Booking_System.Pages.Shared
                 bookingService.Add(NewBooking);
                 Message = "Booking oprettet!";
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Message = "Fejl: " + ex.Message;
             }
 
             LoadData();
         }
-        // N�r der slettes en booking (POST Delete)
+
+        // 🔎 POST: søg på brugernavn
+        public void OnPostSearch()
+        {
+            LoadData(); // henter Bookings + Users
+
+            Message = "Søgning udført."; // bare så du kan se at handleren bliver ramt
+
+            if (string.IsNullOrWhiteSpace(SearchName))
+            {
+                // tom søgning → vis alle
+                return;
+            }
+
+            string searchLower = SearchName.ToLower();
+            List<Booking> filtered = new List<Booking>();
+
+            if (Bookings == null)
+            {
+                return;
+            }
+
+            int i;
+            for (i = 0; i < Bookings.Count; i++)
+            {
+                Booking booking = Bookings[i];
+
+                string username = null;
+
+                // prøv først via navigation property
+                if (booking.Account != null)
+                {
+                    username = booking.Account.Username;
+                }
+                else if (Users != null)
+                {
+                    int j;
+                    for (j = 0; j < Users.Count; j++)
+                    {
+                        if (Users[j].AccountID == booking.AccountID)
+                        {
+                            username = Users[j].Username;
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(username))
+                {
+                    string usernameLower = username.ToLower();
+                    if (usernameLower.Contains(searchLower))
+                    {
+                        filtered.Add(booking);
+                    }
+                }
+            }
+
+            Bookings = filtered;
+        }
+
+        // slet booking
         public IActionResult OnPostDelete(int bookingID)
         {
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
@@ -61,15 +130,16 @@ namespace Zealand_Booking_System.Pages.Shared
                 bookingService.Delete(bookingID);
                 Message = "Booking slettet!";
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Message = "Fejl ved sletning: " + ex.Message;
             }
 
             LoadData();
-            return Page(); // behold besked og opdateret liste
+            return Page();
         }
-        // Hj�lpefunktion til at hente data
+
+        // Hjælpefunktion til at hente data
         private void LoadData()
         {
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
@@ -94,7 +164,7 @@ namespace Zealand_Booking_System.Pages.Shared
             try
             {
                 _bookingService.Update(EditBooking);
-                TempData["Message"] = "Booking er �ndret!";
+                TempData["Message"] = "Booking er ændret!";
             }
             catch (System.Exception ex)
             {
