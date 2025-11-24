@@ -11,6 +11,7 @@ namespace Zealand_Booking_System_Library.Models
         public int AccountID { get; set; }
         public string Username { get; set; }
         public string PasswordHash { get; set; }
+        public virtual string Role { get; set; } = "Account";
 
         public Account() { }
         public Account(int accountID, string username, string passwordHash)

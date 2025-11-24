@@ -9,9 +9,10 @@ namespace Zealand_Booking_System_Library.Repository
 {
     public interface IUserRepository
     {
-        public void AddUser(Account user);
-        public void DeleteUser(int id);
-        public List<Account> GetAllUsers();
-        public void UpdateUser(Account user);
+        Account GetById(int accountId);
+        Account Login(string username, string passwordHash);
+        void CreateUser(Account user, string role);
+        List<Account> GetAll();
+        List<Account> GetAllUsers();
     }
 }

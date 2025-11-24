@@ -1,0 +1,33 @@
+﻿@page
+@model Zealand_Booking_System.Pages.Accounts.RegisterModel
+@{
+    Layout = "_Layout";
+}
+
+<h2>Opret ny bruger</h2>
+
+<form method="post">
+    <div>
+        <label>Username</label>
+        <input asp-for="Username" />
+    </div>
+
+    <div>
+        <label>Password</label>
+        <input asp-for="Password" type="password" />
+    </div>
+
+    <div>
+        <label>Role</label>
+        <select asp-for="Role">
+            <option value="Administrator">Administrator</option>
+            <option value="Teacher">Teacher</option>
+            <option value="Student">Student</option>
+        </select>
+    </div>
+
+    <button type="submit">Opret bruger</button>
+
+    <p style="color:red">@Model.ErrorMessage</p>
+    <p style="color:green">@Model.SuccessMessage</p>
+</form>

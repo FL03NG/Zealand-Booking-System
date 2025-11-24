@@ -8,8 +8,14 @@ namespace Zealand_Booking_System_Library.Models
 {
     public class Administrator : Account
     {
-        public int AdministratorID { get; set; }
+        public string AdministratorID { get; set; }
+        public override string Role { get; set; } = "Administrator";
 
-        public Administrator() { }
+        public Administrator() : base() { }
+
+        public Administrator(int accountID, string username, string passwordHash)
+            : base(accountID, username, passwordHash)
+        {
+        }
     }
 }

@@ -10,6 +10,13 @@ namespace Zealand_Booking_System_Library.Models
     {
         public int StudentID { get; set; }
 
-        public Student () { }
+        public override string Role { get; set; } = "Student";
+
+        public Student() : base() { }
+
+        public Student(int accountID, string username, string passwordHash)
+            : base(accountID, username, passwordHash)
+        {
+        }
     }
 }
