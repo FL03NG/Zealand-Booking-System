@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.DataProtection;
+using Microsoft.Identity.Client;
 using Zealand_Booking_System_Library.Repository;
 using Zealand_Booking_System_Library.Service;
 
@@ -8,8 +9,8 @@ namespace Zealand_Booking_System
     {
         public static void Main(string[] args)
         {
+            
             var builder = WebApplication.CreateBuilder(args);
-
             builder.Services.AddRazorPages();
 
             // ---------------------------------------------------
@@ -46,6 +47,11 @@ namespace Zealand_Booking_System
 
             var app = builder.Build();
 
+            app.MapPost("/logout", (HttpContext context) =>
+            {
+                context.Session.Clear(); // ryd session
+                return Results.Redirect("/Index"); // omdiriger til login
+            });
             // ---------------------------------------------------
             // Middleware pipeline
             // ---------------------------------------------------
