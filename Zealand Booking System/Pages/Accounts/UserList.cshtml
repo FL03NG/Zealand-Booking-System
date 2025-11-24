@@ -1,0 +1,41 @@
+﻿@page
+@model Zealand_Booking_System.Pages.Accounts.UserListModel
+@{
+    ViewData["Title"] = "Brugeroversigt";
+}
+
+<h1>Brugeroversigt</h1>
+
+<form method="post" asp-page-handler="Search" class="mb-3">
+    <div class="input-group">
+        <input asp-for="SearchName" class="form-control" placeholder="Søg på brugernavn..." />
+        <button type="submit" class="btn btn-primary">Søg</button>
+    </div>
+</form>
+
+@if (Model.Users == null || Model.Users.Count == 0)
+{
+    <p>Der er ingen brugere at vise.</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>AccountID</th>
+                <th>Username</th>
+                <th>Rolle</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (Zealand_Booking_System_Library.Models.Account user in Model.Users)
+            {
+                <tr>
+                    <td>@user.AccountID</td>
+                    <td>@user.Username</td>
+                    <td>@user.Role</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
