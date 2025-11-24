@@ -1,9 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Zealand_Booking_System_Library.Models;
 
 namespace Zealand_Booking_System_Library.Repository
@@ -16,6 +13,8 @@ namespace Zealand_Booking_System_Library.Repository
         {
             _connectionString = connectionString;
         }
+
+        // Hent alle brugere (til din UserList-side)
         public List<Account> GetAllUsers()
         {
             List<Account> users = new List<Account>();
@@ -23,6 +22,7 @@ namespace Zealand_Booking_System_Library.Repository
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 con.Open();
+
                 string query = "SELECT AccountID, Username, PasswordHash, AccountRole FROM Account";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
@@ -31,21 +31,7 @@ namespace Zealand_Booking_System_Library.Repository
                     {
                         while (reader.Read())
                         {
-                            var role = reader.GetString(reader.GetOrdinal("AccountRole"));
-
-                            Account user = role switch
-                            {
-                                "Administrator" => new Administrator(),
-                                "Teacher" => new Teacher(),
-                                "Student" => new Student(),
-                                _ => new Account()
-                            };
-
-                            user.AccountID = reader.GetInt32(reader.GetOrdinal("AccountID"));
-                            user.Username = reader.GetString(reader.GetOrdinal("Username"));
-                            user.PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
-                            user.Role = role;
-
+                            Account user = MapToAccount(reader);
                             users.Add(user);
                         }
                     }
@@ -54,158 +40,154 @@ namespace Zealand_Booking_System_Library.Repository
 
             return users;
         }
+
+        // Hent én bruger på id
         public Account GetById(int accountId)
         {
-            using var conn = new SqlConnection(_connectionString);
-            conn.Open();
-
-            string sql = @"
-            SELECT 
-                a.AccountID,
-                a.Username,
-                a.PasswordHash,
-                CASE 
-                    WHEN ad.AdministratorID IS NOT NULL THEN 'Administrator'
-                    WHEN t.TeacherID IS NOT NULL THEN 'Teacher'
-                    WHEN s.StudentID IS NOT NULL THEN 'Student'
-                    ELSE 'Account'
-                END AS AccountRole
-            FROM Account a
-            LEFT JOIN Administrator ad ON a.AccountID = ad.AdministratorID
-            LEFT JOIN Teacher t ON a.AccountID = t.TeacherID
-            LEFT JOIN Student s ON a.AccountID = s.StudentID
-            WHERE a.AccountID = @id";
-
-            using var cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@id", accountId);
-
-            using var reader = cmd.ExecuteReader();
-
-            if (!reader.Read()) return null;
-
-            return MapToAccount(reader);
-        }
-
-        public Account Login(string username, string passwordHash)
-        {
-            using var conn = new SqlConnection(_connectionString);
-            conn.Open();
-
-            string sql = @"
-            SELECT 
-                a.AccountID,
-                a.Username,
-                a.PasswordHash,
-                CASE 
-                    WHEN ad.AdministratorID IS NOT NULL THEN 'Administrator'
-                    WHEN t.TeacherID IS NOT NULL THEN 'Teacher'
-                    WHEN s.StudentID IS NOT NULL THEN 'Student'
-                END AS AccountRole
-            FROM Account a
-            LEFT JOIN Administrator ad ON a.AccountID = ad.AdministratorID
-            LEFT JOIN Teacher t ON a.AccountID = t.TeacherID
-            LEFT JOIN Student s ON a.AccountID = s.StudentID
-            WHERE a.Username = @username";
-
-            using var cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@username", username);
-
-            using var reader = cmd.ExecuteReader();
-
-            if (!reader.Read()) return null;
-
-            if ((string)reader["PasswordHash"] != passwordHash)
-                return null;
-
-            return MapToAccount(reader);
-        }
-
-        public void CreateUser(Account user, string role)
-        {
-            using var conn = new SqlConnection(_connectionString);
-            conn.Open();
-
-            // Insert into Account
-            string sql = @"
-            INSERT INTO Account (Username, PasswordHash)
-            OUTPUT INSERTED.AccountID
-            VALUES (@u, @p)";
-
-            using var cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@u", user.Username);
-            cmd.Parameters.AddWithValue("@p", user.PasswordHash);
-
-            int accountId = (int)cmd.ExecuteScalar();
-
-            // Insert into role table
-            string roleSql = role switch
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                "Administrator" => "INSERT INTO Administrator (AdministratorID) VALUES (@id)",
-                "Teacher" => "INSERT INTO Teacher (TeacherID) VALUES (@id)",
-                "Student" => "INSERT INTO Student (StudentID) VALUES (@id)",
-                _ => null
-            };
+                conn.Open();
 
-            if (roleSql != null)
-            {
-                using var roleCmd = new SqlCommand(roleSql, conn);
-                roleCmd.Parameters.AddWithValue("@id", accountId);
-                roleCmd.ExecuteNonQuery();
+                string sql =
+                    "SELECT AccountID, Username, PasswordHash, AccountRole " +
+                    "FROM Account " +
+                    "WHERE AccountID = @id";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", accountId);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                        {
+                            return null;
+                        }
+
+                        Account account = MapToAccount(reader);
+                        return account;
+                    }
+                }
             }
         }
 
+        // Login på username + password
+        public Account Login(string username, string passwordHash)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string sql =
+                    "SELECT AccountID, Username, PasswordHash, AccountRole " +
+                    "FROM Account " +
+                    "WHERE Username = @username";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@username", username);
+
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (!reader.Read())
+                        {
+                            return null;
+                        }
+
+                        string storedHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
+                        if (storedHash != passwordHash)
+                        {
+                            return null;
+                        }
+
+                        Account account = MapToAccount(reader);
+                        return account;
+                    }
+                }
+            }
+        }
+
+        // Opret ny bruger
+        public void CreateUser(Account user, string role)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string sql =
+                    "INSERT INTO Account (Username, PasswordHash, AccountRole) " +
+                    "VALUES (@u, @p, @r)";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@u", user.Username);
+                    cmd.Parameters.AddWithValue("@p", user.PasswordHash);
+                    cmd.Parameters.AddWithValue("@r", role);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // Bruges fx til en generel liste
         public List<Account> GetAll()
         {
             List<Account> accounts = new List<Account>();
 
-            using var conn = new SqlConnection(_connectionString);
-            conn.Open();
-
-            string sql = @"
-            SELECT 
-                a.AccountID,
-                a.Username,
-                a.PasswordHash,
-                CASE 
-                    WHEN ad.AdministratorID IS NOT NULL THEN 'Administrator'
-                    WHEN t.TeacherID IS NOT NULL THEN 'Teacher'
-                    WHEN s.StudentID IS NOT NULL THEN 'Student'
-                    ELSE 'Account'
-                END AS AccountRole
-            FROM Account a
-            LEFT JOIN Administrator ad ON a.AccountID = ad.AdministratorID
-            LEFT JOIN Teacher t ON a.AccountID = t.TeacherID
-            LEFT JOIN Student s ON a.AccountID = s.StudentID";
-
-            using var cmd = new SqlCommand(sql, conn);
-            using var reader = cmd.ExecuteReader();
-
-            while (reader.Read())
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                accounts.Add(MapToAccount(reader));
+                conn.Open();
+
+                string sql =
+                    "SELECT AccountID, Username, PasswordHash, AccountRole " +
+                    "FROM Account";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            Account account = MapToAccount(reader);
+                            accounts.Add(account);
+                        }
+                    }
+                }
             }
 
             return accounts;
         }
 
+        // Fælles mapping fra SqlDataReader → Account/subklasse
         private Account MapToAccount(SqlDataReader reader)
         {
-            string role = reader["AccountRole"].ToString();
+            string role = reader.GetString(reader.GetOrdinal("AccountRole"));
 
-            Account acc = role switch
+            Account account;
+
+            if (role == "Administrator")
             {
-                "Administrator" => new Administrator(),
-                "Teacher" => new Teacher(),
-                "Student" => new Student(),
-                _ => new Account(),
-            };
+                account = new Administrator();
+            }
+            else if (role == "Teacher")
+            {
+                account = new Teacher();
+            }
+            else if (role == "Student")
+            {
+                account = new Student();
+            }
+            else
+            {
+                account = new Account();
+            }
 
-            acc.AccountID = (int)reader["AccountID"];
-            acc.Username = reader["Username"].ToString();
-            acc.PasswordHash = reader["PasswordHash"].ToString();
+            account.AccountID = reader.GetInt32(reader.GetOrdinal("AccountID"));
+            account.Username = reader.GetString(reader.GetOrdinal("Username"));
+            account.PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
+            account.Role = role;
 
-            return acc;
+            return account;
         }
     }
 }
-
