@@ -23,7 +23,7 @@ namespace Zealand_Booking_System_Library.Repository
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 con.Open();
-                string query = "SELECT Id, Username, PasswordHash, Role FROM Account";
+                string query = "SELECT AccountID, Username, PasswordHash, AccountRole FROM Account";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
                 {
@@ -31,7 +31,7 @@ namespace Zealand_Booking_System_Library.Repository
                     {
                         while (reader.Read())
                         {
-                            var role = reader.GetString(reader.GetOrdinal("Role"));
+                            var role = reader.GetString(reader.GetOrdinal("AccountRole"));
 
                             Account user = role switch
                             {
@@ -41,7 +41,7 @@ namespace Zealand_Booking_System_Library.Repository
                                 _ => new Account()
                             };
 
-                            user.AccountID = reader.GetInt32(reader.GetOrdinal("Id"));
+                            user.AccountID = reader.GetInt32(reader.GetOrdinal("AccountID"));
                             user.Username = reader.GetString(reader.GetOrdinal("Username"));
                             user.PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
                             user.Role = role;
@@ -69,7 +69,7 @@ namespace Zealand_Booking_System_Library.Repository
                     WHEN t.TeacherID IS NOT NULL THEN 'Teacher'
                     WHEN s.StudentID IS NOT NULL THEN 'Student'
                     ELSE 'Account'
-                END AS Role
+                END AS AccountRole
             FROM Account a
             LEFT JOIN Administrator ad ON a.AccountID = ad.AdministratorID
             LEFT JOIN Teacher t ON a.AccountID = t.TeacherID
@@ -100,7 +100,7 @@ namespace Zealand_Booking_System_Library.Repository
                     WHEN ad.AdministratorID IS NOT NULL THEN 'Administrator'
                     WHEN t.TeacherID IS NOT NULL THEN 'Teacher'
                     WHEN s.StudentID IS NOT NULL THEN 'Student'
-                END AS Role
+                END AS AccountRole
             FROM Account a
             LEFT JOIN Administrator ad ON a.AccountID = ad.AdministratorID
             LEFT JOIN Teacher t ON a.AccountID = t.TeacherID
@@ -171,7 +171,7 @@ namespace Zealand_Booking_System_Library.Repository
                     WHEN t.TeacherID IS NOT NULL THEN 'Teacher'
                     WHEN s.StudentID IS NOT NULL THEN 'Student'
                     ELSE 'Account'
-                END AS Role
+                END AS AccountRole
             FROM Account a
             LEFT JOIN Administrator ad ON a.AccountID = ad.AdministratorID
             LEFT JOIN Teacher t ON a.AccountID = t.TeacherID
@@ -190,7 +190,7 @@ namespace Zealand_Booking_System_Library.Repository
 
         private Account MapToAccount(SqlDataReader reader)
         {
-            string role = reader["Role"].ToString();
+            string role = reader["AccountRole"].ToString();
 
             Account acc = role switch
             {

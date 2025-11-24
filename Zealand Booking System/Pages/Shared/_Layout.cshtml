@@ -27,7 +27,7 @@
                         </li>
 
                         @* Kun vis disse links hvis brugeren er logget ind *@
-                        @if (Context.Session.GetInt32("UserId") != null)
+                        @if (Context.Session.GetInt32("AccountID") != null)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-page="/CreateBooking">CreateBooking</a>
@@ -44,7 +44,7 @@
                     <ul class="navbar-nav">
 
                         @* Hvis brugeren IKKE er logget ind *@
-                        @if (Context.Session.GetInt32("UserId") == null)
+                        @if (Context.Session.GetInt32("AccountID") == null)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-page="/Accounts/Login">Login</a>
