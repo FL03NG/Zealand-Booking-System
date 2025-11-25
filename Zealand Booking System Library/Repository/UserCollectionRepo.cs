@@ -116,42 +116,73 @@ namespace Zealand_Booking_System_Library.Repository
             }
         }
 
-        // 🔧 Opdater bruger (bruges til Rediger)
         public void UpdateUser(Account user)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
 
-                string sql = "UPDATE Account SET Username = @u, AccountRole = @r WHERE AccountID = @id";
+                string sql = "UPDATE Account " +
+                             "SET Username = @Username, AccountRole = @AccountRole " +
+                             "WHERE AccountID = @AccountID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@u", user.Username);
-                    cmd.Parameters.AddWithValue("@r", user.Role);
-                    cmd.Parameters.AddWithValue("@id", user.AccountID);
+                    cmd.Parameters.AddWithValue("@Username", user.Username);
+                    cmd.Parameters.AddWithValue("@AccountRole", user.Role);
+                    cmd.Parameters.AddWithValue("@AccountID", user.AccountID);
 
                     cmd.ExecuteNonQuery();
                 }
             }
         }
 
-        // 🗑 Slet bruger
         public void DeleteUser(int accountId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
 
-                string sql = "DELETE FROM Account WHERE AccountID = @id";
-
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                // 1) Slet alle bookinger for brugeren
+                string deleteBookingsSql = "DELETE FROM Booking WHERE AccountID = @id";
+                using (SqlCommand deleteBookingsCmd = new SqlCommand(deleteBookingsSql, conn))
                 {
-                    cmd.Parameters.AddWithValue("@id", accountId);
-                    cmd.ExecuteNonQuery();
+                    deleteBookingsCmd.Parameters.AddWithValue("@id", accountId);
+                    deleteBookingsCmd.ExecuteNonQuery();
+                }
+
+                // 2) Slet fra Administrator, Teacher, Student
+                string deleteAdminSql = "DELETE FROM Administrator WHERE AdministratorID = @id";
+                using (SqlCommand deleteAdminCmd = new SqlCommand(deleteAdminSql, conn))
+                {
+                    deleteAdminCmd.Parameters.AddWithValue("@id", accountId);
+                    deleteAdminCmd.ExecuteNonQuery();
+                }
+
+                string deleteTeacherSql = "DELETE FROM Teacher WHERE TeacherID = @id";
+                using (SqlCommand deleteTeacherCmd = new SqlCommand(deleteTeacherSql, conn))
+                {
+                    deleteTeacherCmd.Parameters.AddWithValue("@id", accountId);
+                    deleteTeacherCmd.ExecuteNonQuery();
+                }
+
+                string deleteStudentSql = "DELETE FROM Student WHERE StudentID = @id";
+                using (SqlCommand deleteStudentCmd = new SqlCommand(deleteStudentSql, conn))
+                {
+                    deleteStudentCmd.Parameters.AddWithValue("@id", accountId);
+                    deleteStudentCmd.ExecuteNonQuery();
+                }
+
+                // 3) Slet selve brugeren
+                string deleteAccountSql = "DELETE FROM Account WHERE AccountID = @id";
+                using (SqlCommand deleteAccountCmd = new SqlCommand(deleteAccountSql, conn))
+                {
+                    deleteAccountCmd.Parameters.AddWithValue("@id", accountId);
+                    deleteAccountCmd.ExecuteNonQuery();
                 }
             }
         }
+
 
         // Alternativ hent alle
         public List<Account> GetAll()
