@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.SqlClient;
-using System;
 using System.Collections.Generic;
 using Zealand_Booking_System_Library.Models;
 
@@ -14,7 +13,7 @@ namespace Zealand_Booking_System_Library.Repository
             _connectionString = connectionString;
         }
 
-        // Hent alle brugere (til din UserList-side)
+        // Hent alle brugere
         public List<Account> GetAllUsers()
         {
             List<Account> users = new List<Account>();
@@ -26,14 +25,11 @@ namespace Zealand_Booking_System_Library.Repository
                 string query = "SELECT AccountID, Username, PasswordHash, AccountRole FROM Account";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            Account user = MapToAccount(reader);
-                            users.Add(user);
-                        }
+                        users.Add(MapToAccount(reader));
                     }
                 }
             }
@@ -41,7 +37,7 @@ namespace Zealand_Booking_System_Library.Repository
             return users;
         }
 
-        // Hent én bruger på id
+        // Hent én bruger
         public Account GetById(int accountId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -50,8 +46,7 @@ namespace Zealand_Booking_System_Library.Repository
 
                 string sql =
                     "SELECT AccountID, Username, PasswordHash, AccountRole " +
-                    "FROM Account " +
-                    "WHERE AccountID = @id";
+                    "FROM Account WHERE AccountID = @id";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
@@ -60,18 +55,15 @@ namespace Zealand_Booking_System_Library.Repository
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (!reader.Read())
-                        {
                             return null;
-                        }
 
-                        Account account = MapToAccount(reader);
-                        return account;
+                        return MapToAccount(reader);
                     }
                 }
             }
         }
 
-        // Login på username + password
+        // Login (simplet)
         public Account Login(string username, string passwordHash)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -80,8 +72,7 @@ namespace Zealand_Booking_System_Library.Repository
 
                 string sql =
                     "SELECT AccountID, Username, PasswordHash, AccountRole " +
-                    "FROM Account " +
-                    "WHERE Username = @username";
+                    "FROM Account WHERE Username = @username";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
@@ -90,18 +81,14 @@ namespace Zealand_Booking_System_Library.Repository
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (!reader.Read())
-                        {
                             return null;
-                        }
 
                         string storedHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
-                        if (storedHash != passwordHash)
-                        {
-                            return null;
-                        }
 
-                        Account account = MapToAccount(reader);
-                        return account;
+                        if (storedHash != passwordHash)
+                            return null;
+
+                        return MapToAccount(reader);
                     }
                 }
             }
@@ -129,7 +116,44 @@ namespace Zealand_Booking_System_Library.Repository
             }
         }
 
-        // Bruges fx til en generel liste
+        // 🔧 Opdater bruger (bruges til Rediger)
+        public void UpdateUser(Account user)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string sql = "UPDATE Account SET Username = @u, AccountRole = @r WHERE AccountID = @id";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@u", user.Username);
+                    cmd.Parameters.AddWithValue("@r", user.Role);
+                    cmd.Parameters.AddWithValue("@id", user.AccountID);
+
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // 🗑 Slet bruger
+        public void DeleteUser(int accountId)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                conn.Open();
+
+                string sql = "DELETE FROM Account WHERE AccountID = @id";
+
+                using (SqlCommand cmd = new SqlCommand(sql, conn))
+                {
+                    cmd.Parameters.AddWithValue("@id", accountId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        // Alternativ hent alle
         public List<Account> GetAll()
         {
             List<Account> accounts = new List<Account>();
@@ -139,18 +163,14 @@ namespace Zealand_Booking_System_Library.Repository
                 conn.Open();
 
                 string sql =
-                    "SELECT AccountID, Username, PasswordHash, AccountRole " +
-                    "FROM Account";
+                    "SELECT AccountID, Username, PasswordHash, AccountRole FROM Account";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
+                using (SqlDataReader reader = cmd.ExecuteReader())
                 {
-                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    while (reader.Read())
                     {
-                        while (reader.Read())
-                        {
-                            Account account = MapToAccount(reader);
-                            accounts.Add(account);
-                        }
+                        accounts.Add(MapToAccount(reader));
                     }
                 }
             }
@@ -158,29 +178,18 @@ namespace Zealand_Booking_System_Library.Repository
             return accounts;
         }
 
-        // Fælles mapping fra SqlDataReader → Account/subklasse
+        // Map SQL -> Account objekt
         private Account MapToAccount(SqlDataReader reader)
         {
             string role = reader.GetString(reader.GetOrdinal("AccountRole"));
 
-            Account account;
-
-            if (role == "Administrator")
+            Account account = role switch
             {
-                account = new Administrator();
-            }
-            else if (role == "Teacher")
-            {
-                account = new Teacher();
-            }
-            else if (role == "Student")
-            {
-                account = new Student();
-            }
-            else
-            {
-                account = new Account();
-            }
+                "Administrator" => new Administrator(),
+                "Teacher" => new Teacher(),
+                "Student" => new Student(),
+                _ => new Account()
+            };
 
             account.AccountID = reader.GetInt32(reader.GetOrdinal("AccountID"));
             account.Username = reader.GetString(reader.GetOrdinal("Username"));
@@ -188,6 +197,10 @@ namespace Zealand_Booking_System_Library.Repository
             account.Role = role;
 
             return account;
+        }
+        public Account GetUserById(int id)
+        {
+            return GetById(id);
         }
     }
 }

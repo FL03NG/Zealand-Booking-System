@@ -12,7 +12,10 @@ namespace Zealand_Booking_System_Library.Repository
         Account GetById(int accountId);
         Account Login(string username, string passwordHash);
         void CreateUser(Account user, string role);
+        void UpdateUser(Account user);
+        void DeleteUser(int accountId);
         List<Account> GetAll();
         List<Account> GetAllUsers();
+        Account GetUserById(int accountId);
     }
 }

@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using Zealand_Booking_System_Library.Models;
 using Zealand_Booking_System_Library.Repository;
 
@@ -19,7 +15,7 @@ namespace Zealand_Booking_System_Library.Service
 
         public Account Login(string username, string password)
         {
-            // Evt. hashing her
+            // TODO: Tilføj hashing hvis nødvendigt
             string hash = password;
             return _repo.Login(username, hash);
         }
@@ -27,6 +23,16 @@ namespace Zealand_Booking_System_Library.Service
         public void Create(Account user, string role)
         {
             _repo.CreateUser(user, role);
+        }
+
+        public void UpdateUser(Account user)
+        {
+            _repo.UpdateUser(user);
+        }
+
+        public void DeleteUser(int id)
+        {
+            _repo.DeleteUser(id);
         }
 
         public Account GetById(int id)
@@ -38,9 +44,14 @@ namespace Zealand_Booking_System_Library.Service
         {
             return _repo.GetAll();
         }
+
         public List<Account> GetAllUsers()
         {
             return _repo.GetAllUsers();
+        }
+        public Account GetUserById(int id)
+        {
+            return _repo.GetUserById(id);
         }
     }
 }

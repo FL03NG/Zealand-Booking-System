@@ -13,6 +13,11 @@
     </div>
 </form>
 
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="alert alert-info">@Model.Message</div>
+}
+
 @if (Model.Users == null || Model.Users.Count == 0)
 {
     <p>Der er ingen brugere at vise.</p>
@@ -23,18 +28,68 @@ else
         <thead>
             <tr>
                 <th>AccountID</th>
-                <th>Username</th>
+                <th>Brugernavn</th>
                 <th>Rolle</th>
+                <th>Handling</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (Zealand_Booking_System_Library.Models.Account user in Model.Users)
+            @foreach (var user in Model.Users)
             {
-                <tr>
-                    <td>@user.AccountID</td>
-                    <td>@user.Username</td>
-                    <td>@user.Role</td>
-                </tr>
+                if (Model.EditUserID == user.AccountID)
+                {
+                    <!-- 🔧 Redigeringstilstand -->
+                    <tr>
+                        <td>@user.AccountID</td>
+
+                        <!-- Brugernavn -->
+                        <td>
+                            <input asp-for="EditUser.Username" class="form-control" />
+                        </td>
+
+                        <!-- Rolle -->
+                        <td>
+                            <select asp-for="EditUser.Role" class="form-control">
+                                <option value="Admin">Admin</option>
+                                <option value="Teacher">Teacher</option>
+                                <option value="Student">Student</option>
+                            </select>
+                        </td>
+
+                        <!-- Handling -->
+                        <td>
+                            <!-- Hele form’en SKAL være i ÉN <td> -->
+                            <form method="post" asp-page-handler="SaveEdit">
+                                <input type="hidden" asp-for="EditUser.AccountID" />
+
+                                <button type="submit" class="btn btn-success btn-sm">Gem</button>
+                                <a asp-page="./UserList" class="btn btn-secondary btn-sm">Fortryd</a>
+                            </form>
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    <!-- 👀 Visningstilstand -->
+                    <tr>
+                        <td>@user.AccountID</td>
+                        <td>@user.Username</td>
+                        <td>@user.Role</td>
+                        <td>
+                            <!-- Slet -->
+                            <form method="post" asp-page-handler="Delete" class="d-inline">
+                                <input type="hidden" name="accountID" value="@user.AccountID" />
+                                <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+                            </form>
+
+                            <!-- Rediger -->
+                            <form method="post" asp-page-handler="StartEdit" class="d-inline">
+                                <input type="hidden" name="accountID" value="@user.AccountID" />
+                                <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>

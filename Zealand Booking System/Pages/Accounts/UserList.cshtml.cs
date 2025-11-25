@@ -16,12 +16,13 @@ namespace Zealand_Booking_System.Pages.Accounts
         [BindProperty]
         public string SearchName { get; set; }
 
-        public string Message { get; private set; }
+        [BindProperty]
+        public int EditUserID { get; set; }
 
-        public UserListModel()
-        {
-            // Tom konstruktør – vi bruger bare connection string direkte
-        }
+        [BindProperty]
+        public Account EditUser { get; set; }
+
+        public string Message { get; private set; }
 
         public void OnGet()
         {
@@ -33,34 +34,56 @@ namespace Zealand_Booking_System.Pages.Accounts
             LoadData();
 
             if (string.IsNullOrWhiteSpace(SearchName))
-            {
                 return;
-            }
 
             string searchLower = SearchName.ToLower();
             List<Account> filtered = new List<Account>();
 
-            if (Users == null)
+            foreach (var user in Users)
             {
-                return;
-            }
-
-            for (int i = 0; i < Users.Count; i++)
-            {
-                Account user = Users[i];
-
-                if (user.Username != null)
+                if (user.Username != null &&
+                    user.Username.ToLower().Contains(searchLower))
                 {
-                    string usernameLower = user.Username.ToLower();
-
-                    if (usernameLower.Contains(searchLower))
-                    {
-                        filtered.Add(user);
-                    }
+                    filtered.Add(user);
                 }
             }
 
             Users = filtered;
+        }
+
+        public IActionResult OnPostStartEdit(int accountID)
+        {
+            EditUserID = accountID;
+
+            UserCollectionRepo repo = new UserCollectionRepo(_connectionString);
+            EditUser = repo.GetUserById(accountID);
+
+            LoadData();
+            return Page();
+        }
+
+        public IActionResult OnPostSaveEdit()
+        {
+            UserCollectionRepo repo = new UserCollectionRepo(_connectionString);
+
+            repo.UpdateUser(EditUser);
+
+            Message = "Bruger opdateret!";
+            LoadData();
+
+            return Page();
+        }
+
+        public IActionResult OnPostDelete(int accountID)
+        {
+            UserCollectionRepo repo = new UserCollectionRepo(_connectionString);
+
+            repo.DeleteUser(accountID);
+
+            Message = "Bruger slettet!";
+            LoadData();
+
+            return Page();
         }
 
         private void LoadData()
