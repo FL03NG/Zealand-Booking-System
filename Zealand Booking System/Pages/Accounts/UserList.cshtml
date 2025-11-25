@@ -36,53 +36,46 @@ else
         <tbody>
             @foreach (var user in Model.Users)
             {
-                if (Model.EditUserID == user.AccountID)
+                @if (Model.EditUserID == user.AccountID)
                 {
-                    <!-- 🔧 Redigeringstilstand -->
+                    <form method="post" asp-page-handler="SaveEdit">
                     <tr>
-                        <td>@user.AccountID</td>
+                        <td>
+                            @user.AccountID
+                            <input type="hidden" asp-for="EditUser.AccountID" />
+                        </td>
 
-                        <!-- Brugernavn -->
                         <td>
                             <input asp-for="EditUser.Username" class="form-control" />
                         </td>
 
-                        <!-- Rolle -->
                         <td>
                             <select asp-for="EditUser.Role" class="form-control">
-                                <option value="Admin">Admin</option>
+                                <option value="Administrator">Administrator</option>
                                 <option value="Teacher">Teacher</option>
                                 <option value="Student">Student</option>
                             </select>
                         </td>
 
-                        <!-- Handling -->
                         <td>
-                            <!-- Hele form’en SKAL være i ÉN <td> -->
-                            <form method="post" asp-page-handler="SaveEdit">
-                                <input type="hidden" asp-for="EditUser.AccountID" />
-
-                                <button type="submit" class="btn btn-success btn-sm">Gem</button>
-                                <a asp-page="./UserList" class="btn btn-secondary btn-sm">Fortryd</a>
-                            </form>
+                            <button type="submit" class="btn btn-success btn-sm">Gem</button>
+                            <a asp-page="./UserList" class="btn btn-secondary btn-sm">Fortryd</a>
                         </td>
                     </tr>
+                    </form>
                 }
                 else
                 {
-                    <!-- 👀 Visningstilstand -->
                     <tr>
                         <td>@user.AccountID</td>
                         <td>@user.Username</td>
                         <td>@user.Role</td>
                         <td>
-                            <!-- Slet -->
                             <form method="post" asp-page-handler="Delete" class="d-inline">
                                 <input type="hidden" name="accountID" value="@user.AccountID" />
                                 <button type="submit" class="btn btn-danger btn-sm">Slet</button>
                             </form>
 
-                            <!-- Rediger -->
                             <form method="post" asp-page-handler="StartEdit" class="d-inline">
                                 <input type="hidden" name="accountID" value="@user.AccountID" />
                                 <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
@@ -90,6 +83,7 @@ else
                         </td>
                     </tr>
                 }
+
             }
         </tbody>
     </table>
