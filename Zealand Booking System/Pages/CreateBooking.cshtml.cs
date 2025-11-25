@@ -8,24 +8,36 @@ namespace Zealand_Booking_System.Pages
 {
     public class BookingModel : PageModel
     {
-        //forbindelse til database
         private readonly string _connectionString =
-            "Server =(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True";
-        // Lister som bruges på siden
+            "Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True";
+
         public List<Booking> Bookings { get; private set; }
         public List<Room> Rooms { get; private set; }
-        public List<Account> Users { get; private set; }
 
         [BindProperty]
         public Booking NewBooking { get; set; }
 
         public string Message { get; private set; }
+
         public void OnGet()
         {
             LoadData();
         }
-        public void OnPost()
+
+        public IActionResult OnPost()
         {
+            // Hent logget bruger fra session
+            int? accountId = HttpContext.Session.GetInt32("AccountID");
+            if (accountId == null)
+            {
+                Message = "Du skal være logget ind for at oprette booking.";
+                LoadData();
+                return Page();
+            }
+
+            // Sæt AccountID på booking
+            NewBooking.AccountID = accountId.Value;
+
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
             BookingService bookingService = new BookingService(bookingRepo);
 
@@ -33,15 +45,16 @@ namespace Zealand_Booking_System.Pages
             {
                 bookingService.Add(NewBooking);
                 Message = "Booking oprettet!";
+                return RedirectToPage(); // genindlæs siden med ny booking
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Message = "Fejl: " + ex.Message;
+                LoadData();
+                return Page();
             }
-
-            LoadData();
         }
-        // Når der slettes en booking (POST Delete)
+
         public IActionResult OnPostDelete(int bookingID)
         {
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
@@ -52,15 +65,15 @@ namespace Zealand_Booking_System.Pages
                 bookingService.Delete(bookingID);
                 Message = "Booking slettet!";
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Message = "Fejl ved sletning: " + ex.Message;
             }
 
             LoadData();
-            return Page(); // behold besked og opdateret liste
+            return Page();
         }
-        // Hjælpefunktion til at hente data
+
         private void LoadData()
         {
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
@@ -69,11 +82,6 @@ namespace Zealand_Booking_System.Pages
 
             RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
             Rooms = roomRepo.GetAllRooms();
-
-            UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
-            Users = userRepo.GetAllUsers();
         }
-
     }
 }
-

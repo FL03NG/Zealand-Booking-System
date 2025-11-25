@@ -3,6 +3,10 @@
 @model Zealand_Booking_System.Pages.Shared.BookingListModel
 @{
     ViewData["Title"] = "Lokale bookinger";
+
+    var role = HttpContext.Session.GetString("Role"); // logget bruger rolle
+    var accountId = HttpContext.Session.GetInt32("AccountID"); // logget bruger id
+    var allowedRoles = new[] { "Administrator", "Teacher" }; // roller med adgang til alle
 }
 
 <h2>Lokale bookinger</h2>
@@ -45,25 +49,18 @@
                         <td>@(booking.Room != null ? booking.Room.RoomName : $"ID: {booking.RoomID}")</td>
                         <td colspan="3">
                             <form method="post" asp-page-handler="SaveEdit" class="d-inline">
-
-                                <!-- skjulte værdier -->
                                 <input asp-for="EditBooking.BookingID" type="hidden" />
                                 <input asp-for="EditBooking.AccountID" type="hidden" />
                                 <input asp-for="EditBooking.RoomID" type="hidden" />
 
                                 <div class="mb-2">
                                     <label for="EditBooking_BookingDate">Dato:</label>
-                                    <input asp-for="EditBooking.BookingDate"
-                                           id="EditBooking_BookingDate"
-                                           type="date"
-                                           class="form-control" />
+                                    <input asp-for="EditBooking.BookingDate" id="EditBooking_BookingDate" type="date" class="form-control" />
                                 </div>
 
                                 <div class="mb-2">
                                     <label for="EditBooking_TimeSlot">Tidsrum:</label>
-                                    <select asp-for="EditBooking.TimeSlot"
-                                            id="EditBooking_TimeSlot"
-                                            class="form-control">
+                                    <select asp-for="EditBooking.TimeSlot" id="EditBooking_TimeSlot" class="form-control">
                                         <option value="Slot08_10">08:00 - 10:00</option>
                                         <option value="Slot10_12">10:00 - 12:00</option>
                                         <option value="Slot12_14">12:00 - 14:00</option>
@@ -72,8 +69,6 @@
                                 </div>
 
                                 <button type="submit" class="btn btn-success btn-sm">Gem</button>
-
-                                <!-- Fortryd = ny GET på samme side -->
                                 <a asp-page="./BookingList" class="btn btn-secondary btn-sm">Fortryd</a>
                             </form>
                         </td>
@@ -89,17 +84,24 @@
                         <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
                         <td>@Html.DisplayFor(_ => booking.TimeSlot)</td>
                         <td>
-                            <!-- SLET -->
-                            <form method="post" asp-page-handler="Delete" class="d-inline">
-                                <input type="hidden" name="bookingID" value="@booking.BookingID" />
-                                <button type="submit" class="btn btn-danger btn-sm">Slet</button>
-                            </form>
+                            @* Kun vis Slet og Rediger for tilladte roller eller hvis brugeren ejer bookingen *@
+                            @if (allowedRoles.Contains(role) || booking.AccountID == accountId)
+                            {
+                                <!-- SLET -->
+                                <form method="post" asp-page-handler="Delete" class="d-inline">
+                                    <input type="hidden" name="bookingID" value="@booking.BookingID" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+                                </form>
 
-                            <!-- REDIGER -->
-                            <form method="post" asp-page-handler="StartEdit" class="d-inline">
-                                <input type="hidden" name="bookingID" value="@booking.BookingID" />
-                                <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
-                            </form>
+                                <!-- REDIGER (kun for admin/lærer) -->
+                                @if (allowedRoles.Contains(role))
+                                {
+                                    <form method="post" asp-page-handler="StartEdit" class="d-inline">
+                                        <input type="hidden" name="bookingID" value="@booking.BookingID" />
+                                        <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
+                                    </form>
+                                }
+                            }
                         </td>
                     </tr>
                 }

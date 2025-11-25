@@ -1,11 +1,9 @@
 ﻿@page
-@using Zealand_Booking_System_Library.Models
-@using Zealand_Booking_System_Library.Repository
-@using Zealand_Booking_System_Library.Service
-@model Zealand_Booking_System.Pages.Shared.BookingListModel
+@model Zealand_Booking_System.Pages.BookingModel
 @{
     ViewData["Title"] = "Opret booking";
 }
+
 <h3>Opret ny booking</h3>
 
 @if (!string.IsNullOrEmpty(Model.Message))
@@ -14,52 +12,37 @@
 }
 
 <form method="post" style="width:50%;">
-    <!-- Account dropdown -->
-    <div style="margin-bottom:10px;">
-        <label for="AccountID">Vælg Account:</label><br />
-        <select asp-for="NewBooking.AccountID" id="AccountID" required>
-            <option value="">-- Vælg Account --</option>
-            @if (Model.Users != null)
-            {
-                foreach (Account user in Model.Users)
-                {
-                    <option value="@user.AccountID">@user.Username</option>
-                }
-            }
-        </select>
-    </div>
-
     <!-- Room dropdown -->
-    <div style="margin-bottom:10px;">
-        <label for="RoomID">Vælg Room:</label><br />
-        <select asp-for="NewBooking.RoomID" id="RoomID" required>
-            <option value="">-- Vælg Room --</option>
-            @if (Model.Rooms != null)
+    <div class="mb-3">
+        <label for="RoomID">Vælg Lokale:</label>
+        <select asp-for="NewBooking.RoomID" class="form-control" required>
+            <option value="">-- Vælg Lokale --</option>
+            @foreach (var room in Model.Rooms)
             {
-                foreach (Room r in Model.Rooms)
-                {
-                    <option value="@r.RoomID">@r.RoomName</option>
-                }
+                <option value="@room.RoomID">@room.RoomName</option>
             }
         </select>
     </div>
 
     <!-- Dato -->
-    <div style="margin-bottom:10px;">
-        <label for="BookingDate">Dato:</label><br />
-        <input asp-for="NewBooking.BookingDate" type="date" id="BookingDate" required />
+    <div class="mb-3">
+        <label for="BookingDate">Dato:</label>
+        <input asp-for="NewBooking.BookingDate" type="date" class="form-control" required />
     </div>
 
     <!-- Tidsrum -->
-    <div style="margin-bottom:10px;">
-        <label for="TimeSlot">Tidsrum:</label><br />
-        <select asp-for="NewBooking.TimeSlot" id="TimeSlot" required>
-            <option value="Morning">Morgen (08-10)</option>
-            <option value="Afternoon">Eftermiddag (12-14)</option>
-            <option value="Evening">Aften (16-18)</option>
-            <option value="Night">Nat (20-22)</option>
+    <div class="mb-3">
+        <label for="TimeSlot">Tidsrum:</label>
+        <select asp-for="NewBooking.TimeSlot" class="form-control" required>
+            <option value="Slot08_10">08:00 - 10:00)</option>
+            <option value="Slot10_12">10:00 - 12:00)</option>
+            <option value="Slot12_14">12:00 - 14:00)</option>
+            <option value="Slot14_16">14:00 - 16:00)</option>
         </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Book tid</button>
 </form>
+
+<hr />
+

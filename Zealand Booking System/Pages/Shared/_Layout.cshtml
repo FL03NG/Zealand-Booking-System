@@ -19,6 +19,13 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
+                @{
+                    // Hent rolle og brugernavn fra session
+                    var role = Context.Session.GetString("Role");
+                    var username = Context.Session.GetString("Username");
+                    var accountId = Context.Session.GetInt32("AccountID");
+                }
+
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
 
@@ -27,7 +34,7 @@
                         </li>
 
                         @* Kun vis disse links hvis brugeren er logget ind *@
-                        @if (Context.Session.GetInt32("AccountID") != null)
+                        @if (accountId != null)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-page="/CreateBooking">CreateBooking</a>
@@ -35,19 +42,28 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-page="/BookingList">BookingList</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Room">Room</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Accounts/UserList">Brugere</a>
-                            </li>
+
+                            @* Kun admin og lærer kan se Room *@
+                            @if (role == "Administrator" || role == "Teacher")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-page="/Room">Room</a>
+                                </li>
+                            }
+
+                            @* Kun admin kan se brugerliste *@
+                            @if (role == "Administrator")
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-page="/Accounts/UserList">Brugere</a>
+                                </li>
+                            }
                         }
                     </ul>
 
                     <ul class="navbar-nav">
-
                         @* Hvis brugeren IKKE er logget ind *@
-                        @if (Context.Session.GetInt32("AccountID") == null)
+                        @if (accountId == null)
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-page="/Accounts/Login">Login</a>
@@ -60,7 +76,7 @@
                         else
                         {
                             <li class="nav-item d-flex align-items-center me-3 text-muted">
-                                Logget ind som: <strong class="ms-1">@Context.Session.GetString("Username")</strong>
+                                Logget ind som: <strong class="ms-1">@username</strong>
                             </li>
 
                             <li class="nav-item">
@@ -69,7 +85,6 @@
                                 </form>
                             </li>
                         }
-
                     </ul>
 
                 </div>
@@ -85,8 +100,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - Zealand_Booking_System -
-            <a asp-page="/Privacy">Privacy</a>
+            &copy; 2025 - Zealand_Booking_System - <a asp-page="/Privacy">Privacy</a>
         </div>
     </footer>
 
