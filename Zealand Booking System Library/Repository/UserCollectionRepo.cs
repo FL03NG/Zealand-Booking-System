@@ -229,9 +229,6 @@ namespace Zealand_Booking_System_Library.Repository
 
             return account;
         }
-        public Account GetUserById(int id)
-        {
-            return GetById(id);
-        }
+       
     }
 }

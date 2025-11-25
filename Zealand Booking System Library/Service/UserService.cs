@@ -49,9 +49,6 @@ namespace Zealand_Booking_System_Library.Service
         {
             return _repo.GetAllUsers();
         }
-        public Account GetUserById(int id)
-        {
-            return _repo.GetUserById(id);
-        }
+       
     }
 }

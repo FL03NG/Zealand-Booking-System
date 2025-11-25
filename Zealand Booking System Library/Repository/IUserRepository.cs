@@ -16,6 +16,6 @@ namespace Zealand_Booking_System_Library.Repository
         void DeleteUser(int accountId);
         List<Account> GetAll();
         List<Account> GetAllUsers();
-        Account GetUserById(int accountId);
+        
     }
 }

@@ -56,7 +56,7 @@ namespace Zealand_Booking_System.Pages.Accounts
             EditUserID = accountID;
 
             UserCollectionRepo repo = new UserCollectionRepo(_connectionString);
-            EditUser = repo.GetUserById(accountID);
+            EditUser = repo.GetById(accountID);
 
             LoadData();
             return Page();
