@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Zealand_Booking_System_Library.Models;
 using Microsoft.Data.SqlClient;
 
@@ -16,44 +14,54 @@ namespace Zealand_Booking_System_Library.Repository
         {
             _connectionString = connectionString;
         }
+
         public void AddRoom(Room room)
         {
-            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;"))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 SqlCommand cmd = new SqlCommand(
-                    "INSERT INTO Room (RoomName, Size, RoomDescription, RoomLocation) " +
-                    "VALUES (@RoomName, @Size, @RoomDescription, @RoomLocation)", conn);
+                    "INSERT INTO Room (RoomName, Size, RoomDescription, RoomLocation, RoomType, HasSmartBoard) " +
+                    "VALUES (@RoomName, @Size, @RoomDescription, @RoomLocation, @RoomType, @HasSmartBoard)", conn);
 
                 cmd.Parameters.AddWithValue("@RoomName", room.RoomName);
                 cmd.Parameters.AddWithValue("@Size", room.Size);
-                cmd.Parameters.AddWithValue("@RoomDescription", room.RoomDescription);
+                cmd.Parameters.AddWithValue("@RoomDescription", room.RoomDescription ?? "");
                 cmd.Parameters.AddWithValue("@RoomLocation", room.RoomLocation);
+                cmd.Parameters.AddWithValue("@RoomType", (int)room.RoomType);      // enum -> int
+                cmd.Parameters.AddWithValue("@HasSmartBoard", room.HasSmartBoard); // bool -> bit
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
         }
+
         public List<Room> GetAllRooms()
         {
             List<Room> rooms = new List<Room>();
 
-            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;"))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                SqlCommand cmd = new SqlCommand("SELECT * FROM Room", conn);
+                SqlCommand cmd = new SqlCommand("SELECT RoomID, RoomName, Size, RoomDescription, RoomLocation, RoomType, HasSmartBoard FROM Room", conn);
                 conn.Open();
 
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        Room r = new Room
-                        {
-                            RoomID = (int)reader["RoomID"],
-                            RoomName = (string)reader["RoomName"],
-                            Size = (string)reader["Size"],
-                            RoomDescription = (string)reader["RoomDescription"],
-                            RoomLocation = (string)reader["RoomLocation"],
-                        };
+                        Room r = new Room();
+                        r.RoomID = (int)reader["RoomID"];
+                        r.RoomName = (string)reader["RoomName"];
+                        r.Size = (string)reader["Size"];
+                        r.RoomDescription = reader["RoomDescription"].ToString();
+                        r.RoomLocation = reader["RoomLocation"].ToString();
+
+                        // NYT: map RoomType (int -> enum)
+                        int roomTypeValue = Convert.ToInt32(reader["RoomType"]);
+                        r.RoomType = (RoomType)roomTypeValue;
+
+                        // NYT: map HasSmartBoard (bit -> bool)
+                        r.HasSmartBoard = Convert.ToBoolean(reader["HasSmartBoard"]);
+
                         rooms.Add(r);
                     }
                 }
@@ -67,22 +75,27 @@ namespace Zealand_Booking_System_Library.Repository
             {
                 SqlCommand cmd = new SqlCommand(
                     @"UPDATE Room 
-              SET RoomName=@RoomName,
-                  Size=@Size,
-                  RoomDescription=@RoomDescription,
-                  RoomLocation=@RoomLocation
-              WHERE RoomID=@RoomID", conn);
+                      SET RoomName = @RoomName,
+                          Size = @Size,
+                          RoomDescription = @RoomDescription,
+                          RoomLocation = @RoomLocation,
+                          RoomType = @RoomType,
+                          HasSmartBoard = @HasSmartBoard
+                      WHERE RoomID = @RoomID", conn);
 
                 cmd.Parameters.AddWithValue("@RoomID", room.RoomID);
                 cmd.Parameters.AddWithValue("@RoomName", room.RoomName);
                 cmd.Parameters.AddWithValue("@Size", room.Size);
                 cmd.Parameters.AddWithValue("@RoomDescription", room.RoomDescription ?? "");
                 cmd.Parameters.AddWithValue("@RoomLocation", room.RoomLocation);
+                cmd.Parameters.AddWithValue("@RoomType", (int)room.RoomType);
+                cmd.Parameters.AddWithValue("@HasSmartBoard", room.HasSmartBoard);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
         }
+
         public void DeleteRoom(int id)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -102,13 +115,15 @@ namespace Zealand_Booking_System_Library.Repository
                 cmdRoom.ExecuteNonQuery();
             }
         }
+
         public Room GetRoomById(int roomID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
 
-                string sql = "SELECT RoomID, RoomName, RoomLocation, Size, RoomDescription FROM Room WHERE RoomID = @RoomID";
+                string sql = "SELECT RoomID, RoomName, RoomLocation, Size, RoomDescription, RoomType, HasSmartBoard " +
+                             "FROM Room WHERE RoomID = @RoomID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
@@ -118,14 +133,19 @@ namespace Zealand_Booking_System_Library.Repository
                     {
                         if (reader.Read())
                         {
-                            return new Room
-                            {
-                                RoomID = (int)reader["RoomID"],
-                                RoomName = reader["RoomName"].ToString(),
-                                RoomLocation = reader["RoomLocation"].ToString(),
-                                Size = (string)reader["Size"],
-                                RoomDescription = reader["RoomDescription"].ToString()
-                            };
+                            Room room = new Room();
+                            room.RoomID = (int)reader["RoomID"];
+                            room.RoomName = reader["RoomName"].ToString();
+                            room.RoomLocation = reader["RoomLocation"].ToString();
+                            room.Size = (string)reader["Size"];
+                            room.RoomDescription = reader["RoomDescription"].ToString();
+
+                            int roomTypeValue = Convert.ToInt32(reader["RoomType"]);
+                            room.RoomType = (RoomType)roomTypeValue;
+
+                            room.HasSmartBoard = Convert.ToBoolean(reader["HasSmartBoard"]);
+
+                            return room;
                         }
                     }
                 }

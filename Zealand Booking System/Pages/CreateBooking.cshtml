@@ -19,7 +19,9 @@
             <option value="">-- Vælg Lokale --</option>
             @foreach (var room in Model.Rooms)
             {
-                <option value="@room.RoomID">@room.RoomName</option>
+                <option value="@room.RoomID">
+                    @room.RoomName (@room.RoomType, Smartboard: @(room.HasSmartBoard ? "Ja" : "Nej"))
+                </option>
             }
         </select>
     </div>
@@ -34,10 +36,10 @@
     <div class="mb-3">
         <label for="TimeSlot">Tidsrum:</label>
         <select asp-for="NewBooking.TimeSlot" class="form-control" required>
-            <option value="Slot08_10">08:00 - 10:00)</option>
-            <option value="Slot10_12">10:00 - 12:00)</option>
-            <option value="Slot12_14">12:00 - 14:00)</option>
-            <option value="Slot14_16">14:00 - 16:00)</option>
+            <option value="Slot08_10">08:00 - 10:00</option>
+            <option value="Slot10_12">10:00 - 12:00</option>
+            <option value="Slot12_14">12:00 - 14:00</option>
+            <option value="Slot14_16">14:00 - 16:00</option>
         </select>
     </div>
 
@@ -45,4 +47,3 @@
 </form>
 
 <hr />
-
