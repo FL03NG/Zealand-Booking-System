@@ -21,7 +21,7 @@ namespace Zealand_Booking_System_Library.Repository
 
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string sql = "SELECT RoomID, RoomName, Size, RoomDescription, RoomLocation, RoomType, HasSmartBoard FROM Room";
+                string sql = "SELECT RoomID, RoomName, RoomDescription, RoomLocation, RoomType, HasSmartBoard FROM Room";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
@@ -35,7 +35,7 @@ namespace Zealand_Booking_System_Library.Repository
 
                             room.RoomID = Convert.ToInt32(reader["RoomID"]);
                             room.RoomName = reader["RoomName"].ToString();
-                            room.Size = reader["Size"].ToString();
+                            //room.Size = reader["Size"].ToString();
                             room.RoomDescription = reader["RoomDescription"] != DBNull.Value
                                 ? reader["RoomDescription"].ToString()
                                 : string.Empty;
@@ -68,7 +68,7 @@ namespace Zealand_Booking_System_Library.Repository
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                string sql = "SELECT RoomID, RoomName, RoomLocation, Size, RoomDescription, RoomType, HasSmartBoard " +
+                string sql = "SELECT RoomID, RoomName, RoomLocation, RoomDescription, RoomType, HasSmartBoard " +
                              "FROM Room WHERE RoomID = @RoomID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
@@ -86,7 +86,7 @@ namespace Zealand_Booking_System_Library.Repository
                             room.RoomID = Convert.ToInt32(reader["RoomID"]);
                             room.RoomName = reader["RoomName"].ToString();
                             room.RoomLocation = reader["RoomLocation"].ToString();
-                            room.Size = reader["Size"].ToString();
+                            //room.Size = reader["Size"].ToString();
                             room.RoomDescription = reader["RoomDescription"] != DBNull.Value
                                 ? reader["RoomDescription"].ToString()
                                 : string.Empty;
@@ -117,13 +117,13 @@ namespace Zealand_Booking_System_Library.Repository
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 string sql =
-                    "INSERT INTO Room (RoomName, Size, RoomDescription, RoomLocation, RoomType, HasSmartBoard) " +
-                    "VALUES (@RoomName, @Size, @RoomDescription, @RoomLocation, @RoomType, @HasSmartBoard)";
+                    "INSERT INTO Room (RoomName, RoomDescription, RoomLocation, RoomType, HasSmartBoard) " +
+                    "VALUES (@RoomName, @RoomDescription, @RoomLocation, @RoomType, @HasSmartBoard)";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
                     cmd.Parameters.AddWithValue("@RoomName", room.RoomName);
-                    cmd.Parameters.AddWithValue("@Size", room.Size);
+                    //cmd.Parameters.AddWithValue("@Size", room.Size);
                     cmd.Parameters.AddWithValue("@RoomDescription",
                         string.IsNullOrEmpty(room.RoomDescription) ? string.Empty : room.RoomDescription);
                     cmd.Parameters.AddWithValue("@RoomLocation", room.RoomLocation);
@@ -144,7 +144,6 @@ namespace Zealand_Booking_System_Library.Repository
                 string sql =
                     @"UPDATE Room 
                       SET RoomName = @RoomName,
-                          Size = @Size,
                           RoomDescription = @RoomDescription,
                           RoomLocation = @RoomLocation,
                           RoomType = @RoomType,
@@ -155,7 +154,7 @@ namespace Zealand_Booking_System_Library.Repository
                 {
                     cmd.Parameters.AddWithValue("@RoomID", room.RoomID);
                     cmd.Parameters.AddWithValue("@RoomName", room.RoomName);
-                    cmd.Parameters.AddWithValue("@Size", room.Size);
+                    //cmd.Parameters.AddWithValue("@Size", room.Size);
                     cmd.Parameters.AddWithValue("@RoomDescription",
                         string.IsNullOrEmpty(room.RoomDescription) ? string.Empty : room.RoomDescription);
                     cmd.Parameters.AddWithValue("@RoomLocation", room.RoomLocation);

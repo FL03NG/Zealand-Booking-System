@@ -48,13 +48,9 @@
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-page="/BookingList">BookingList</a>
                             </li>
-
-                            @if (role == "Administrator" || role == "Teacher")
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-dark" asp-page="/Room">Room</a>
-                                </li>
-                            }
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-page="/Room">Room</a>
+                            </li>
 
                             @if (role == "Administrator")
                             {
