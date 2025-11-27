@@ -1,90 +1,104 @@
 ﻿@page
 @model Zealand_Booking_System.Pages.Accounts.UserListModel
+@using Zealand_Booking_System_Library.Models
 @{
     ViewData["Title"] = "Brugeroversigt";
 }
 
-<h1>Brugeroversigt</h1>
+<section class="my-4 my-md-5">
+    <h1 class="zb-section-title mb-3">Brugeroversigt</h1>
 
-<form method="post" asp-page-handler="Search" class="mb-3">
-    <div class="input-group">
-        <input asp-for="SearchName" class="form-control" placeholder="Søg på brugernavn..." />
-        <button type="submit" class="btn btn-primary">Søg</button>
+    <!-- Søgning -->
+    <div class="zb-form-card mb-4">
+        <form method="post" asp-page-handler="Search" class="mb-0">
+            <label asp-for="SearchName" class="form-label">Søg på brugernavn</label>
+            <div class="input-group">
+                <input asp-for="SearchName" class="form-control" placeholder="Søg på brugernavn..." />
+                <button type="submit" class="btn zb-btn-primary">
+                    Søg
+                </button>
+            </div>
+        </form>
     </div>
-</form>
 
-@if (!string.IsNullOrEmpty(Model.Message))
-{
-    <div class="alert alert-info">@Model.Message</div>
-}
+    @if (!string.IsNullOrEmpty(Model.Message))
+    {
+        <div class="alert alert-info">@Model.Message</div>
+    }
 
-@if (Model.Users == null || Model.Users.Count == 0)
-{
-    <p>Der er ingen brugere at vise.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>AccountID</th>
-                <th>Brugernavn</th>
-                <th>Rolle</th>
-                <th>Handling</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var user in Model.Users)
-            {
-                @if (Model.EditUserID == user.AccountID)
-                {
-                    <form method="post" asp-page-handler="SaveEdit">
-                    <tr>
-                        <td>
-                            @user.AccountID
-                            <input type="hidden" asp-for="EditUser.AccountID" />
-                        </td>
+    @if (Model.Users == null || Model.Users.Count == 0)
+    {
+        <p>Der er ingen brugere at vise.</p>
+    }
+    else
+    {
+        <div class="zb-table-card">
+            <div class="table-responsive">
+                <table class="table table-sm align-middle zb-table">
+                    <thead>
+                        <tr>
+                            <th>AccountID</th>
+                            <th>Brugernavn</th>
+                            <th>Rolle</th>
+                            <th>Handling</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (Account user in Model.Users)
+                        {
+                            if (Model.EditUserID == user.AccountID)
+                            {
+                                <!-- Redigeringstilstand -->
+                                <tr>
+                                    <form method="post" asp-page-handler="SaveEdit">
+                                    <td>
+                                        @user.AccountID
+                                        <input type="hidden" asp-for="EditUser.AccountID" />
+                                    </td>
 
-                        <td>
-                            <input asp-for="EditUser.Username" class="form-control" />
-                        </td>
+                                    <td>
+                                        <input asp-for="EditUser.Username" class="form-control" />
+                                    </td>
 
-                        <td>
-                            <select asp-for="EditUser.Role" class="form-control">
-                                <option value="Administrator">Administrator</option>
-                                <option value="Teacher">Teacher</option>
-                                <option value="Student">Student</option>
-                            </select>
-                        </td>
+                                    <td>
+                                        <select asp-for="EditUser.Role" class="form-select">
+                                            <option value="Administrator">Administrator</option>
+                                            <option value="Teacher">Teacher</option>
+                                            <option value="Student">Student</option>
+                                        </select>
+                                    </td>
 
-                        <td>
-                            <button type="submit" class="btn btn-success btn-sm">Gem</button>
-                            <a asp-page="./UserList" class="btn btn-secondary btn-sm">Fortryd</a>
-                        </td>
-                    </tr>
-                    </form>
-                }
-                else
-                {
-                    <tr>
-                        <td>@user.AccountID</td>
-                        <td>@user.Username</td>
-                        <td>@user.Role</td>
-                        <td>
-                            <form method="post" asp-page-handler="Delete" class="d-inline">
-                                <input type="hidden" name="accountID" value="@user.AccountID" />
-                                <button type="submit" class="btn btn-danger btn-sm">Slet</button>
-                            </form>
+                                    <td>
+                                        <button type="submit" class="btn btn-success btn-sm">Gem</button>
+                                        <a asp-page="./UserList" class="btn zb-btn-secondary btn-sm">Fortryd</a>
+                                    </td>
+                                    </form>
+                                </tr>
+                            }
+                            else
+                            {
+                                <!-- Visningstilstand -->
+                                <tr>
+                                    <td>@user.AccountID</td>
+                                    <td>@user.Username</td>
+                                    <td>@user.Role</td>
+                                    <td>
+                                        <form method="post" asp-page-handler="Delete" class="d-inline">
+                                            <input type="hidden" name="accountID" value="@user.AccountID" />
+                                            <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+                                        </form>
 
-                            <form method="post" asp-page-handler="StartEdit" class="d-inline">
-                                <input type="hidden" name="accountID" value="@user.AccountID" />
-                                <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-
-            }
-        </tbody>
-    </table>
-}
+                                        <form method="post" asp-page-handler="StartEdit" class="d-inline">
+                                            <input type="hidden" name="accountID" value="@user.AccountID" />
+                                            <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</section>

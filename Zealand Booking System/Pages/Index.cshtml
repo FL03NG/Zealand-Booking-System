@@ -16,13 +16,41 @@
                 Systemet er udviklet med fokus på overskuelighed og Zealands visuelle identitet.
             </p>
             <div class="d-flex flex-wrap gap-2">
-                <a asp-page="/Booking/Index" class="btn zb-btn-primary">
-                    Book et lokale
-                </a>
-                <a asp-page="/Booking/MyBookings" class="btn zb-btn-secondary">
-                    Se dine bookinger
-                </a>
+                @{
+                    int? loggetId = HttpContext.Session.GetInt32("AccountID");
+                }
+
+                @if (loggetId == null)
+                {
+                    <!-- Ikke logget ind -->
+                    <a asp-page="/Accounts/Login" class="btn zb-btn-primary">
+                        Log ind
+                    </a>
+                    <a asp-page="/Accounts/Register" class="btn zb-btn-secondary">
+                        Opret bruger
+                    </a>
+                }
+                else
+                {
+                    <!-- Logget ind -->
+                    <a asp-page="/CreateBooking" class="btn zb-btn-primary">
+                        Book et lokale
+                    </a>
+                    <a asp-page="/BookingList" class="btn zb-btn-secondary">
+                        Se dine bookinger
+                    </a>
+                }
             </div>
+            <p class="small text-muted mt-3 mb-0">
+                @if (loggetId == null)
+                {
+                    <span>Du skal være logget ind for at booke lokaler.</span>
+                }
+                else
+                {
+                    <span>Du er logget ind – vælg en funktion ovenfor.</span>
+                }
+            </p>
             <p class="small text-muted mt-3 mb-0">
                 Log ind med din Zealand-konto for at få adgang til alle funktioner.
             </p>

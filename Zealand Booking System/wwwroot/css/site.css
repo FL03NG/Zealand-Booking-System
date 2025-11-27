@@ -144,3 +144,63 @@ a {
     .zb-footer a {
         color: var(--zb-yellow-soft);
     }
+/* Tydeligere tekst i booking-listen (Lokale bookinger) */
+
+/* Header-tekst i tabellen */
+.zb-table thead th {
+    color: #ffe97a !important; /* gul */
+    border-color: rgba(255, 233, 122, .2);
+}
+
+/* Selve rækkerne */
+.zb-table tbody td {
+    color: #ffe97a !important; /* gul tekst */
+    border-top: 1px solid rgba(255, 233, 122, .12);
+}
+
+/* Hvis der er brugt .table-striped et sted */
+.table-striped.zb-table tbody tr:nth-of-type(odd) {
+    background-color: #111111;
+}
+
+.table-striped.zb-table tbody tr:nth-of-type(even) {
+    background-color: #090909;
+}
+
+/* Hover-effekt, så man kan følge rækken */
+.zb-table tbody tr:hover {
+    background-color: #181818;
+}
+/* === FIX: Brugeroversigt tabel tekst skal være gul/hvid, ikke grå === */
+
+/* Tabel headere */
+table.zb-table thead th,
+.table thead th,
+.table-bordered thead th {
+    color: #ffe97a !important;
+    border-color: rgba(255, 233, 122, 0.3) !important;
+}
+
+/* Tabel celler */
+table.zb-table tbody td,
+.table tbody td,
+.table-bordered tbody td {
+    color: #ffe97a !important;
+}
+
+/* Hvis du bruger table-bordered */
+.table-bordered td, .table-bordered th {
+    border-color: rgba(255, 233, 122, 0.25) !important;
+}
+
+/* Row hover – så man kan følge linjen */
+table.zb-table tbody tr:hover,
+.table tbody tr:hover {
+    background-color: rgba(255, 233, 122, 0.08) !important;
+}
+
+/* Fjern Bootstrap striped hover grå */
+.table-striped tbody tr:nth-of-type(odd),
+.table-striped tbody tr:nth-of-type(even) {
+    color: #ffe97a !important;
+}

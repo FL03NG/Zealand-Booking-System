@@ -43,12 +43,21 @@ namespace Zealand_Booking_System_Library.Service
             List<Booking> allbookings = _bookingRepo.GetAll();
             int sameRoomSameSlotCount = 0;
 
+            // NYT: tæller hvor mange bookinger denne bruger allerede har
+            int userBookingCount = 0;
+
             foreach (Booking existing in allbookings)
             {
                 bool sameDay = existing.BookingDate.Date == booking.BookingDate.Date;
                 bool sameSlot = existing.TimeSlot == booking.TimeSlot;
                 bool sameUser = existing.AccountID == booking.AccountID;
                 bool sameRoom = existing.RoomID == booking.RoomID;
+
+                // tæller alle bookinger for brugeren (uanset dato)
+                if (sameUser)
+                {
+                    userBookingCount++;
+                }
 
                 // 2) Samme bruger må ikke have to bookinger i samme tidsrum
                 if (sameUser && sameDay && sameSlot)
@@ -61,6 +70,12 @@ namespace Zealand_Booking_System_Library.Service
                 {
                     sameRoomSameSlotCount++;
                 }
+            }
+
+            // NYT: max 5 bookinger per bruger
+            if (userBookingCount >= 5)
+            {
+                throw new Exception("Du har allerede 5 bookinger. Slet en booking, før du opretter en ny.");
             }
 
             // 4) Tjek om vi rammer max for lokale-typen
