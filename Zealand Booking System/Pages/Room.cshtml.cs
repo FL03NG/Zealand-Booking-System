@@ -1,5 +1,6 @@
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
-using System.Reflection.PortableExecutable;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Zealand_Booking_System_Library.Models;
@@ -18,6 +19,7 @@ namespace Zealand_Booking_System.Pages
 
         [BindProperty]
         public Room EditRoom { get; set; }
+
         // Liste som indeholder alle lokaler
         public List<Room> Room { get; set; } = new List<Room>();
 
@@ -35,22 +37,29 @@ namespace Zealand_Booking_System.Pages
         // Constructor – initialiserer repository og service så vi kan forbinde til databasen
         public RoomModel()
         {
-            // Opretter repository og sender det videre til service-laget
             RoomCollectionRepo repo = new RoomCollectionRepo(_connectionString);
             _roomService = new RoomService(repo);
         }
 
         // GET-metode – kaldes når siden hentes første gang
-        // Henter alle eksisterende lokaler fra databasen
         public void OnGet()
         {
-            var allRooms = _roomService.GetAllRooms();
+            List<Room> allRooms = _roomService.GetAllRooms();
+
             if (!string.IsNullOrEmpty(SearchString))
             {
-                // Filtrerer lokaler baseret på søgeteksten
-                Room = allRooms
-                    .Where(r => r.RoomName.Contains(SearchString, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                List<Room> filtered = new List<Room>();
+
+                foreach (Room r in allRooms)
+                {
+                    if (r.RoomName != null &&
+                        r.RoomName.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        filtered.Add(r);
+                    }
+                }
+
+                Room = filtered;
             }
             else
             {
@@ -58,29 +67,23 @@ namespace Zealand_Booking_System.Pages
             }
         }
 
-        // POST-metode – kaldes når brugeren indsender formularen for at oprette et nyt lokale
+        // POST – opret nyt lokale
         public IActionResult OnPost()
         {
             try
             {
-                // Forsøger at tilføje det nye lokale til databasen
                 _roomService.AddRoom(NewRoom);
-
-                // Viser besked hvis oprettelsen lykkes
                 Debug.WriteLine("Lokale oprettet!");
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
-                // Hvis der sker en fejl, vises en fejlbesked
                 Debug.WriteLine("Fejl under oprettelse: " + ex.Message);
             }
 
-            // Genindlæser siden så brugeren ser den opdaterede liste
             return RedirectToPage();
         }
 
-        // POST-metode – kaldes når brugeren trykker på "Slet" knappen
-        // Denne metode modtager et ID på det lokale der skal slettes
+        // POST – slet lokale
         public IActionResult OnPostDelete(int roomID)
         {
             try
@@ -88,7 +91,7 @@ namespace Zealand_Booking_System.Pages
                 _roomService.DeleteRoom(roomID);
                 TempData["Message"] = "Lokale slettet!";
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 TempData["Message"] = "Fejl under sletning: " + ex.Message;
             }
@@ -96,6 +99,7 @@ namespace Zealand_Booking_System.Pages
             return RedirectToPage();
         }
 
+        // POST – start redigering
         public IActionResult OnPostStartEdit(int roomID)
         {
             EditRoomID = roomID;
@@ -103,21 +107,21 @@ namespace Zealand_Booking_System.Pages
             Room = _roomService.GetAllRooms(); // reload list
             return Page();
         }
-       public IActionResult OnPostSaveEdit()
-{
-    try
-    {
-        _roomService.UpdateRoom(EditRoom);
-        TempData["Message"] = "Lokalet er ændret!";
-    }
-    catch (System.Exception ex)
-    {
-        TempData["Message"] = "Fejl under redigering: " + ex.Message;
-    }
 
-    return RedirectToPage(); // reload
-}
+        // POST – gem redigering
+        public IActionResult OnPostSaveEdit()
+        {
+            try
+            {
+                _roomService.UpdateRoom(EditRoom);
+                TempData["Message"] = "Lokalet er ændret!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = "Fejl under redigering: " + ex.Message;
+            }
 
-
+            return RedirectToPage();
+        }
     }
 }

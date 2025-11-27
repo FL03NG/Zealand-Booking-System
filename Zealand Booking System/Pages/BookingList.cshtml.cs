@@ -42,7 +42,10 @@ namespace Zealand_Booking_System.Pages.Shared
         public BookingListModel()
         {
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
-            _bookingService = new BookingService(bookingRepo);
+            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
+
+            // BookingService kræver nu både bookingRepo og roomRepo
+            _bookingService = new BookingService(bookingRepo, roomRepo);
         }
 
         public void OnGet()
@@ -50,7 +53,6 @@ namespace Zealand_Booking_System.Pages.Shared
             LoadData();
         }
 
-        // Opret booking (hvis du bruger formularen nederst)
         public void OnPost()
         {
             try

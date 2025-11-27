@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Zealand_Booking_System_Library.Models;
@@ -39,7 +41,8 @@ namespace Zealand_Booking_System.Pages
             NewBooking.AccountID = accountId.Value;
 
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
-            BookingService bookingService = new BookingService(bookingRepo);
+            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
+            BookingService bookingService = new BookingService(bookingRepo, roomRepo);
 
             try
             {
@@ -58,7 +61,8 @@ namespace Zealand_Booking_System.Pages
         public IActionResult OnPostDelete(int bookingID)
         {
             BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
-            BookingService bookingService = new BookingService(bookingRepo);
+            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
+            BookingService bookingService = new BookingService(bookingRepo, roomRepo);
 
             try
             {
@@ -76,11 +80,11 @@ namespace Zealand_Booking_System.Pages
 
         private void LoadData()
         {
-            BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
-            BookingService bookingService = new BookingService(bookingRepo);
-            Bookings = bookingService.GetAll();
-
             RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
+            BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
+            BookingService bookingService = new BookingService(bookingRepo, roomRepo);
+
+            Bookings = bookingService.GetAll();
             Rooms = roomRepo.GetAllRooms();
         }
     }
