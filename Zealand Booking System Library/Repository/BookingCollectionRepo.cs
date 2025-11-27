@@ -33,7 +33,6 @@ namespace Zealand_Booking_System_Library.Repository
                 b.RoomID,
                 a.Username,
                 r.RoomName,
-                r.Size,
                 r.RoomDescription,
                 r.RoomLocation
             FROM Booking b
@@ -67,7 +66,7 @@ namespace Zealand_Booking_System_Library.Repository
                     Room room = new Room();
                     room.RoomID = booking.RoomID;
                     room.RoomName = reader["RoomName"].ToString();
-                    room.Size = reader["Size"].ToString();
+                    //room.Size = reader["Size"].ToString();
                     room.RoomDescription = reader["RoomDescription"].ToString();
                     room.RoomLocation = reader["RoomLocation"].ToString();
                     booking.Room = room;
@@ -149,7 +148,6 @@ namespace Zealand_Booking_System_Library.Repository
                 b.RoomID,
                 a.Username,
                 r.RoomName,
-                r.Size,
                 r.RoomDescription,
                 r.RoomLocation
             FROM Booking b
@@ -184,7 +182,7 @@ namespace Zealand_Booking_System_Library.Repository
                                 {
                                     RoomID = (int)reader["RoomID"],
                                     RoomName = reader["RoomName"].ToString(),
-                                    Size = reader["Size"].ToString(),
+                                    //Size = reader["Size"].ToString(),
                                     RoomDescription = reader["RoomDescription"].ToString(),
                                     RoomLocation = reader["RoomLocation"].ToString()
                                 }

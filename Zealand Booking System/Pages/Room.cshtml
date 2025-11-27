@@ -1,6 +1,9 @@
 ﻿@page
 @model Zealand_Booking_System.Pages.RoomModel
 @{
+    var role = HttpContext.Session.GetString("Role"); // logget bruger rolle
+    var accountId = HttpContext.Session.GetInt32("AccountID"); // logget bruger id
+    var allowedRoles = new[] { "Administrator", "Teacher" }; // roller med adgang til alle
 }
 
 <body>
@@ -26,8 +29,8 @@
                 <label>Lokation:</label>
                 <input asp-for="EditRoom.RoomLocation" class="form-control" />
 
-                <label>Størrelse:</label>
-                <input asp-for="EditRoom.Size" class="form-control" type="number" />
+                @* <label>Størrelse:</label>
+                <input asp-for="EditRoom.Size" class="form-control" type="number" /> *@
 
                 <label>Beskrivelse:</label>
                 <textarea asp-for="EditRoom.RoomDescription" class="form-control"></textarea>
@@ -55,7 +58,7 @@
             <!-- VISNINGSTILSTAND -->
             <h5 class="card-title">@room.RoomName</h5>
             <p>
-                Størrelse: @room.Size <br />
+                @* Størrelse: @room.Size <br /> *@
                 Lokation: @room.RoomLocation <br />
                 Type: @room.RoomType <br />
                 Smartboard: @(room.HasSmartBoard ? "Ja" : "Nej") <br />
@@ -63,24 +66,31 @@
             </p>
 
             <!-- SLET -->
-            <form method="post" asp-page-handler="Delete" style="display:inline;">
-                <input type="hidden" name="roomID" value="@room.RoomID" />
-                <button type="submit" class="btn btn-danger">Slet</button>
-            </form>
+            @if (allowedRoles.Contains(role))
+            {
+                <form method="post" asp-page-handler="Delete" style="display:inline;">
+                    <input type="hidden" name="roomID" value="@room.RoomID" />
+                    <button type="submit" class="btn btn-danger">Slet</button>
+                </form>
+            }
 
             <!-- REDIGER -->
-            <form method="post" asp-page-handler="StartEdit" style="display:inline;">
-                <input type="hidden" name="roomID" value="@room.RoomID" />
-                <button type="submit" class="btn btn-warning">Rediger</button>
-            </form>
+            @if (allowedRoles.Contains(role))
+            {
+                <form method="post" asp-page-handler="StartEdit" style="display:inline;">
+                    <input type="hidden" name="roomID" value="@room.RoomID" />
+                    <button type="submit" class="btn btn-warning">Rediger</button>
+                </form>
+            }
 
             <!-- BOOK -->
-            <a asp-page="/Booking" class="btn btn-success">
+            <a asp-page="/CreateBooking" class="btn btn-success">
                 Book lokalet
             </a>
         }
     }
-
+    @if (allowedRoles.Contains(role)) 
+    {
     <!-- FORMULAR TIL AT OPRETTE NYT LOKALE -->
     <h3>Opret nyt lokale</h3>
     <form method="post" style="width:50%; margin-bottom: 30px;">
@@ -95,10 +105,10 @@
             <input asp-for="NewRoom.RoomLocation" id="RoomLocation" required class="form-control" />
         </div>
 
-        <div class="mb-2">
+       @*  <div class="mb-2">
             <label for="Size">Størrelse:</label><br />
             <input asp-for="NewRoom.Size" id="Size" type="number" required class="form-control" />
-        </div>
+        </div> *@
 
         <div class="mb-2">
             <label for="RoomDescription">Beskrivelse:</label><br />
@@ -123,4 +133,5 @@
 
         <button type="submit" class="btn btn-primary mt-2">Opret lokale</button>
     </form>
+    }
 </body>
