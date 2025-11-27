@@ -1,79 +1,69 @@
 using Microsoft.AspNetCore.DataProtection;
-using Microsoft.Identity.Client;
 using Zealand_Booking_System_Library.Repository;
 using Zealand_Booking_System_Library.Service;
 
-namespace Zealand_Booking_System
+var builder = WebApplication.CreateBuilder(args);
+
+// Razor Pages
+builder.Services.AddRazorPages();
+
+// ---------------------------------------------------
+// Connection string fra appsettings.json
+// ---------------------------------------------------
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+
+// ---------------------------------------------------
+// Repositories og services
+// ---------------------------------------------------
+builder.Services.AddScoped<IRoomRepository>(provider => new RoomCollectionRepo(connectionString));
+builder.Services.AddScoped<RoomService>();
+
+builder.Services.AddScoped<IUserRepository>(provider => new UserCollectionRepo(connectionString));
+builder.Services.AddScoped<UserService>();
+
+builder.Services.AddScoped<INotificationRepository>(provider => new NotificationCollectionRepo(connectionString));
+builder.Services.AddScoped<NotificationService>();
+
+// ---------------------------------------------------
+// Data Protection
+// ---------------------------------------------------
+builder.Services.AddDataProtection()
+       .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Dataprotection-Keys"))
+       .SetApplicationName("ZealandBookingSystem");
+
+// ---------------------------------------------------
+// Session
+// ---------------------------------------------------
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            
-            var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddRazorPages();
+    options.IdleTimeout = TimeSpan.FromHours(1);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+builder.Services.AddHttpContextAccessor();
 
-            // ---------------------------------------------------
-            // Connection String
-            // ---------------------------------------------------
-            string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var app = builder.Build();
 
-            // ---------------------------------------------------
-            // Dependency Injection
-            // ---------------------------------------------------
-            builder.Services.AddScoped<IRoomRepository>(provider => new RoomCollectionRepo(connectionString));
-            builder.Services.AddScoped<RoomService>();
+// Logout
+app.MapPost("/logout", (HttpContext context) =>
+{
+    context.Session.Clear();
+    return Results.Redirect("/Index");
+});
 
-            builder.Services.AddScoped<IUserRepository>(provider => new UserCollectionRepo(connectionString));
-            builder.Services.AddScoped<UserService>();
-
-            // ---------------------------------------------------
-            // Data Protection (beholder dit setup)
-            // ---------------------------------------------------
-            builder.Services.AddDataProtection()
-                   .PersistKeysToFileSystem(new DirectoryInfo(@"C:\Dataprotection-Keys"))
-                   .SetApplicationName("ZealandBookingSystem");
-
-            // ---------------------------------------------------
-            // Session (bruges til login systemet)
-            // ---------------------------------------------------
-            builder.Services.AddDistributedMemoryCache();
-            builder.Services.AddSession(options =>
-            {
-                options.IdleTimeout = TimeSpan.FromHours(1);
-                options.Cookie.HttpOnly = true;
-                options.Cookie.IsEssential = true;
-            });
-
-            var app = builder.Build();
-
-            app.MapPost("/logout", (HttpContext context) =>
-            {
-                context.Session.Clear(); // ryd session
-                return Results.Redirect("/Index"); // omdiriger til login
-            });
-            // ---------------------------------------------------
-            // Middleware pipeline
-            // ---------------------------------------------------
-            if (!app.Environment.IsDevelopment())
-            {
-                app.UseExceptionHandler("/Error");
-                app.UseHsts();
-            }
-
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-
-            app.UseRouting();
-
-            // Session før Authorization
-            app.UseSession();
-
-            app.UseAuthorization();
-
-            app.MapRazorPages();
-
-            app.Run();
-        }
-    }
+// Middleware pipeline
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+app.UseStaticFiles();
+app.UseRouting();
+app.UseSession();
+app.UseAuthorization();
+
+app.MapRazorPages();
+app.Run();

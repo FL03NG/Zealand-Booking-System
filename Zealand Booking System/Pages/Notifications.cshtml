@@ -1,0 +1,22 @@
+﻿@page
+@model Zealand_Booking_System.Pages.NotificationsModel
+
+<h2>Dine notifikationer</h2>
+
+@if (Model.Notifications.Count == 0)
+{
+    <p>Du har ingen nye notifikationer.</p>
+}
+else
+{
+    foreach (var n in Model.Notifications)
+    {
+        <div class="alert alert-warning d-flex justify-content-between">
+            <span>@n.Message</span>
+            <form method="post" asp-page-handler="MarkRead">
+                <input type="hidden" name="notificationID" value="@n.NotificationID" />
+                <button class="btn btn-sm btn-success">OK</button>
+            </form>
+        </div>
+    }
+}

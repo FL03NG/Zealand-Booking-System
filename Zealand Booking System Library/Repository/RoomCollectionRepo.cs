@@ -16,122 +16,126 @@ namespace Zealand_Booking_System_Library.Repository
         {
             _connectionString = connectionString;
         }
-        public void AddRoom(Room room)
-        {
-            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;"))
-            {
-                SqlCommand cmd = new SqlCommand(
-                    "INSERT INTO Room (RoomName, Size, RoomDescription, RoomLocation) " +
-                    "VALUES (@RoomName, @Size, @RoomDescription, @RoomLocation)", conn);
 
-                cmd.Parameters.AddWithValue("@RoomName", room.RoomName);
-                cmd.Parameters.AddWithValue("@Size", room.Size);
-                cmd.Parameters.AddWithValue("@RoomDescription", room.RoomDescription);
-                cmd.Parameters.AddWithValue("@RoomLocation", room.RoomLocation);
-
-                conn.Open();
-                cmd.ExecuteNonQuery();
-            }
-        }
+        // Hent alle lokaler
         public List<Room> GetAllRooms()
         {
-            List<Room> rooms = new List<Room>();
+            List<Room> rooms = new();
 
-            using (SqlConnection conn = new SqlConnection("Server=(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True;"))
+            using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                SqlCommand cmd = new SqlCommand("SELECT * FROM Room", conn);
-                conn.Open();
+                string sql = "SELECT RoomID, RoomName, Size, RoomDescription, RoomLocation FROM Room";
+                SqlCommand cmd = new SqlCommand(sql, conn);
 
+                conn.Open();
                 using (SqlDataReader reader = cmd.ExecuteReader())
                 {
                     while (reader.Read())
                     {
-                        Room r = new Room
+                        rooms.Add(new Room
                         {
-                            RoomID = (int)reader["RoomID"],
-                            RoomName = (string)reader["RoomName"],
-                            Size = (string)reader["Size"],
-                            RoomDescription = (string)reader["RoomDescription"],
-                            RoomLocation = (string)reader["RoomLocation"],
-                        };
-                        rooms.Add(r);
+                            RoomID = reader.GetInt32(reader.GetOrdinal("RoomID")),
+                            RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
+                            Size = reader.GetString(reader.GetOrdinal("Size")),
+                            RoomDescription = reader["RoomDescription"] != DBNull.Value ? reader.GetString(reader.GetOrdinal("RoomDescription")) : "",
+                            RoomLocation = reader.GetString(reader.GetOrdinal("RoomLocation"))
+                        });
                     }
                 }
             }
+
             return rooms;
         }
 
-        public void UpdateRoom(Room room)
+        // Hent et enkelt lokale
+        public Room GetRoomById(int roomID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                SqlCommand cmd = new SqlCommand(
-                    @"UPDATE Room 
-              SET RoomName=@RoomName,
-                  Size=@Size,
-                  RoomDescription=@RoomDescription,
-                  RoomLocation=@RoomLocation
-              WHERE RoomID=@RoomID", conn);
+                string sql = "SELECT RoomID, RoomName, Size, RoomDescription, RoomLocation FROM Room WHERE RoomID = @RoomID";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@RoomID", roomID);
 
-                cmd.Parameters.AddWithValue("@RoomID", room.RoomID);
+                conn.Open();
+                using (SqlDataReader reader = cmd.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        return new Room
+                        {
+                            RoomID = reader.GetInt32(reader.GetOrdinal("RoomID")),
+                            RoomName = reader.GetString(reader.GetOrdinal("RoomName")),
+                            Size = reader.GetString(reader.GetOrdinal("Size")),
+                            RoomDescription = reader["RoomDescription"] != DBNull.Value ? reader.GetString(reader.GetOrdinal("RoomDescription")) : "",
+                            RoomLocation = reader.GetString(reader.GetOrdinal("RoomLocation"))
+                        };
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        // Opret nyt lokale
+        public void AddRoom(Room room)
+        {
+            using (SqlConnection conn = new SqlConnection(_connectionString))
+            {
+                string sql = @"INSERT INTO Room (RoomName, Size, RoomDescription, RoomLocation)
+                               VALUES (@RoomName, @Size, @RoomDescription, @RoomLocation)";
+                SqlCommand cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@RoomName", room.RoomName);
                 cmd.Parameters.AddWithValue("@Size", room.Size);
-                cmd.Parameters.AddWithValue("@RoomDescription", room.RoomDescription ?? "");
+                cmd.Parameters.AddWithValue("@RoomDescription", string.IsNullOrEmpty(room.RoomDescription) ? "" : room.RoomDescription);
                 cmd.Parameters.AddWithValue("@RoomLocation", room.RoomLocation);
 
                 conn.Open();
                 cmd.ExecuteNonQuery();
             }
         }
-        public void DeleteRoom(int id)
+
+        // Opdater eksisterende lokale
+        public void UpdateRoom(Room room)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
+                string sql = @"UPDATE Room 
+                               SET RoomName = @RoomName,
+                                   Size = @Size,
+                                   RoomDescription = @RoomDescription,
+                                   RoomLocation = @RoomLocation
+                               WHERE RoomID = @RoomID";
+                SqlCommand cmd = new SqlCommand(sql, conn);
+                cmd.Parameters.AddWithValue("@RoomID", room.RoomID);
+                cmd.Parameters.AddWithValue("@RoomName", room.RoomName);
+                cmd.Parameters.AddWithValue("@Size", room.Size);
+                cmd.Parameters.AddWithValue("@RoomDescription", string.IsNullOrEmpty(room.RoomDescription) ? "" : room.RoomDescription);
+                cmd.Parameters.AddWithValue("@RoomLocation", room.RoomLocation);
+
                 conn.Open();
-
-                // Først: slet alle bookinger for det lokale
-                string deleteBookingsSql = "DELETE FROM Booking WHERE RoomID = @id";
-                SqlCommand cmdBookings = new SqlCommand(deleteBookingsSql, conn);
-                cmdBookings.Parameters.AddWithValue("@id", id);
-                cmdBookings.ExecuteNonQuery();
-
-                // Så: slet selve lokalet
-                string deleteRoomSql = "DELETE FROM Room WHERE RoomID = @id";
-                SqlCommand cmdRoom = new SqlCommand(deleteRoomSql, conn);
-                cmdRoom.Parameters.AddWithValue("@id", id);
-                cmdRoom.ExecuteNonQuery();
+                cmd.ExecuteNonQuery();
             }
         }
-        public Room GetRoomById(int roomID)
+
+        // Slet lokale (inkl. alle bookinger tilknyttet)
+        public void DeleteRoom(int roomID)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
 
-                string sql = "SELECT RoomID, RoomName, RoomLocation, Size, RoomDescription FROM Room WHERE RoomID = @RoomID";
+                // Slet alle bookinger for dette lokale først
+                string deleteBookingsSql = "DELETE FROM Booking WHERE RoomID = @RoomID";
+                SqlCommand cmdBookings = new SqlCommand(deleteBookingsSql, conn);
+                cmdBookings.Parameters.AddWithValue("@RoomID", roomID);
+                cmdBookings.ExecuteNonQuery();
 
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                {
-                    cmd.Parameters.AddWithValue("@RoomID", roomID);
-
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        if (reader.Read())
-                        {
-                            return new Room
-                            {
-                                RoomID = (int)reader["RoomID"],
-                                RoomName = reader["RoomName"].ToString(),
-                                RoomLocation = reader["RoomLocation"].ToString(),
-                                Size = (string)reader["Size"],
-                                RoomDescription = reader["RoomDescription"].ToString()
-                            };
-                        }
-                    }
-                }
+                // Slet selve lokalet
+                string deleteRoomSql = "DELETE FROM Room WHERE RoomID = @RoomID";
+                SqlCommand cmdRoom = new SqlCommand(deleteRoomSql, conn);
+                cmdRoom.Parameters.AddWithValue("@RoomID", roomID);
+                cmdRoom.ExecuteNonQuery();
             }
-
-            return null; // hvis ingen fundet
         }
     }
 }

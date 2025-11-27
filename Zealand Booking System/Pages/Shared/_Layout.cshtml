@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using Zealand_Booking_System_Library.Models
+@inject Zealand_Booking_System_Library.Service.NotificationService NotificationService
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -6,34 +9,37 @@
     <title>@ViewData["Title"] - Zealand_Booking_System</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/Zealand_Booking_System.styles.css" asp-append-version="true" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom mb-3">
             <div class="container">
                 <a class="navbar-brand" asp-area="" asp-page="/Index">Zealand_Booking_System</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                        aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 @{
-                    // Hent rolle og brugernavn fra session
                     var role = Context.Session.GetString("Role");
                     var username = Context.Session.GetString("Username");
                     var accountId = Context.Session.GetInt32("AccountID");
+
+                    int unreadNotifications = 0;
+
+                    // Tjek at brugeren er logget ind
+                    if (accountId.HasValue)
+                    {
+                        // Hent antal ulæste notifikationer
+                        unreadNotifications = NotificationService.GetUnread(accountId.Value).Count;
+                    }
                 }
 
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-page="/Index">Home</a>
                         </li>
 
-                        @* Kun vis disse links hvis brugeren er logget ind *@
                         @if (accountId != null)
                         {
                             <li class="nav-item">
@@ -43,7 +49,6 @@
                                 <a class="nav-link text-dark" asp-page="/BookingList">BookingList</a>
                             </li>
 
-                            @* Kun admin og lærer kan se Room *@
                             @if (role == "Administrator" || role == "Teacher")
                             {
                                 <li class="nav-item">
@@ -51,7 +56,6 @@
                                 </li>
                             }
 
-                            @* Kun admin kan se brugerliste *@
                             @if (role == "Administrator")
                             {
                                 <li class="nav-item">
@@ -62,16 +66,10 @@
                     </ul>
 
                     <ul class="navbar-nav">
-                        @* Hvis brugeren IKKE er logget ind *@
                         @if (accountId == null)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Accounts/Login">Login</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Accounts/Register">Register</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Accounts/Login">Login</a></li>
+                            <li class="nav-item"><a class="nav-link text-dark" asp-page="/Accounts/Register">Register</a></li>
                         }
                         else
                         {
@@ -84,9 +82,21 @@
                                     <button type="submit" class="btn btn-link nav-link">Logout</button>
                                 </form>
                             </li>
+
+                            @* Notifikationer *@
+                            <li class="nav-item">
+                                <a class="nav-link text-dark position-relative" asp-page="/Notifications">
+                                    Notifications
+                                    @if (unreadNotifications > 0)
+                                    {
+                                        <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                                            @unreadNotifications
+                                        </span>
+                                    }
+                                </a>
+                            </li>
                         }
                     </ul>
-
                 </div>
             </div>
         </nav>
@@ -107,7 +117,6 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
-
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

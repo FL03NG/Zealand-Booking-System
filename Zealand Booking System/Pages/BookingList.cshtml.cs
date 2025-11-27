@@ -118,16 +118,21 @@ namespace Zealand_Booking_System.Pages.Shared
         // 🗑 Slet booking
         public IActionResult OnPostDelete(int bookingID)
         {
-            try
-            {
-                _bookingService.Delete(bookingID);
-                Message = "Booking slettet!";
-            }
-            catch (Exception ex)
-            {
-                Message = "Fejl ved sletning: " + ex.Message;
-            }
+            var booking = _bookingService.GetBookingById(bookingID);
 
+            // SLET BOOKING
+            _bookingService.Delete(bookingID);
+
+            // LAV NOTIFIKATION
+            var noteRepo = new NotificationCollectionRepo(_connectionString);
+            var noteService = new NotificationService(noteRepo);
+
+            noteService.Create(
+                booking.AccountID,
+                $"Din booking den {booking.BookingDate:dd-MM-yyyy} blev slettet af en administrator/lærer."
+            );
+
+            Message = "Booking slettet!";
             LoadData();
             return Page();
         }
