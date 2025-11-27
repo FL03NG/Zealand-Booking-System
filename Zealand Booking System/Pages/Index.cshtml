@@ -1,10 +1,98 @@
 ﻿@page
-@model IndexModel
+@model Zealand_Booking_System.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Forside";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<section class="zb-hero my-4 my-md-5">
+    <div class="row align-items-center gy-4">
+        <div class="col-lg-6">
+            <span class="zb-badge mb-2">For studerende & undervisere</span>
+            <h1 class="zb-hero-title mb-3">
+                Book et studielokale på Zealand – hurtigt og enkelt
+            </h1>
+            <p class="zb-hero-text mb-4">
+                Find og reserver ledige lokaler til gruppearbejde, projekter eller undervisning.
+                Systemet er udviklet med fokus på overskuelighed og Zealands visuelle identitet.
+            </p>
+            <div class="d-flex flex-wrap gap-2">
+                <a asp-page="/Booking/Index" class="btn zb-btn-primary">
+                    Book et lokale
+                </a>
+                <a asp-page="/Booking/MyBookings" class="btn zb-btn-secondary">
+                    Se dine bookinger
+                </a>
+            </div>
+            <p class="small text-muted mt-3 mb-0">
+                Log ind med din Zealand-konto for at få adgang til alle funktioner.
+            </p>
+        </div>
+        <div class="col-lg-6">
+            <div class="zb-hero-card shadow-sm">
+                <h5 class="mb-3">Næste skridt</h5>
+                <ul class="list-unstyled mb-3">
+                    <li class="d-flex mb-2">
+                        <span class="zb-step-number me-2">1</span>
+                        <div>
+                            <strong>Log ind</strong><br />
+                            <span class="small text-muted">Brug dit brugernavn og din adgangskode.</span>
+                        </div>
+                    </li>
+                    <li class="d-flex mb-2">
+                        <span class="zb-step-number me-2">2</span>
+                        <div>
+                            <strong>Vælg dato og tidsrum</strong><br />
+                            <span class="small text-muted">Se kun lokaler, der faktisk er ledige.</span>
+                        </div>
+                    </li>
+                    <li class="d-flex">
+                        <span class="zb-step-number me-2">3</span>
+                        <div>
+                            <strong>Bekræft din booking</strong><br />
+                            <span class="small text-muted">Få en klar oversigt over dine reservationer.</span>
+                        </div>
+                    </li>
+                </ul>
+                <div class="zb-hero-meta small">
+                    <div>Udviklet som del af Datamatiker-projekt</div>
+                    <div class="text-muted">Zealand · Roskilde</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="my-5">
+    <h2 class="zb-section-title mb-3">Hvorfor bruge systemet?</h2>
+    <p class="text-muted mb-4">
+        Systemet hjælper med at udnytte Zealands lokaler bedre og gør det let for studerende
+        og undervisere at finde ledige rum til studieaktiviteter.
+    </p>
+
+    <div class="row gy-4">
+        <div class="col-md-4">
+            <div class="zb-info-card h-100">
+                <h5 class="mb-2">Overblik over lokaler</h5>
+                <p class="small text-muted mb-0">
+                    Se alle relevante lokaler samlet ét sted – filtreret på campus, størrelse og udstyr.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="zb-info-card h-100">
+                <h5 class="mb-2">Ingen dobbeltbookinger</h5>
+                <p class="small text-muted mb-0">
+                    Systemet tjekker automatisk, om lokalet allerede er booket i det valgte tidsrum.
+                </p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="zb-info-card h-100">
+                <h5 class="mb-2">Designet til studerende</h5>
+                <p class="small text-muted mb-0">
+                    Layout og farver er inspireret af zealand.dk, så det føles velkendt og let at navigere i.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
