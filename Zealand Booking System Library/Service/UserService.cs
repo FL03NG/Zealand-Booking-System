@@ -40,11 +40,6 @@ namespace Zealand_Booking_System_Library.Service
             return _repo.GetById(id);
         }
 
-        public List<Account> GetAll()
-        {
-            return _repo.GetAll();
-        }
-
         public List<Account> GetAllUsers()
         {
             return _repo.GetAllUsers();

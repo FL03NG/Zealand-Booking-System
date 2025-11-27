@@ -183,32 +183,6 @@ namespace Zealand_Booking_System_Library.Repository
             }
         }
 
-
-        // Alternativ hent alle
-        public List<Account> GetAll()
-        {
-            List<Account> accounts = new List<Account>();
-
-            using (SqlConnection conn = new SqlConnection(_connectionString))
-            {
-                conn.Open();
-
-                string sql =
-                    "SELECT AccountID, Username, PasswordHash, AccountRole FROM Account";
-
-                using (SqlCommand cmd = new SqlCommand(sql, conn))
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        accounts.Add(MapToAccount(reader));
-                    }
-                }
-            }
-
-            return accounts;
-        }
-
         // Map SQL -> Account objekt
         private Account MapToAccount(SqlDataReader reader)
         {
