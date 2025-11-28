@@ -9,23 +9,47 @@
 <section class="my-4 my-md-5">
     <h2 class="zb-section-title mb-3">Lokaler</h2>
 
-    <!-- SØGEFELT -->
     <div class="zb-form-card mb-4">
-        <form method="get" class="mb-0">
-            <label for="SearchString" class="form-label">Søg efter lokaler</label>
-            <input type="text"
-                   name="SearchString"
-                   id="SearchString"
-                   value="@Model.SearchString"
-                   placeholder="Søg efter lokaler..."
-                   class="form-control" />
-            <button type="submit" class="btn zb-btn-secondary mt-2">Søg</button>
+        <form method="get" class="row g-2 align-items-end">
+            <!-- SØGEFELT -->
+            <div class="col-md-6">
+                <label for="SearchString" class="form-label">Søg efter lokaler</label>
+                <input type="text"
+                       name="SearchString"
+                       id="SearchString"
+                       value="@Model.SearchString"
+                       placeholder="Søg efter lokaler..."
+                       class="form-control" />
+            </div>
+
+            <!-- ROOMTYPE DROPDOWN -->
+            <div class="col-md-4">
+                <label for="RoomTypeFilter" class="form-label">Sortér efter RoomType</label>
+                <select name="RoomTypeFilter" id="RoomTypeFilter" class="form-select">
+                    <option value="">Alle</option>
+                    @foreach (var type in Enum.GetValues(typeof(Zealand_Booking_System_Library.Models.RoomType)))
+                    {
+                        if (Model.RoomTypeFilter == type.ToString())
+                        {
+                            <option value="@type" selected>@type</option>
+                        }
+                        else
+                        {
+                            <option value="@type">@type</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <!-- SUBMIT KNAP -->
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn zb-btn-secondary mt-2">Søg</button>
+            </div>
         </form>
     </div>
-
     <!-- LISTE AF LOKALER -->
     <div class="row gy-4">
-        @foreach (Zealand_Booking_System_Library.Models.Room room in Model.Room)
+        @foreach (var room in Model.Room)
         {
             <div class="col-md-6 col-lg-4">
                 <div class="zb-info-card h-100">

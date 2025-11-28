@@ -33,18 +33,18 @@ a {
 /* Navbar – sort med tynd gul linje */
 
 .zb-navbar {
-    background-color: #000000;
+    background-color: var(--zb-yellow);
     border-bottom: 1px solid var(--zb-yellow);
 }
 
 .navbar-brand,
 .navbar-brand:focus,
 .navbar-brand:hover {
-    color: var(--zb-yellow) !important;
+    color: #000000;
 }
 
 .navbar-nav .nav-link {
-    color: var(--zb-yellow) !important;
+    color: #000000;
     font-weight: 500;
 }
 

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Zealand_Booking_System_Library.Models;
 using Zealand_Booking_System_Library.Repository;
 using Zealand_Booking_System_Library.Service;
+using System.Linq;
 
 namespace Zealand_Booking_System.Pages
 {
@@ -20,54 +21,47 @@ namespace Zealand_Booking_System.Pages
         [BindProperty]
         public Room EditRoom { get; set; }
 
-        // Liste som indeholder alle lokaler
         public List<Room> Room { get; set; } = new List<Room>();
 
-        // Property til søgning
         [BindProperty(SupportsGet = true)]
         public string SearchString { get; set; } = string.Empty;
 
-        // Service som håndterer CRUD-operationer for lokaler
+        [BindProperty(SupportsGet = true)]
+        public string RoomTypeFilter { get; set; } = string.Empty;
+
         private RoomService _roomService;
 
-        // Property som bruges til at modtage nye lokaledata fra formularen
         [BindProperty]
         public Room NewRoom { get; set; } = new Room();
 
-        // Constructor – initialiserer repository og service så vi kan forbinde til databasen
         public RoomModel()
         {
             RoomCollectionRepo repo = new RoomCollectionRepo(_connectionString);
             _roomService = new RoomService(repo);
         }
 
-        // GET-metode – kaldes når siden hentes første gang
         public void OnGet()
         {
-            List<Room> allRooms = _roomService.GetAllRooms();
+            var allRooms = _roomService.GetAllRooms();
 
             if (!string.IsNullOrEmpty(SearchString))
             {
-                List<Room> filtered = new List<Room>();
-
-                foreach (Room r in allRooms)
-                {
-                    if (r.RoomName != null &&
-                        r.RoomName.IndexOf(SearchString, StringComparison.OrdinalIgnoreCase) >= 0)
-                    {
-                        filtered.Add(r);
-                    }
-                }
-
-                Room = filtered;
+                allRooms = allRooms
+                    .Where(r => !string.IsNullOrEmpty(r.RoomName) &&
+                                r.RoomName.Contains(SearchString, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
             }
-            else
+
+            if (!string.IsNullOrEmpty(RoomTypeFilter))
             {
-                Room = allRooms;
+                allRooms = allRooms
+                    .Where(r => r.RoomType.ToString() == RoomTypeFilter)
+                    .ToList();
             }
+
+            Room = allRooms;
         }
 
-        // POST – opret nyt lokale
         public IActionResult OnPost()
         {
             try
@@ -83,7 +77,6 @@ namespace Zealand_Booking_System.Pages
             return RedirectToPage();
         }
 
-        // POST – slet lokale
         public IActionResult OnPostDelete(int roomID)
         {
             try
@@ -99,16 +92,14 @@ namespace Zealand_Booking_System.Pages
             return RedirectToPage();
         }
 
-        // POST – start redigering
         public IActionResult OnPostStartEdit(int roomID)
         {
             EditRoomID = roomID;
             EditRoom = _roomService.GetRoomById(roomID);
-            Room = _roomService.GetAllRooms(); // reload list
+            Room = _roomService.GetAllRooms();
             return Page();
         }
 
-        // POST – gem redigering
         public IActionResult OnPostSaveEdit()
         {
             try
