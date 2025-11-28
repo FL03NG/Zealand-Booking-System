@@ -10,11 +10,11 @@ namespace Zealand_Booking_System_Library.Repository
     public interface IUserRepository
     {
         Account GetById(int accountId);
-        Account Login(string username, string passwordHash);
+        Account GetByUsername(string username);
         void CreateUser(Account user, string role);
         void UpdateUser(Account user);
         void DeleteUser(int accountId);
         List<Account> GetAllUsers();
-        
+
     }
 }

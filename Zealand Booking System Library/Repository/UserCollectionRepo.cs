@@ -13,7 +13,6 @@ namespace Zealand_Booking_System_Library.Repository
             _connectionString = connectionString;
         }
 
-        // Hent alle brugere
         public List<Account> GetAllUsers()
         {
             List<Account> users = new List<Account>();
@@ -37,7 +36,6 @@ namespace Zealand_Booking_System_Library.Repository
             return users;
         }
 
-        // Hent én bruger
         public Account GetById(int accountId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -63,8 +61,7 @@ namespace Zealand_Booking_System_Library.Repository
             }
         }
 
-        // Login (simplet)
-        public Account Login(string username, string passwordHash)
+        public Account GetByUsername(string username)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
@@ -83,18 +80,12 @@ namespace Zealand_Booking_System_Library.Repository
                         if (!reader.Read())
                             return null;
 
-                        string storedHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
-
-                        if (storedHash != passwordHash)
-                            return null;
-
                         return MapToAccount(reader);
                     }
                 }
             }
         }
 
-        // Opret ny bruger
         public void CreateUser(Account user, string role)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -183,7 +174,6 @@ namespace Zealand_Booking_System_Library.Repository
             }
         }
 
-        // Map SQL -> Account objekt
         private Account MapToAccount(SqlDataReader reader)
         {
             string role = reader.GetString(reader.GetOrdinal("AccountRole"));
@@ -203,6 +193,5 @@ namespace Zealand_Booking_System_Library.Repository
 
             return account;
         }
-       
     }
 }

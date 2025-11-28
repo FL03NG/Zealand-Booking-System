@@ -15,13 +15,22 @@ namespace Zealand_Booking_System_Library.Service
 
         public Account Login(string username, string password)
         {
-            // TODO: Tilføj hashing hvis nødvendigt
-            string hash = password;
-            return _repo.Login(username, hash);
+            Account user = _repo.GetByUsername(username);
+            if (user == null)
+                return null;
+
+            // Argon2 verify
+            if (PasswordHasher.Verify(user.PasswordHash, password))
+                return user;
+
+            return null;
         }
 
         public void Create(Account user, string role)
         {
+            // Hash password inden det sendes til repository
+            user.PasswordHash = PasswordHasher.Hash(user.PasswordHash);
+
             _repo.CreateUser(user, role);
         }
 
@@ -44,6 +53,6 @@ namespace Zealand_Booking_System_Library.Service
         {
             return _repo.GetAllUsers();
         }
-       
+
     }
 }
