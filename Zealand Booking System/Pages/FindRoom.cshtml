@@ -81,7 +81,7 @@
                     <td>@avail.CurrentBookings / @avail.MaxBookings</td>
                     <td>@avail.StatusText</td>
                     <td>
-                        <a asp-page="/Booking"
+                        <a asp-page="/BookingList"
                            asp-route-roomId="@avail.Room.RoomID"
                            asp-route-date="@Model.SelectedDate.ToString("yyyy-MM-dd")"
                            asp-route-timeSlot="@Model.SelectedTimeSlot"
