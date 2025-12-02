@@ -114,5 +114,79 @@ namespace Zealand_Booking_System_Library.Service
         {
             _bookingRepo.Update(booking);
         }
+        public List<RoomAvailability> GetRoomAvailability(DateTime date, TimeSlot timeSlot, RoomType? roomType)
+        {
+            List<Room> allRooms = _roomRepo.GetAllRooms();
+            List<Booking> allBookings = _bookingRepo.GetAll();
+
+            List<RoomAvailability> result = new List<RoomAvailability>();
+
+            for (int i = 0; i < allRooms.Count; i++)
+            {
+                Room room = allRooms[i];
+
+                // Filtrér på type, hvis der er valgt en
+                if (roomType.HasValue && room.RoomType != roomType.Value)
+                {
+                    continue;
+                }
+
+                int maxBookingsForRoom;
+
+                if (room.RoomType == RoomType.ClassRoom)
+                {
+                    maxBookingsForRoom = 2;
+                }
+                else if (room.RoomType == RoomType.MeetingRoom)
+                {
+                    maxBookingsForRoom = 1;
+                }
+                else
+                {
+                    maxBookingsForRoom = 1;
+                }
+
+                int currentBookings = 0;
+
+                for (int j = 0; j < allBookings.Count; j++)
+                {
+                    Booking booking = allBookings[j];
+
+                    bool sameRoom = booking.RoomID == room.RoomID;
+                    bool sameDate = booking.BookingDate.Date == date.Date;
+                    bool sameSlot = booking.TimeSlot == timeSlot;
+
+                    if (sameRoom && sameDate && sameSlot)
+                    {
+                        currentBookings = currentBookings + 1;
+                    }
+                }
+
+                RoomAvailability availability = new RoomAvailability();
+                availability.Room = room;
+                availability.MaxBookings = maxBookingsForRoom;
+                availability.CurrentBookings = currentBookings;
+
+                if (currentBookings == 0)
+                {
+                    availability.StatusColor = "green";
+                    availability.StatusText = "Helt ledig";
+                }
+                else if (currentBookings < maxBookingsForRoom)
+                {
+                    availability.StatusColor = "yellow";
+                    availability.StatusText = "Delvist booket";
+                }
+                else
+                {
+                    availability.StatusColor = "red";
+                    availability.StatusText = "Fuldt booket";
+                }
+
+                result.Add(availability);
+            }
+
+            return result;
+        }
     }
 }

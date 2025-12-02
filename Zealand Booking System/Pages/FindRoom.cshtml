@@ -1,0 +1,96 @@
+﻿@page
+@model Zealand_Booking_System.Pages.FindRoomsModel
+@using Zealand_Booking_System_Library.Models
+
+@{
+    ViewData["Title"] = "Find ledige lokaler";
+}
+
+<h1>Find ledige lokaler</h1>
+
+<form method="post" class="mb-3">
+    <div class="row g-2">
+        <div class="col-md-3">
+            <label asp-for="SelectedDate" class="form-label">Dato</label>
+            <input asp-for="SelectedDate" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="SelectedTimeSlot" class="form-label">Tidspunkt</label>
+            <select asp-for="SelectedTimeSlot"
+                    class="form-select"
+                    asp-items="Html.GetEnumSelectList<TimeSlot>()">
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label asp-for="SelectedRoomType" class="form-label">Lokaletype</label>
+            <select asp-for="SelectedRoomType" class="form-select">
+                <option value="">Alle typer</option>
+                @foreach (RoomType type in Enum.GetValues(typeof(RoomType)))
+                {
+                    bool selected = Model.SelectedRoomType.HasValue && Model.SelectedRoomType.Value == type;
+                    <option value="@type" selected="@(selected)">
+                        @type
+                    </option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">Opdater liste</button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered align-middle">
+    <thead>
+        <tr>
+            <th>Lokale</th>
+            <th>Type</th>
+            <th>Lokation</th>
+            <th>Bookings</th>
+            <th>Status</th>
+            <th>Handling</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.Rooms != null)
+        {
+            foreach (RoomAvailability avail in Model.Rooms)
+            {
+                string rowClass;
+
+                if (avail.StatusColor == "green")
+                {
+                    rowClass = "table-success";
+                }
+                else if (avail.StatusColor == "yellow")
+                {
+                    rowClass = "table-warning";
+                }
+                else
+                {
+                    rowClass = "table-danger";
+                }
+
+                <tr class="@rowClass">
+                    <td>@avail.Room.RoomName</td>
+                    <td>@avail.Room.RoomType</td>
+                    <td>@avail.Room.RoomLocation</td>
+                    <td>@avail.CurrentBookings / @avail.MaxBookings</td>
+                    <td>@avail.StatusText</td>
+                    <td>
+                        <a asp-page="/Booking"
+                           asp-route-roomId="@avail.Room.RoomID"
+                           asp-route-date="@Model.SelectedDate.ToString("yyyy-MM-dd")"
+                           asp-route-timeSlot="@Model.SelectedTimeSlot"
+                           class="btn btn-sm btn-outline-dark">
+                            Book lokalet
+                        </a>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
