@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Zealand Booking System Library\Zealand Booking System Library.csproj" />
+    <ProjectReference Include="..\Zealand Booking System\Zealand Booking System.csproj" />
   </ItemGroup>
 
   <ItemGroup>
