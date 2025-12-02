@@ -22,6 +22,9 @@ namespace Zealand_Booking_System_Library.Service
         }
         public void AddRoom(Room room)
         {
+            if (room == null)
+                throw new ArgumentNullException(nameof(room));
+
             _roomRepo.AddRoom(room);
         }
 
