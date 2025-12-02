@@ -19,9 +19,27 @@
 .container {
     background-color: transparent;
 }
+/* Knappen for "Book lokalet" */
+.btn-book-room {
+    background-color: var(--zb-yellow);
+    color: #000000;
+    border: 1px solid var(--zb-yellow);
+    font-weight: 600;
+}
 
+    .btn-book-room:hover {
+        background-color: #ffef96; /* lidt lysere ved hover */
+        border-color: #ffef96;
+        color: #000000;
+    }
+/*status boks(farve)*/
+.status-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    display: inline-block;
+}
 /* Links og standard-tekst */
-
 a {
     color: var(--zb-yellow);
 }

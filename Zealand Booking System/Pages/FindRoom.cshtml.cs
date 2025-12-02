@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Http;
 using Zealand_Booking_System_Library.Models;
 using Zealand_Booking_System_Library.Repository;
 using Zealand_Booking_System_Library.Service;
@@ -23,6 +24,7 @@ namespace Zealand_Booking_System.Pages
             _bookingService = new BookingService(bookingRepo, roomRepo);
         }
 
+        // --- FILTER ---
         [BindProperty]
         public DateTime SelectedDate { get; set; }
 
@@ -32,18 +34,24 @@ namespace Zealand_Booking_System.Pages
         [BindProperty]
         public RoomType? SelectedRoomType { get; set; }
 
-        // VIGTIGT: RoomAvailability, ikke Room
-        public List<RoomAvailability> Rooms { get; private set; }
+        // --- BOOKING PROPS ---
+        [BindProperty]
+        public int RoomID { get; set; }
 
+        // --- ROOM AVAILABILITY ---
+        public List<RoomAvailability> Rooms { get; private set; } = new();
+
+        // --- GET ---
         public void OnGet()
         {
             SelectedDate = DateTime.Today;
-            SelectedTimeSlot = TimeSlot.Slot08_10;   // standard
-            SelectedRoomType = null;                 // "alle typer"
+            SelectedTimeSlot = TimeSlot.Slot08_10;
+            SelectedRoomType = null;
 
             LoadRooms();
         }
 
+        // --- POST: filtrer liste ---
         public void OnPost()
         {
             if (SelectedDate == DateTime.MinValue)
@@ -54,6 +62,43 @@ namespace Zealand_Booking_System.Pages
             LoadRooms();
         }
 
+        // --- POST: book et lokale ---
+        public IActionResult OnPostBook()
+        {
+            int? accountId = HttpContext.Session.GetInt32("AccountID");
+            if (accountId == null)
+            {
+                TempData["Message"] = "Du skal være logget ind for at booke et lokale.";
+                return RedirectToPage("/BookingList");
+            }
+
+            Booking newBooking = new Booking
+            {
+                RoomID = RoomID,
+                BookingDate = SelectedDate,
+                TimeSlot = SelectedTimeSlot,
+                AccountID = accountId.Value
+            };
+
+            try
+            {
+                _bookingService.Add(newBooking);
+                TempData["Message"] = "Booking oprettet!";
+            }
+            catch (Exception ex)
+            {
+                TempData["Message"] = "Fejl: " + ex.Message;
+            }
+
+            return RedirectToPage(new
+            {
+                SelectedDate,
+                SelectedTimeSlot,
+                SelectedRoomType
+            });
+        }
+
+        // --- HJÆLPEMETODE ---
         private void LoadRooms()
         {
             Rooms = _bookingService.GetRoomAvailability(SelectedDate, SelectedTimeSlot, SelectedRoomType);

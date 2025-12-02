@@ -8,6 +8,11 @@
 
 <h1>Find ledige lokaler</h1>
 
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-info">@TempData["Message"]</div>
+}
+
 <form method="post" class="mb-3">
     <div class="row g-2">
         <div class="col-md-3">
@@ -46,11 +51,11 @@
 <table class="table table-bordered align-middle">
     <thead>
         <tr>
+            <th>Status</th> <!-- Ny kolonne til farvekasse -->
             <th>Lokale</th>
             <th>Type</th>
             <th>Lokation</th>
             <th>Bookings</th>
-            <th>Status</th>
             <th>Handling</th>
         </tr>
     </thead>
@@ -59,35 +64,32 @@
         {
             foreach (RoomAvailability avail in Model.Rooms)
             {
-                string rowClass;
+                string boxColor = avail.StatusColor switch
+                {
+                    "green" => "bg-success",
+                    "yellow" => "bg-warning",
+                    _ => "bg-danger"
+                };
 
-                if (avail.StatusColor == "green")
-                {
-                    rowClass = "table-success";
-                }
-                else if (avail.StatusColor == "yellow")
-                {
-                    rowClass = "table-warning";
-                }
-                else
-                {
-                    rowClass = "table-danger";
-                }
-
-                <tr class="@rowClass">
+                <tr>
+                    <!-- Farvekasse -->
+                    <td>
+                        <div class="status-box @boxColor"></div>
+                    </td>
                     <td>@avail.Room.RoomName</td>
                     <td>@avail.Room.RoomType</td>
                     <td>@avail.Room.RoomLocation</td>
                     <td>@avail.CurrentBookings / @avail.MaxBookings</td>
-                    <td>@avail.StatusText</td>
                     <td>
-                        <a asp-page="/BookingList"
-                           asp-route-roomId="@avail.Room.RoomID"
-                           asp-route-date="@Model.SelectedDate.ToString("yyyy-MM-dd")"
-                           asp-route-timeSlot="@Model.SelectedTimeSlot"
-                           class="btn btn-sm btn-outline-dark">
-                            Book lokalet
-                        </a>
+                        <form method="post">
+                            <input type="hidden" name="RoomID" value="@avail.Room.RoomID" />
+                            <input type="hidden" name="SelectedDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
+                            <input type="hidden" name="SelectedTimeSlot" value="@Model.SelectedTimeSlot" />
+                            <input type="hidden" name="SelectedRoomType" value="@Model.SelectedRoomType" />
+                            <button type="submit" asp-page-handler="Book" class="btn btn-sm btn-book-room">
+                                Book lokalet
+                            </button>
+                        </form>
                     </td>
                 </tr>
             }
