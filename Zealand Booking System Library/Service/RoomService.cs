@@ -25,11 +25,22 @@ namespace Zealand_Booking_System_Library.Service
             if (room == null)
                 throw new ArgumentNullException(nameof(room));
 
+            if (string.IsNullOrWhiteSpace(room.RoomName))
+                throw new ArgumentException("RoomName cannot be empty.");
+
+            if (string.IsNullOrWhiteSpace(room.RoomLocation))
+                throw new ArgumentException("RoomLocation cannot be empty.");
+
+            if (!Enum.IsDefined(typeof(RoomType), room.RoomType))
+                throw new ArgumentException("Invalid RoomType.");
+
             _roomRepo.AddRoom(room);
         }
 
         public void DeleteRoom(int id)
         {
+            if (id <= 0)
+                throw new ArgumentException("Invalid room ID");
             _roomRepo.DeleteRoom(id);
         }
 

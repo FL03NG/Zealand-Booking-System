@@ -14,8 +14,9 @@ namespace Zealand_Booking_System_Library.Service.Tests
     [TestClass()]
     public class RoomServiceTests
     {
+        //--------------------------------------AddRoom---------------------
         [TestMethod]
-        public void AddRoom_ShouldCallRepositoryAddRoom_Once()
+        public void AddRoom_ShouldCallRepositoryAddRoom_Once() //happypath
         {
             // Arrange
             var mockRepo = new Mock<IRoomRepository>();
@@ -23,7 +24,7 @@ namespace Zealand_Booking_System_Library.Service.Tests
 
             var room = new Room
             {
-                RoomName = "TestRoom",
+                RoomName = null,
                 RoomLocation = "A123",
                 RoomDescription = "Test description",
                 RoomType = RoomType.ClassRoom,
@@ -33,14 +34,8 @@ namespace Zealand_Booking_System_Library.Service.Tests
             // Act
             service.AddRoom(room);
 
-            // Assert: verify that AddRoom was called exactly once with the same room
-            mockRepo.Verify(r => r.AddRoom(It.Is<Room>(x =>
-                x.RoomName == "TestRoom" &&
-                x.RoomLocation == "A123" &&
-                x.RoomDescription == "Test description" &&
-                x.RoomType == RoomType.ClassRoom &&
-                x.HasSmartBoard == true
-            )), Times.Once);
+            // Assert
+            mockRepo.Verify(r => r.AddRoom(room), Times.Once);
         }
 
         [TestMethod]
@@ -50,8 +45,42 @@ namespace Zealand_Booking_System_Library.Service.Tests
             var mockRepo = new Mock<IRoomRepository>();
             var service = new RoomService(mockRepo.Object);
 
-            // Act + Assert
-            Assert.ThrowsException<ArgumentNullException>(() => service.AddRoom(null));
+            // Act & Assert
+            Assert.ThrowsException<ArgumentNullException>(
+                delegate { service.AddRoom(null); }
+            );
+            mockRepo.Verify(r => r.AddRoom(It.IsAny<Room>()), Times.Never);
         }
+
+        //-------------------------DeleteRoom-------------------------
+        [TestMethod]
+        public void DeleteRoom_ValidId_ShouldCallRepositoryOnce()
+        {
+            // Arrange
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+            int roomId = 1;
+
+            // Act
+            service.DeleteRoom(roomId);
+
+            // Assert
+            mockRepo.Verify(r => r.DeleteRoom(roomId), Times.Once);
+        }
+        [TestMethod]
+        public void DeleteRoom_InvalidId_ShouldThrowArgumentException()
+        {
+            // Arrange
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+            int invalidId = 0;
+
+            // Act & Assert
+            Assert.ThrowsException<ArgumentException>(
+                delegate { service.DeleteRoom(invalidId); }
+            );
+
+        }
+
     }
 }
