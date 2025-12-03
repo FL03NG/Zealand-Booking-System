@@ -50,6 +50,20 @@ namespace Zealand_Booking_System_Library.Service
         }
         public void UpdateRoom(Room room)
         {
+            if (room == null)
+                throw new ArgumentNullException(nameof(room));
+
+            if (room.RoomID <= 0)
+                throw new ArgumentException("RoomID must be a positive number.");
+
+            if (string.IsNullOrWhiteSpace(room.RoomName))
+                throw new ArgumentException("RoomName cannot be empty.");
+
+            if (string.IsNullOrWhiteSpace(room.RoomLocation))
+                throw new ArgumentException("RoomLocation cannot be empty.");
+
+            if (!Enum.IsDefined(typeof(RoomType), room.RoomType))
+                throw new ArgumentException("Invalid RoomType.");
             _roomRepo.UpdateRoom(room);
         }
     }

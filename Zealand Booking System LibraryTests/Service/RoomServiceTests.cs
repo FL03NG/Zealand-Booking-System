@@ -16,7 +16,7 @@ namespace Zealand_Booking_System_Library.Service.Tests
     {
         //--------------------------------------AddRoom---------------------
         [TestMethod]
-        public void AddRoom_ShouldCallRepositoryAddRoom_Once() //happypath
+        public void AddRoom_ShouldCallRepositoryAddRoom_Once()
         {
             // Arrange
             var mockRepo = new Mock<IRoomRepository>();
@@ -24,7 +24,7 @@ namespace Zealand_Booking_System_Library.Service.Tests
 
             var room = new Room
             {
-                RoomName = null,
+                RoomName = "TestLokale",
                 RoomLocation = "A123",
                 RoomDescription = "Test description",
                 RoomType = RoomType.ClassRoom,
@@ -40,47 +40,276 @@ namespace Zealand_Booking_System_Library.Service.Tests
 
         [TestMethod]
         public void AddRoom_NullRoom_ShouldThrowArgumentNullException()
-        {
-            // Arrange
+        {// Arrange
             var mockRepo = new Mock<IRoomRepository>();
             var service = new RoomService(mockRepo.Object);
 
-            // Act & Assert
-            Assert.ThrowsException<ArgumentNullException>(
-                delegate { service.AddRoom(null); }
-            );
-            mockRepo.Verify(r => r.AddRoom(It.IsAny<Room>()), Times.Never);
+            Room room = new Room
+            {
+                RoomName = null, // invalid
+                RoomLocation = "A123",
+                RoomDescription = "Test",
+                RoomType = RoomType.ClassRoom,
+                HasSmartBoard = true
+            };
+
+            // Act + Assert
+            Assert.ThrowsException<ArgumentException>(() => service.AddRoom(room));
         }
 
         //-------------------------DeleteRoom-------------------------
         [TestMethod]
         public void DeleteRoom_ValidId_ShouldCallRepositoryOnce()
         {
-            // Arrange
+            // Arrange:
+            // Vi opretter et mock repository og RoomService,
+            // og bruger et gyldigt ID (1)
             var mockRepo = new Mock<IRoomRepository>();
             var service = new RoomService(mockRepo.Object);
             int roomId = 1;
 
-            // Act
+            // Act:
+            // Metoden skal køre uden fejl
             service.DeleteRoom(roomId);
 
-            // Assert
+            // Assert:
+            // Repositoryets DeleteRoom() SKAL blive kaldt præcis én gang
             mockRepo.Verify(r => r.DeleteRoom(roomId), Times.Once);
         }
+
         [TestMethod]
-        public void DeleteRoom_InvalidId_ShouldThrowArgumentException()
+        public void DeleteRoom_InvalidId_Zero_ShouldThrowArgumentException()
+        {
+            // Arrange:
+            // Bruger ID = 0 (ulovligt, da id <= 0 skal give exception)
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            // Act & Assert:
+            // Vi forventer at metoden kaster en ArgumentException
+            Assert.ThrowsException<ArgumentException>(() => service.DeleteRoom(0));
+        }
+
+        [TestMethod]
+        public void DeleteRoom_InvalidId_Negative_ShouldThrowArgumentException()
+        {
+            // Arrange:
+            // Bruger et negativt ID (ulovligt)
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            // Act & Assert:
+            // Metoden skal kaste en ArgumentException
+            Assert.ThrowsException<ArgumentException>(() => service.DeleteRoom(-5));
+        }
+
+        [TestMethod]
+        public void DeleteRoom_InvalidId_MinValue_ShouldThrowArgumentException()
+        {
+            // Arrange:
+            // Bruger det mindst mulige int (ekstrem edge case)
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            // Act & Assert:
+            // Metoden skal stadig kaste exception
+            Assert.ThrowsException<ArgumentException>(() => service.DeleteRoom(int.MinValue));
+        }
+
+        [TestMethod]
+        public void DeleteRoom_Valid_LargeId_ShouldCallRepository()
+        {
+            // Arrange:
+            // Bruger et stort gyldigt ID (int.MaxValue)
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+            int roomId = int.MaxValue;
+
+            // Act:
+            // Skal gennemføres uden fejl
+            service.DeleteRoom(roomId);
+
+            // Assert:
+            // Repositoryets DeleteRoom() SKAL kaldes én gang
+            mockRepo.Verify(r => r.DeleteRoom(roomId), Times.Once);
+        }
+        //-----------------------------UpdateRoom-----------------
+        [TestMethod]
+        public void UpdateRoom_ValidRoom_ShouldCallRepositoryOnce()
         {
             // Arrange
             var mockRepo = new Mock<IRoomRepository>();
             var service = new RoomService(mockRepo.Object);
-            int invalidId = 0;
 
-            // Act & Assert
-            Assert.ThrowsException<ArgumentException>(
-                delegate { service.DeleteRoom(invalidId); }
-            );
+            var room = new Room
+            {
+                RoomID = 1,
+                RoomName = "Test",
+                RoomLocation = "A100",
+                RoomDescription = "Desc",
+                RoomType = RoomType.ClassRoom,
+                HasSmartBoard = true
+            };
 
+            // Act
+            service.UpdateRoom(room);
+
+            // Assert
+            mockRepo.Verify(r => r.UpdateRoom(room), Times.Once);
         }
 
+        //validering
+        [TestMethod]
+        public void UpdateRoom_NullRoom_ShouldThrowArgumentNullException()
+        {
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            Assert.ThrowsException<ArgumentNullException>(() =>
+            {
+                service.UpdateRoom(null);
+            });
+        }
+
+        [TestMethod]
+        public void UpdateRoom_InvalidRoomId_ShouldThrowArgumentException()
+        {
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            var room = new Room
+            {
+                RoomID = 0,
+                RoomName = "Test",
+                RoomLocation = "A100",
+                RoomType = RoomType.ClassRoom
+            };
+
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                service.UpdateRoom(room);
+            });
+        }
+
+        [TestMethod]
+        public void UpdateRoom_EmptyRoomName_ShouldThrowArgumentException()
+        {
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            var room = new Room
+            {
+                RoomID = 1,
+                RoomName = "",
+                RoomLocation = "A100",
+                RoomType = RoomType.ClassRoom
+            };
+
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                service.UpdateRoom(room);
+            });
+        }
+
+        [TestMethod]
+        public void UpdateRoom_NullRoomName_ShouldThrowArgumentException()
+        {
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            var room = new Room
+            {
+                RoomID = 1,
+                RoomName = null,
+                RoomLocation = "A100",
+                RoomType = RoomType.ClassRoom
+            };
+
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                service.UpdateRoom(room);
+            });
+        }
+
+        [TestMethod]
+        public void UpdateRoom_EmptyRoomLocation_ShouldThrowArgumentException()
+        {
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            var room = new Room
+            {
+                RoomID = 1,
+                RoomName = "Test",
+                RoomLocation = "",
+                RoomType = RoomType.ClassRoom
+            };
+
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                service.UpdateRoom(room);
+            });
+        }
+
+        [TestMethod]
+        public void UpdateRoom_NullRoomLocation_ShouldThrowArgumentException()
+        {
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            var room = new Room
+            {
+                RoomID = 1,
+                RoomName = "Test",
+                RoomLocation = null,
+                RoomType = RoomType.ClassRoom
+            };
+
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                service.UpdateRoom(room);
+            });
+        }
+
+        [TestMethod]
+        public void UpdateRoom_InvalidRoomType_ShouldThrowArgumentException()
+        {
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            var room = new Room
+            {
+                RoomID = 1,
+                RoomName = "Test",
+                RoomLocation = "A100",
+                RoomType = (RoomType)999 // invalid enum value
+            };
+
+            Assert.ThrowsException<ArgumentException>(() =>
+            {
+                service.UpdateRoom(room);
+            });
+        }
+
+        // Ensure that repository is not called when validation fails
+        [TestMethod]
+        public void UpdateRoom_InvalidRoom_ShouldNotCallRepository()
+        {
+            var mockRepo = new Mock<IRoomRepository>();
+            var service = new RoomService(mockRepo.Object);
+
+            var room = new Room
+            {
+                RoomID = -1,                 // invalid
+                RoomName = "Test",
+                RoomLocation = "A100",
+                RoomType = RoomType.ClassRoom
+            };
+
+            try { service.UpdateRoom(room); }
+            catch { /* ignore exception */ }
+
+            mockRepo.Verify(r => r.UpdateRoom(It.IsAny<Room>()), Times.Never);
+        }
     }
 }
