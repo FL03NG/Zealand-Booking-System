@@ -56,7 +56,7 @@ namespace Zealand_Booking_System.Pages.Accounts
                 ErrorMessage = $"Fejl: {ex.Message}";
             }
 
-            return Page();
+            return RedirectToPage("/Accounts/Login");
         }
 
     }
