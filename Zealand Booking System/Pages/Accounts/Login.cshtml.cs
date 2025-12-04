@@ -33,6 +33,7 @@ namespace Zealand_Booking_System.Pages.Accounts
 
             // Save session
             HttpContext.Session.SetInt32("AccountID", user.AccountID);
+            HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("Role", user.Role);
 
             return RedirectToPage("/Index");

@@ -73,13 +73,13 @@
                         }
                         else
                         {
-                            <li class="nav-item d-flex align-items-center me-3 text-muted">
-                                Logget ind som: <strong class="ms-1">@username</strong>
+                            <li class="nav-item d-flex align-items-center me-3">
+                                <span class="text-dark">Logget ind som: <strong class="ms-1">@username</strong></span>
                             </li>
 
-                            <li class="nav-item">
-                                <form method="post" action="/logout" class="d-inline">
-                                    <button type="submit" class="btn btn-link nav-link">Logout</button>
+                            <li class="nav-item d-flex align-items-center">
+                                <form method="post" action="/logout" class="d-inline m-0 p-0">
+                                    <button type="submit" class="btn btn-link nav-link text-dark m-0 p-0">Logout</button>
                                 </form>
                             </li>
 
