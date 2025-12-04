@@ -46,19 +46,20 @@
                         @if (accountId != null)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/FindRoom">Find Room</a>
+                                <a class="nav-link text-dark" asp-page="/FindRoom">Create Booking</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/BookingList">Booking Liste</a>
+                                <a class="nav-link text-dark" asp-page="/BookingList">Bookings</a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-page="/Room">Room</a>
-                            </li>
+                           
 
                             @if (role == "Administrator")
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-page="/Accounts/UserList">Brugere</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-page="/Room">Room</a>
                                 </li>
                             }
                         }
