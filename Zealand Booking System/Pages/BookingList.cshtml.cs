@@ -2,8 +2,6 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 using Zealand_Booking_System_Library.Models;
 using Zealand_Booking_System_Library.Repository;
 using Zealand_Booking_System_Library.Service;
@@ -15,37 +13,37 @@ namespace Zealand_Booking_System.Pages.Shared
         private readonly string _connectionString =
             "Server =(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True";
 
-        // Lister til visning
+        // List data
         public List<Booking> Bookings { get; private set; }
         public List<Room> Rooms { get; private set; }
         public List<Account> Users { get; private set; }
 
-        // Ny booking (formular i bunden – hvis du bruger den)
-        [BindProperty]
+        [BindProperty] 
         public Booking NewBooking { get; set; }
-
-        // 🔎 søgning
-        [BindProperty]
+        [BindProperty] 
         public string SearchName { get; set; }
-
-        // ✏ redigering
-        [BindProperty]
+        [BindProperty] 
         public int EditBookingID { get; set; }
-
-        [BindProperty]
+        [BindProperty] 
         public Booking EditBooking { get; set; }
 
         private readonly BookingService _bookingService;
+
+        //UserService til at hente subklasser
+        private readonly UserService _userService;
 
         public string Message { get; private set; }
 
         public BookingListModel()
         {
-            BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
-            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
+            var bookingRepo = new BookingCollectionRepo(_connectionString);
+            var roomRepo = new RoomCollectionRepo(_connectionString);
+            var userRepo = new UserCollectionRepo(_connectionString);
 
-            // BookingService kræver nu både bookingRepo og roomRepo
             _bookingService = new BookingService(bookingRepo, roomRepo);
+
+            //UserService som kan hente Student/Teacher/Admin
+            _userService = new UserService(userRepo);
         }
 
         public void OnGet()
@@ -67,65 +65,36 @@ namespace Zealand_Booking_System.Pages.Shared
 
             LoadData();
         }
-        // 🔎 Søg på brugernavn
+
         public void OnPostSearch()
         {
-            LoadData(); // henter Bookings + Users
-
+            LoadData();
             if (string.IsNullOrWhiteSpace(SearchName))
-            {
-                return; // tom søgning → behold alle
-            }
+                return;
 
             string searchLower = SearchName.ToLower();
             List<Booking> filtered = new List<Booking>();
 
-            if (Bookings == null)
+            foreach (var booking in Bookings)
             {
-                return;
-            }
+                string username = booking.Account?.Username;
 
-            for (int i = 0; i < Bookings.Count; i++)
-            {
-                Booking booking = Bookings[i];
-                string username = null;
-
-                if (booking.Account != null)
+                if (!string.IsNullOrEmpty(username) &&
+                    username.ToLower().Contains(searchLower))
                 {
-                    username = booking.Account.Username;
-                }
-                else if (Users != null)
-                {
-                    for (int j = 0; j < Users.Count; j++)
-                    {
-                        if (Users[j].AccountID == booking.AccountID)
-                        {
-                            username = Users[j].Username;
-                        }
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(username))
-                {
-                    if (username.ToLower().Contains(searchLower))
-                    {
-                        filtered.Add(booking);
-                    }
+                    filtered.Add(booking);
                 }
             }
 
             Bookings = filtered;
         }
 
-        // 🗑 Slet booking
         public IActionResult OnPostDelete(int bookingID)
         {
             var booking = _bookingService.GetBookingById(bookingID);
 
-            // SLET BOOKING
             _bookingService.Delete(bookingID);
 
-            // LAV NOTIFIKATION
             var noteRepo = new NotificationCollectionRepo(_connectionString);
             var noteService = new NotificationService(noteRepo);
 
@@ -139,7 +108,6 @@ namespace Zealand_Booking_System.Pages.Shared
             return Page();
         }
 
-        // ✏ Start redigering
         public IActionResult OnPostStartEdit(int bookingID)
         {
             Message = "StartEdit ramte: " + bookingID;
@@ -149,7 +117,6 @@ namespace Zealand_Booking_System.Pages.Shared
             return Page();
         }
 
-        // 💾 Gem redigering
         public IActionResult OnPostSaveEdit()
         {
             try
@@ -164,20 +131,26 @@ namespace Zealand_Booking_System.Pages.Shared
                 return Page();
             }
 
-            // Hent de opdaterede data og bliv på siden
             LoadData();
             return Page();
         }
 
-        // Fælles load
+        
         private void LoadData()
         {
             Bookings = _bookingService.GetAll();
 
-            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
+          
+            foreach (var booking in Bookings)
+            {
+                booking.Account = _userService.GetById(booking.AccountID);
+                // Nu bliver booking.Account = Student / Teacher / Administrator
+            }
+
+            var roomRepo = new RoomCollectionRepo(_connectionString);
             Rooms = roomRepo.GetAllRooms();
 
-            UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
+            var userRepo = new UserCollectionRepo(_connectionString);
             Users = userRepo.GetAllUsers();
         }
     }
