@@ -56,11 +56,11 @@ namespace Zealand_Booking_System.Pages.Shared
             try
             {
                 _bookingService.Add(NewBooking);
-                Message = "Booking oprettet!";
+                Message = "Booking created!";
             }
             catch (Exception ex)
             {
-                Message = "Fejl: " + ex.Message;
+                Message = "Error: " + ex.Message;
             }
 
             LoadData();
@@ -100,7 +100,7 @@ namespace Zealand_Booking_System.Pages.Shared
 
             noteService.Create(
                 booking.AccountID,
-                $"Din booking den {booking.BookingDate:dd-MM-yyyy} blev slettet af en administrator/lærer."
+                $"Your booking at {booking.BookingDate:dd-MM-yyyy} has been deleted."
             );
 
             Message = "Booking slettet!";
@@ -110,7 +110,7 @@ namespace Zealand_Booking_System.Pages.Shared
 
         public IActionResult OnPostStartEdit(int bookingID)
         {
-            Message = "StartEdit ramte: " + bookingID;
+            Message = "Editing startet";
             EditBookingID = bookingID;
             EditBooking = _bookingService.GetBookingById(bookingID);
             LoadData();
@@ -122,11 +122,11 @@ namespace Zealand_Booking_System.Pages.Shared
             try
             {
                 _bookingService.Update(EditBooking);
-                Message = "Booking er ændret!";
+                Message = "Booking has been editet!";
             }
             catch (Exception ex)
             {
-                Message = "Fejl under redigering: " + ex.Message;
+                Message = "Error during editing: " + ex.Message;
                 LoadData();
                 return Page();
             }
