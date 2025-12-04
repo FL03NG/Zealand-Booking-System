@@ -68,7 +68,7 @@ namespace Zealand_Booking_System.Pages
             int? accountId = HttpContext.Session.GetInt32("AccountID");
             if (accountId == null)
             {
-                TempData["Message"] = "Du skal være logget ind for at booke et lokale.";
+                TempData["Message"] = "You need to be logged in to make a booking.";
                 return RedirectToPage("/BookingList");
             }
 
@@ -83,11 +83,11 @@ namespace Zealand_Booking_System.Pages
             try
             {
                 _bookingService.Add(newBooking);
-                TempData["Message"] = "Booking oprettet!";
+                TempData["Message"] = "Booking made!";
             }
             catch (Exception ex)
             {
-                TempData["Message"] = "Fejl: " + ex.Message;
+                TempData["Message"] = "Error: " + ex.Message;
             }
 
             return RedirectToPage(new

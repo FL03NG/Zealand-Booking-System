@@ -112,6 +112,50 @@ namespace Zealand_Booking_System_Library.Service
 
         public void Update(Booking booking)
         {
+            // 1) Find rummet
+            Room room = _roomRepo.GetRoomById(booking.RoomID);
+            if (room == null)
+            {
+                throw new Exception("Lokalet findes ikke.");
+            }
+
+            // 2) Maks antal bookings afhængig af rummetype
+            int maxBookingsForRoom;
+            if (room.RoomType == RoomType.ClassRoom)
+                maxBookingsForRoom = 2;
+            else
+                maxBookingsForRoom = 1;
+
+            // 3) Hent alle bookings
+            List<Booking> allBookings = _bookingRepo.GetAll();
+            int sameRoomSameSlotCount = 0;
+
+            foreach (Booking existing in allBookings)
+            {
+                // Ignorer den booking vi selv redigerer
+                if (existing.BookingID == booking.BookingID)
+                    continue;
+
+                bool sameDay = existing.BookingDate.Date == booking.BookingDate.Date;
+                bool sameSlot = existing.TimeSlot == booking.TimeSlot;
+                bool sameRoom = existing.RoomID == booking.RoomID;
+
+                if (sameRoom && sameDay && sameSlot)
+                {
+                    sameRoomSameSlotCount++;
+                }
+            }
+
+            // 4) Tjek om max antal bookings er nået
+            if (sameRoomSameSlotCount >= maxBookingsForRoom)
+            {
+                if (room.RoomType == RoomType.ClassRoom)
+                    throw new Exception("Dette klasselokale er allerede booket af to brugere i dette tidsrum.");
+                else
+                    throw new Exception("Dette mødelokale er allerede booket i dette tidsrum.");
+            }
+
+            // 5) Alt ok → opdater
             _bookingRepo.Update(booking);
         }
         public List<RoomAvailability> GetRoomAvailability(DateTime date, TimeSlot timeSlot, RoomType? roomType)
