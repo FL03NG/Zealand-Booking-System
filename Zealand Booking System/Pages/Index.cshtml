@@ -1,88 +1,92 @@
 ﻿@page
 @model Zealand_Booking_System.Pages.IndexModel
 @{
-    ViewData["Title"] = "Forside";
+    ViewData["Title"] = "Home";
 }
 
 <section class="zb-hero my-4 my-md-5">
     <div class="row align-items-center gy-4">
         <div class="col-lg-6">
-            <span class="zb-badge mb-2">For studerende & undervisere</span>
+            <span class="zb-badge mb-2">For students & teachers</span>
             <h1 class="zb-hero-title mb-3">
-                Book et studielokale på Zealand – hurtigt og enkelt
+                Book a study room at Zealand – fast and easy
             </h1>
             <p class="zb-hero-text mb-4">
-                Find og reserver ledige lokaler til gruppearbejde, projekter eller undervisning.
-                Systemet er udviklet med fokus på overskuelighed og Zealands visuelle identitet.
+                Find and reserve available rooms for group work, projects, or teaching.
+                The system is designed with clarity and the official Zealand visual identity in mind.
             </p>
+
             <div class="d-flex flex-wrap gap-2">
                 @{
-                    int? loggetId = HttpContext.Session.GetInt32("AccountID");
+                    int? loggedId = HttpContext.Session.GetInt32("AccountID");
                 }
 
-                @if (loggetId == null)
+                @if (loggedId == null)
                 {
-                    <!-- Ikke logget ind -->
+                    <!-- Not logged in -->
                     <a asp-page="/Accounts/Login" class="btn zb-btn-primary">
-                        Log ind
+                        Log in
                     </a>
                     <a asp-page="/Accounts/Register" class="btn zb-btn-secondary">
-                        Opret bruger
+                        Create account
                     </a>
                 }
                 else
                 {
-                    <!-- Logget ind -->
+                    <!-- Logged in -->
                     <a asp-page="/FindRoom" class="btn zb-btn-primary">
-                        Book et lokale
+                        Book a room
                     </a>
                     <a asp-page="/BookingList" class="btn zb-btn-secondary">
-                        Se dine bookinger
+                        View your bookings
                     </a>
                 }
             </div>
+
             <p class="small text-muted mt-3 mb-0">
-                @if (loggetId == null)
+                @if (loggedId == null)
                 {
-                    <span>Du skal være logget ind for at booke lokaler.</span>
+                    <span>You must be logged in to book rooms.</span>
                 }
                 else
                 {
-                    <span>Du er logget ind – vælg en funktion ovenfor.</span>
+                    <span>You are logged in – choose an option above.</span>
                 }
             </p>
+
             <p class="small text-muted mt-3 mb-0">
-                Log ind med din Zealand-konto for at få adgang til alle funktioner.
+                Log in with your Zealand account to access all features.
             </p>
         </div>
+
         <div class="col-lg-6">
             <div class="zb-hero-card shadow-sm">
-                <h5 class="mb-3">Næste skridt</h5>
+                <h5 class="mb-3">Next steps</h5>
                 <ul class="list-unstyled mb-3">
                     <li class="d-flex mb-2">
                         <span class="zb-step-number me-2">1</span>
                         <div>
-                            <strong>Log ind</strong><br />
-                            <span class="small text-muted">Brug dit brugernavn og din adgangskode.</span>
+                            <strong>Log in</strong><br />
+                            <span class="small text-muted">Use your username and password.</span>
                         </div>
                     </li>
                     <li class="d-flex mb-2">
                         <span class="zb-step-number me-2">2</span>
                         <div>
-                            <strong>Vælg dato og tidsrum</strong><br />
-                            <span class="small text-muted">Se kun lokaler, der faktisk er ledige.</span>
+                            <strong>Select date and timeslot</strong><br />
+                            <span class="small text-muted">See only rooms that are truly available.</span>
                         </div>
                     </li>
                     <li class="d-flex">
                         <span class="zb-step-number me-2">3</span>
                         <div>
-                            <strong>Bekræft din booking</strong><br />
-                            <span class="small text-muted">Få en klar oversigt over dine reservationer.</span>
+                            <strong>Confirm your booking</strong><br />
+                            <span class="small text-muted">Get a clear overview of all your reservations.</span>
                         </div>
                     </li>
                 </ul>
                 <div class="zb-hero-meta small">
-                    <div>Udviklet som del af Datamatiker-projekt</div>
+                    <div>Developed as part of a Datamatiker project</div>
                     <div class="text-muted">Zealand · Roskilde</div>
                 </div>
             </div>
@@ -90,37 +94,47 @@
     </div>
 </section>
 
-<section class="my-5">
-    <h2 class="zb-section-title mb-3">Hvorfor bruge systemet?</h2>
-    <p class="text-muted mb-4">
-        Systemet hjælper med at udnytte Zealands lokaler bedre og gør det let for studerende
-        og undervisere at finde ledige rum til studieaktiviteter.
-    </p>
+@{
+    int? loggedId2 = HttpContext.Session.GetInt32("AccountID");
+}
 
-    <div class="row gy-4">
-        <div class="col-md-4">
-            <div class="zb-info-card h-100">
-                <h5 class="mb-2">Overblik over lokaler</h5>
-                <p class="small text-muted mb-0">
-                    Se alle relevante lokaler samlet ét sted – filtreret på campus, størrelse og udstyr.
-                </p>
+@if (loggedId2 == null)
+{
+    <!-- Only show this section when NOT logged in -->
+    <section class="my-5">
+        <h2 class="zb-section-title mb-3">Why use this system?</h2>
+        <p class="text-muted mb-4">
+            The system helps optimize Zealand’s room usage and makes it easy for students
+            and teachers to find available rooms for study activities.
+        </p>
+
+        <div class="row gy-4">
+            <div class="col-md-4">
+                <div class="zb-info-card h-100">
+                    <h5 class="mb-2">Room overview</h5>
+                    <p class="small text-muted mb-0">
+                        View all relevant rooms in one place – filtered by campus, size, and equipment.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="zb-info-card h-100">
+                    <h5 class="mb-2">No double bookings</h5>
+                    <p class="small text-muted mb-0">
+                        The system automatically checks if the room is already booked at the selected time.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="zb-info-card h-100">
+                    <h5 class="mb-2">Designed for students</h5>
+                    <p class="small text-muted mb-0">
+                        Layout and colors are inspired by zealand.dk to feel familiar and easy to navigate.
+                    </p>
+                </div>
             </div>
         </div>
-        <div class="col-md-4">
-            <div class="zb-info-card h-100">
-                <h5 class="mb-2">Ingen dobbeltbookinger</h5>
-                <p class="small text-muted mb-0">
-                    Systemet tjekker automatisk, om lokalet allerede er booket i det valgte tidsrum.
-                </p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="zb-info-card h-100">
-                <h5 class="mb-2">Designet til studerende</h5>
-                <p class="small text-muted mb-0">
-                    Layout og farver er inspireret af zealand.dk, så det føles velkendt og let at navigere i.
-                </p>
-            </div>
-        </div>
-    </div>
-</section>
+    </section>
+}
