@@ -1,27 +1,71 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Zealand_Booking_System_Library.Models;
 using Zealand_Booking_System_Library.Repository;
 
 namespace Zealand_Booking_System_Library.Service
 {
+    /// <summary>
+    /// Service responsible for business rules around bookings.
+    ///
+    /// Responsibility:
+    /// - Validates booking rules before saving to the database.
+    /// - Uses repositories to read and write bookings and rooms.
+    /// - Ensures no double bookings and enforces room capacity limits.
+    ///
+    /// Why this class exists:
+    /// - To separate business logic from data access and UI.
+    /// - To keep booking rules in one place instead of spreading
+    ///   if-statements across Razor Pages and repositories.
+    /// </summary>
     public class BookingService
     {
+        /// <summary>
+        /// Repository used to load, create, update and delete bookings.
+        /// </summary>
         private readonly IBookingRepository _bookingRepo;
+
+        /// <summary>
+        /// Repository used to load room information, including room type.
+        /// </summary>
         private readonly IRoomRepository _roomRepo;
 
+        /// <summary>
+        /// Creates a new BookingService with the required repositories.
+        /// Using interfaces here makes the service easy to unit test
+        /// and independent of the actual database implementation.
+        /// </summary>
         public BookingService(IBookingRepository bookingRepo, IRoomRepository roomRepo)
         {
             _bookingRepo = bookingRepo;
             _roomRepo = roomRepo;
         }
 
+        /// <summary>
+        /// Adds a new booking after checking all business rules.
+        ///
+        /// Rules enforced:
+        /// - The room must exist.
+        /// - Maximum number of bookings per room depends on RoomType.
+        ///   - ClassRoom: up to 2 bookings per time slot.
+        ///   - MeetingRoom: only 1 booking per time slot.
+        /// - A user cannot have two bookings in the same time slot on the same day.
+        /// - A user can have at most 5 bookings in total.
+        ///
+        /// Why:
+        /// - Keeps the system realistic and prevents abuse or overbooking.
+        /// - Guarantees that rules are always checked before data is saved.
+        /// </summary>
         public void Add(Booking booking)
         {
-            // 1) Find rummet for at se RoomType
+            // 1) Find the room to determine room type
             Room room = _roomRepo.GetRoomById(booking.RoomID);
             if (room == null)
             {
+                // Message is in Danish because it is shown to end users in the UI.
                 throw new Exception("Lokalet findes ikke.");
             }
 
@@ -29,21 +73,24 @@ namespace Zealand_Booking_System_Library.Service
 
             if (room.RoomType == RoomType.ClassRoom)
             {
-                maxBookingsForRoom = 2;  // ClassRoom: må deles af 2
+                // ClassRoom can be shared by two users.
+                maxBookingsForRoom = 2;
             }
             else if (room.RoomType == RoomType.MeetingRoom)
             {
-                maxBookingsForRoom = 1;  // MeetingRoom: kun 1 booking ad gangen
+                // MeetingRoom can only have one booking at a time.
+                maxBookingsForRoom = 1;
             }
             else
             {
-                maxBookingsForRoom = 1;  // fallback
+                // Fallback rule if new room types are introduced.
+                maxBookingsForRoom = 1;
             }
 
             List<Booking> allbookings = _bookingRepo.GetAll();
             int sameRoomSameSlotCount = 0;
 
-            // NYT: tæller hvor mange bookinger denne bruger allerede har
+            // Counts how many bookings this user already has (any date).
             int userBookingCount = 0;
 
             foreach (Booking existing in allbookings)
@@ -53,32 +100,32 @@ namespace Zealand_Booking_System_Library.Service
                 bool sameUser = existing.AccountID == booking.AccountID;
                 bool sameRoom = existing.RoomID == booking.RoomID;
 
-                // tæller alle bookinger for brugeren (uanset dato)
+                // Count all bookings for this user (regardless of date).
                 if (sameUser)
                 {
                     userBookingCount++;
                 }
 
-                // 2) Samme bruger må ikke have to bookinger i samme tidsrum
+                // Rule: same user cannot have two bookings in the same time slot and day.
                 if (sameUser && sameDay && sameSlot)
                 {
                     throw new Exception("Du har allerede en booking i dette tidsrum.");
                 }
 
-                // 3) Tæl bookinger på samme lokale, dato og tidsrum
+                // Count bookings for the same room, date and time slot.
                 if (sameRoom && sameDay && sameSlot)
                 {
                     sameRoomSameSlotCount++;
                 }
             }
 
-            // NYT: max 5 bookinger per bruger
+            // Rule: max 5 bookings per user.
             if (userBookingCount >= 5)
             {
                 throw new Exception("Du har allerede 5 bookinger. Slet en booking, før du opretter en ny.");
             }
 
-            // 4) Tjek om vi rammer max for lokale-typen
+            // Check room capacity rule based on room type.
             if (sameRoomSameSlotCount >= maxBookingsForRoom)
             {
                 if (room.RoomType == RoomType.ClassRoom)
@@ -91,50 +138,84 @@ namespace Zealand_Booking_System_Library.Service
                 }
             }
 
-            // 5) Alt ok → gem booking
+            // If all rules pass, save the booking.
             _bookingRepo.Add(booking);
         }
 
+        /// <summary>
+        /// Retrieves a single booking by ID.
+        /// Why:
+        /// - Allows UI and other services to load a detailed booking for view or edit.
+        /// </summary>
         public Booking GetBookingById(int bookingID)
         {
             return _bookingRepo.GetBookingById(bookingID);
         }
 
+        /// <summary>
+        /// Deletes a booking by its ID.
+        /// Why:
+        /// - Used when users or admins want to cancel or remove bookings.
+        /// </summary>
         public void Delete(int id)
         {
             _bookingRepo.Delete(id);
         }
 
+        /// <summary>
+        /// Retrieves all bookings.
+        /// Why:
+        /// - Used for admin overviews, lists and reports.
+        /// </summary>
         public List<Booking> GetAll()
         {
             return _bookingRepo.GetAll();
         }
 
+        /// <summary>
+        /// Updates an existing booking after re-checking capacity rules.
+        ///
+        /// Rules enforced:
+        /// - The room must still exist.
+        /// - ClassRoom: max 2 bookings per time slot.
+        /// - Other rooms: max 1 booking per time slot.
+        /// - The booking being updated does not count against itself.
+        ///
+        /// Why:
+        /// - Prevents users from changing a booking into a slot that
+        ///   would violate the capacity rules.
+        /// </summary>
         public void Update(Booking booking)
         {
-            // 1) Find rummet
+            // 1) Find the room for this booking.
             Room room = _roomRepo.GetRoomById(booking.RoomID);
             if (room == null)
             {
                 throw new Exception("Lokalet findes ikke.");
             }
 
-            // 2) Maks antal bookings afhængig af rummetype
+            // 2) Determine max bookings based on room type.
             int maxBookingsForRoom;
             if (room.RoomType == RoomType.ClassRoom)
+            {
                 maxBookingsForRoom = 2;
+            }
             else
+            {
                 maxBookingsForRoom = 1;
+            }
 
-            // 3) Hent alle bookings
+            // 3) Load all bookings.
             List<Booking> allBookings = _bookingRepo.GetAll();
             int sameRoomSameSlotCount = 0;
 
             foreach (Booking existing in allBookings)
             {
-                // Ignorer den booking vi selv redigerer
+                // Ignore the booking we are currently editing.
                 if (existing.BookingID == booking.BookingID)
+                {
                     continue;
+                }
 
                 bool sameDay = existing.BookingDate.Date == booking.BookingDate.Date;
                 bool sameSlot = existing.TimeSlot == booking.TimeSlot;
@@ -146,18 +227,36 @@ namespace Zealand_Booking_System_Library.Service
                 }
             }
 
-            // 4) Tjek om max antal bookings er nået
+            // 4) Check if max bookings for the room are reached.
             if (sameRoomSameSlotCount >= maxBookingsForRoom)
             {
                 if (room.RoomType == RoomType.ClassRoom)
+                {
                     throw new Exception("Dette klasselokale er allerede booket af to brugere i dette tidsrum.");
+                }
                 else
+                {
                     throw new Exception("Dette mødelokale er allerede booket i dette tidsrum.");
+                }
             }
 
-            // 5) Alt ok → opdater
+            // 5) If all rules are satisfied, update the booking.
             _bookingRepo.Update(booking);
         }
+
+        /// <summary>
+        /// Calculates availability for all rooms on a given date and time slot,
+        /// optionally filtered by room type.
+        ///
+        /// Responsibility:
+        /// - Combines room data and booking data to compute how many bookings
+        ///   each room has compared to the maximum allowed.
+        ///
+        /// Why this method exists:
+        /// - Used by "Find available rooms" pages to show an overview with
+        ///   colors and status texts (green/yellow/red).
+        /// - Keeps the availability logic centralized in the service layer.
+        /// </summary>
         public List<RoomAvailability> GetRoomAvailability(DateTime date, TimeSlot timeSlot, RoomType? roomType)
         {
             List<Room> allRooms = _roomRepo.GetAllRooms();
@@ -169,7 +268,7 @@ namespace Zealand_Booking_System_Library.Service
             {
                 Room room = allRooms[i];
 
-                // Filtrér på type, hvis der er valgt en
+                // Filter by room type if a specific type is requested.
                 if (roomType.HasValue && room.RoomType != roomType.Value)
                 {
                     continue;
@@ -192,6 +291,7 @@ namespace Zealand_Booking_System_Library.Service
 
                 int currentBookings = 0;
 
+                // Count all bookings for this room on the selected date and time slot.
                 for (int j = 0; j < allBookings.Count; j++)
                 {
                     Booking booking = allBookings[j];
@@ -211,6 +311,7 @@ namespace Zealand_Booking_System_Library.Service
                 availability.MaxBookings = maxBookingsForRoom;
                 availability.CurrentBookings = currentBookings;
 
+                // Set color and text based on how full the room is.
                 if (currentBookings == 0)
                 {
                     availability.StatusColor = "green";
