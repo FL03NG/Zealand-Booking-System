@@ -39,7 +39,7 @@ namespace Zealand_Booking_System.Pages
         /// Collection of rooms displayed in the UI.
         /// Filtering is applied server-side to keep logic centralized.
         /// </summary>
-        public List<Room> Room { get; set; } = new List<Room>();
+        public List<Room> Rooms { get; set; } = new List<Room>();
         /// <summary>
         /// Search text used to filter rooms by name.
         /// Supports GET binding so filters persist in the URL.
