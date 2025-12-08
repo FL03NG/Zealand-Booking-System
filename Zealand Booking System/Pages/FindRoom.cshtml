@@ -1,18 +1,27 @@
 ﻿@page
 @model Zealand_Booking_System.Pages.FindRoomsModel
 @using Zealand_Booking_System_Library.Models
-
 @{
+    /*
+        The page title is set dynamically so it can be reused
+        in the shared layout and browser metadata.
+    */
     ViewData["Title"] = "Find ledige lokaler";
 }
-
 <h1>Find ledige lokaler</h1>
-
+@*
+    Temporary feedback messages are shown here to give users
+    immediate confirmation after actions like bookings or updates.
+*@
 @if (TempData["Message"] != null)
 {
     <div class="alert alert-info">@TempData["Message"]</div>
 }
-
+@*
+    The filter form allows users to narrow down room availability
+    without navigating away from the page, keeping the workflow fast
+    and focused.
+*@
 <form method="post" class="mb-3">
     <div class="row g-2">
         <div class="col-md-3">
@@ -22,6 +31,10 @@
 
         <div class="col-md-3">
             <label asp-for="SelectedTimeSlot" class="form-label">Tidspunkt</label>
+            @*
+                Enum-based dropdown ensures valid, predefined values
+                and keeps UI and domain logic aligned.
+            *@
             <select asp-for="SelectedTimeSlot"
                     class="form-select"
                     asp-items="Html.GetEnumSelectList<TimeSlot>()">
@@ -30,6 +43,10 @@
 
         <div class="col-md-3">
             <label asp-for="SelectedRoomType" class="form-label">Lokaletype</label>
+            @*
+                Room type filtering is optional to allow broad searches
+                when users are unsure about requirements.
+            *@
             <select asp-for="SelectedRoomType" class="form-select">
                 <option value="">Alle typer</option>
                 @foreach (RoomType type in Enum.GetValues(typeof(RoomType)))
@@ -43,15 +60,22 @@
         </div>
 
         <div class="col-md-3 d-flex align-items-end">
+            @*
+                Submitting the form refreshes the list based on
+                selected criteria instead of loading a new page.
+            *@
             <button type="submit" class="btn btn-primary w-100">Opdater liste</button>
         </div>
     </div>
 </form>
-
+@*
+    The table provides a compact overview of room availability,
+    allowing users to compare options and act immediately.
+*@
 <table class="table table-bordered align-middle">
     <thead>
         <tr>
-            <th>Status</th> <!-- Ny kolonne til farvekasse -->
+            <th>Status</th>
             <th>Lokale</th>
             <th>Type</th>
             <th>Lokation</th>
@@ -64,6 +88,10 @@
         {
             foreach (RoomAvailability avail in Model.Rooms)
             {
+                @*
+                    Visual status indicators reduce cognitive load
+                    by communicating availability at a glance.
+                *@
                 string boxColor = avail.StatusColor switch
                 {
                     "green" => "bg-success",
@@ -81,6 +109,10 @@
                     <td>@avail.Room.RoomLocation</td>
                     <td>@avail.CurrentBookings / @avail.MaxBookings</td>
                     <td>
+                        @*
+                            Booking is handled via POST to preserve state
+                            and ensure the correct filter context is reused.
+                        *@
                         <form method="post">
                             <input type="hidden" name="RoomID" value="@avail.Room.RoomID" />
                             <input type="hidden" name="SelectedDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />

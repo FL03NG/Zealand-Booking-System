@@ -2,13 +2,20 @@
 @model Zealand_Booking_System.Pages.Accounts.UserListModel
 @using Zealand_Booking_System_Library.Models
 @{
+    /*
+        This page provides administrators with an overview of all user accounts.
+        It supports searching, inline editing, and deletion while keeping all
+        management actions in one consolidated interface.
+    */
     ViewData["Title"] = "Brugeroversigt";
 }
 
 <section class="my-4 my-md-5">
     <h1 class="zb-section-title mb-3">Brugeroversigt</h1>
-
-    <!-- Søgning -->
+    <!--
+        Searching is implemented as a server-side post to ensure results
+        remain consistent with backend validation and authorization.
+    -->
     <div class="zb-form-card mb-4">
         <form method="post" asp-page-handler="Search" class="mb-0">
             <label asp-for="SearchName" class="form-label">Søg på brugernavn</label>
@@ -20,12 +27,18 @@
             </div>
         </form>
     </div>
-
+    @*
+        Feedback messages are shown centrally to give clear confirmation
+        of actions such as updates or deletions.
+    *@
     @if (!string.IsNullOrEmpty(Model.Message))
     {
         <div class="alert alert-info">@Model.Message</div>
     }
-
+    @*
+        An explicit empty-state message avoids confusion when no results
+        match the current search or filter criteria.
+    *@
     @if (Model.Users == null || Model.Users.Count == 0)
     {
         <p>Der er ingen brugere at vise.</p>
@@ -34,6 +47,10 @@
     {
         <div class="zb-table-card">
             <div class="table-responsive">
+                @*
+                    A table layout is used here to support quick scanning
+                    and comparison of user attributes.
+                *@
                 <table class="table table-sm align-middle zb-table">
                     <thead>
                         <tr>
@@ -48,7 +65,10 @@
                         {
                             if (Model.EditUserID == user.AccountID)
                             {
-                                <!-- Redigeringstilstand -->
+                                @*
+                                    Inline edit mode keeps administrators in context,
+                                    reducing the risk of editing the wrong account.
+                                *@
                                 <tr>
                                     <form method="post" asp-page-handler="SaveEdit">
                                     <td>
@@ -61,6 +81,10 @@
                                     </td>
 
                                     <td>
+                                        @*
+                                                Role selection is restricted to predefined
+                                                values to prevent invalid system states.
+                                        *@
                                         <select asp-for="EditUser.Role" class="form-select">
                                             <option value="Administrator">Administrator</option>
                                             <option value="Teacher">Teacher</option>
@@ -77,17 +101,23 @@
                             }
                             else
                             {
-                                <!-- Visningstilstand -->
+                                @*
+                                    Display mode prioritizes readability while
+                                    keeping key management actions immediately accessible.
+                                *@
                                 <tr>
                                     <td>@user.AccountID</td>
                                     <td>@user.Username</td>
                                     <td>@user.Role</td>
                                     <td>
+                                        @*
+                                            Deletion is handled via POST to avoid
+                                            accidental actions through link navigation.
+                                        *@
                                         <form method="post" asp-page-handler="Delete" class="d-inline">
                                             <input type="hidden" name="accountID" value="@user.AccountID" />
                                             <button type="submit" class="btn btn-danger btn-sm">Slet</button>
                                         </form>
-
                                         <form method="post" asp-page-handler="StartEdit" class="d-inline">
                                             <input type="hidden" name="accountID" value="@user.AccountID" />
                                             <button type="submit" class="btn btn-warning btn-sm">Rediger</button>

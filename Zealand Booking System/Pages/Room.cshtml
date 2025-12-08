@@ -1,17 +1,28 @@
 ﻿@page
 @model Zealand_Booking_System.Pages.RoomModel
 @{
+    /*
+        User role and identity are retrieved from session data
+        to control which actions and UI elements are available.
+        This keeps authorization logic consistent with the rest of the application.
+    */
     string role = HttpContext.Session.GetString("Role");
     int? accountId = HttpContext.Session.GetInt32("AccountID");
+    // Only users with these roles are allowed to manage rooms
     string[] allowedRoles = new[] { "Administrator", "Teacher" };
 }
-
 <section class="my-4 my-md-5">
+    <!--
+        The room management section provides both overview and
+        administrative actions in one place to reduce navigation complexity.
+    -->
     <h2 class="zb-section-title mb-3">Lokaler</h2>
-
     <div class="zb-form-card mb-4">
+        @*
+            Search and filtering are handled via GET so results
+            can be bookmarked, shared, and refreshed safely.
+        *@
         <form method="get" class="row g-2 align-items-end">
-            <!-- SØGEFELT -->
             <div class="col-md-6">
                 <label for="SearchString" class="form-label">Søg efter lokaler</label>
                 <input type="text"
@@ -21,10 +32,12 @@
                        placeholder="Søg efter lokaler..."
                        class="form-control" />
             </div>
-
-            <!-- ROOMTYPE DROPDOWN -->
             <div class="col-md-4">
                 <label for="RoomTypeFilter" class="form-label">Sortér efter RoomType</label>
+                @*
+                    Room type filtering is optional to allow broad
+                    or very specific searches depending on the user's needs.
+                *@
                 <select name="RoomTypeFilter" id="RoomTypeFilter" class="form-select">
                     <option value="">Alle</option>
                     @foreach (var type in Enum.GetValues(typeof(Zealand_Booking_System_Library.Models.RoomType)))
@@ -40,14 +53,15 @@
                     }
                 </select>
             </div>
-
-            <!-- SUBMIT KNAP -->
             <div class="col-md-2 d-grid">
                 <button type="submit" class="btn zb-btn-secondary mt-2">Søg</button>
             </div>
         </form>
     </div>
-    <!-- LISTE AF LOKALER -->
+    <!--
+        Rooms are displayed as cards instead of a table to improve readability
+        and support responsive layouts on smaller screens.
+    -->
     <div class="row gy-4">
         @foreach (var room in Model.Room)
         {
@@ -55,7 +69,10 @@
                 <div class="zb-info-card h-100">
                     @if (Model.EditRoomID == room.RoomID)
                     {
-                        <!-- REDIGERINGSTILSTAND -->
+                        @*
+                            Edit mode replaces display mode inline
+                            to keep context and avoid navigating away.
+                        *@
                         <form method="post" asp-page-handler="SaveEdit">
                             <input asp-for="EditRoom.RoomID" type="hidden" />
 
@@ -93,7 +110,10 @@
                     }
                     else
                     {
-                        <!-- VISNINGSTILSTAND -->
+                        @*
+                            Display mode focuses on readability and quick actions,
+                            keeping details concise but informative.
+                        *@
                         <h5 class="card-title">@room.RoomName</h5>
                         <p class="small">
                             Lokation: @room.RoomLocation <br />
@@ -101,23 +121,25 @@
                             Smartboard: @(room.HasSmartBoard ? "Ja" : "Nej") <br />
                             @room.RoomDescription
                         </p>
-
                         @if (allowedRoles.Contains(role))
                         {
-                            <!-- SLET -->
+                            @*
+                                Destructive and administrative actions are
+                                restricted to authorized roles only.
+                            *@
                             <form method="post" asp-page-handler="Delete" class="d-inline">
                                 <input type="hidden" name="roomID" value="@room.RoomID" />
                                 <button type="submit" class="btn btn-danger btn-sm">Slet</button>
                             </form>
-
-                            <!-- REDIGER -->
                             <form method="post" asp-page-handler="StartEdit" class="d-inline">
                                 <input type="hidden" name="roomID" value="@room.RoomID" />
                                 <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
                             </form>
                         }
-
-                        <!-- BOOK -->
+                        @*
+                            Booking is always available to keep room usage
+                            accessible even when management permissions are limited.
+                        *@
                         <a asp-page="/CreateBooking" class="btn zb-btn-primary btn-sm mt-1">
                             Book lokalet
                         </a>
@@ -126,30 +148,28 @@
             </div>
         }
     </div>
-
     @if (allowedRoles.Contains(role))
     {
-        <!-- FORMULAR TIL AT OPRETTE NYT LOKALE -->
+        @*
+            Room creation is separated visually and logically
+            to reduce accidental changes and improve clarity.
+        *@
         <div class="zb-form-card mt-5">
             <h3 class="mb-3">Opret nyt lokale</h3>
             <form method="post">
                 @Html.AntiForgeryToken()
-
                 <div class="mb-2">
                     <label for="RoomName" class="form-label">Lokalenavn</label>
                     <input asp-for="NewRoom.RoomName" id="RoomName" required class="form-control" />
                 </div>
-
                 <div class="mb-2">
                     <label for="RoomLocation" class="form-label">Lokation</label>
                     <input asp-for="NewRoom.RoomLocation" id="RoomLocation" required class="form-control" />
                 </div>
-
                 <div class="mb-2">
                     <label for="RoomDescription" class="form-label">Beskrivelse</label>
                     <textarea asp-for="NewRoom.RoomDescription" id="RoomDescription" class="form-control"></textarea>
                 </div>
-
                 <div class="mb-2">
                     <label class="form-label">Lokaletype</label>
                     <select asp-for="NewRoom.RoomType"
@@ -158,12 +178,10 @@
                         <option value="">-- Vælg type --</option>
                     </select>
                 </div>
-
                 <div class="form-check mb-2">
                     <input asp-for="NewRoom.HasSmartBoard" class="form-check-input" type="checkbox" />
                     <label asp-for="NewRoom.HasSmartBoard" class="form-check-label">Har smartboard</label>
                 </div>
-
                 <button type="submit" class="btn zb-btn-primary mt-2">Opret lokale</button>
             </form>
         </div>

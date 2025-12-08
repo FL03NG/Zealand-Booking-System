@@ -1,23 +1,41 @@
 ﻿@page
 @model Zealand_Booking_System.Pages.Accounts.LoginModel
 @{
+    /*
+        This page handles user authentication by collecting credentials
+        and delegating validation to the backend services.
+        It acts only as an input layer and does not perform security logic.
+    */
     Layout = "_Layout";
 }
 
 <h2>Login</h2>
-
+@*
+    The form submits credentials to the PageModel so authentication logic
+    remains centralized and testable in the service layer.
+*@
 <form method="post">
+    @*
+        Username is collected to uniquely identify the account.
+        Any validation or lookup is intentionally deferred to the backend.
+    *@
     <div>
         <label>Username</label>
         <input asp-for="Username" />
     </div>
-
+    @*
+        Password input is masked at the UI level to reduce
+        the risk of accidental exposure during entry.
+    *@
     <div>
         <label>Password</label>
         <input asp-for="Password" type="password" />
     </div>
 
     <button type="submit">Login</button>
-
+    @*
+        Authentication feedback is displayed only after submission
+        to avoid revealing account existence or system behavior.
+    *@
     <p style="color:red">@Model.ErrorMessage</p>
 </form>
