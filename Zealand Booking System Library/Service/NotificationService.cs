@@ -8,15 +8,41 @@ using Zealand_Booking_System_Library.Repository;
 
 namespace Zealand_Booking_System_Library.Service
 {
+    /// <summary>
+    /// Service responsible for handling notification logic.
+    ///
+    /// Responsibility:
+    /// - Provides a simple API for creating, retrieving, and updating notifications.
+    /// - Acts as a layer between the UI/business logic and the repository.
+    ///
+    /// Why this class exists:
+    /// - To keep controllers/Razor Pages clean and free from repository calls.
+    /// - To allow future expansion (e.g., email notifications, batching, templates)
+    ///   without changing the rest of the system.
+    /// </summary>
     public class NotificationService
     {
+        /// <summary>
+        /// Repository that performs actual database operations for notifications.
+        /// Injected to support dependency inversion and unit testing.
+        /// </summary>
         private readonly INotificationRepository _repo;
 
+        /// <summary>
+        /// Creates a new NotificationService with the required repository.
+        /// </summary>
         public NotificationService(INotificationRepository repo)
         {
             _repo = repo;
         }
 
+        /// <summary>
+        /// Creates a new notification for a user.
+        ///
+        /// Why:
+        /// - Used when the system needs to inform a user about a booking change,
+        ///   such as deletion or an important update.
+        /// </summary>
         public void Create(int accountId, string message)
         {
             _repo.Add(new Notification
@@ -26,11 +52,25 @@ namespace Zealand_Booking_System_Library.Service
             });
         }
 
+        /// <summary>
+        /// Returns all unread notifications for the given user.
+        ///
+        /// Why:
+        /// - Enables UI components (icons, badges, dropdowns) to show new messages.
+        /// - Prevents the user from missing important updates.
+        /// </summary>
         public List<Notification> GetUnread(int accountId)
         {
             return _repo.GetUnread(accountId);
         }
 
+        /// <summary>
+        /// Marks a notification as read.
+        ///
+        /// Why:
+        /// - Ensures that notifications only appear once.
+        /// - Keeps the notification list clean and up to date.
+        /// </summary>
         public void MarkAsRead(int id)
         {
             _repo.MarkAsRead(id);

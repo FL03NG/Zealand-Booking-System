@@ -1,17 +1,67 @@
-﻿@page
+﻿@*
+    <summary>
+    Index page for the Zealand Booking System.
+
+    Responsibility:
+    - Acts as the landing page of the application.
+    - Adapts the content depending on whether the user is logged in.
+    - Guides users towards login, registration, or creating and managing bookings.
+
+    Why this page exists:
+    - To give a clear starting point for new and returning users.
+    - To explain the system in simple steps and highlight the main actions.
+    </summary>
+*@
+@page
 @model Zealand_Booking_System.Pages.IndexModel
 @{
     ViewData["Title"] = "Home";
+
+    /// <summary>
+    /// Reads the current user's AccountID from the session.
+    /// The login state controls which text, buttons and steps are shown on the page.
+    /// </summary>
     int? loggedId = HttpContext.Session.GetInt32("AccountID");
 }
 
+@*
+    <summary>
+    Hero section with main message and actions.
+
+    Responsibility:
+    - Shows different content for guests and logged-in users.
+    - For guests: explains what the system does and who it is for.
+    - For logged-in users: pushes them directly towards creating a booking.
+
+    Why this section exists:
+    - To quickly communicate the purpose of the system.
+    - To highlight the most important next action.
+    </summary>
+*@
 <section class="zb-hero my-4 my-md-5">
     <div class="row align-items-start gy-4">
 
-        <!-- LEFT SIDE -->
+        @*
+            <summary>
+            Left side of the hero section.
+
+            Responsibility:
+            - Shows welcome text and call-to-action depending on login state.
+            - Displays login and registration buttons for guests.
+            - Displays booking buttons for logged-in users.
+
+            Why this area exists:
+            - To make it obvious what the user should do next
+              without reading documentation or menus.
+            </summary>
+        *@
         <div class="col-lg-6">
 
-            @* Overskrift/badge *@
+            @*
+                If the user is not logged in, we show general information and
+                a neutral badge. If logged in, we show a strong booking call-to-action.
+                This helps guide different user types towards the right action.
+            *@
             @if (loggedId == null)
             {
                 <span class="zb-badge mb-2">For students & teachers</span>
@@ -27,22 +77,35 @@
             }
             else
             {
+                @*
+                    Logged-in users already understand the system.
+                    Here we focus on the main next step: creating a booking.
+                *@
                 <span class="zb-badge mb-3"
                       style="background-color:#f7d774;
-                                 color:black;
-                                 font-weight:bold;
-                                 font-size:1.3rem;
-                                 padding:10px 22px;
-                                 border-radius:25px;">
+                             color:black;
+                             font-weight:bold;
+                             font-size:1.3rem;
+                             padding:10px 22px;
+                             border-radius:25px;">
                     CREATE A BOOKING NOW!
                 </span>
             }
 
-            <!-- BUTTONS -->
+            @*
+                Button area.
+
+                Responsibility:
+                - For guests: show actions to log in or create an account.
+                - For logged-in users: show direct links to booking and booking overview.
+
+                Why this area exists:
+                - Users should only see actions they can actually use in their current state.
+                - Reduces confusion and clicks by giving the most relevant options.
+            *@
             <div class="d-flex flex-wrap gap-3">
                 @if (loggedId == null)
                 {
-                    <!-- NOT LOGGED IN -->
                     <a asp-page="/Accounts/Login" class="btn zb-btn-primary px-4 py-2">
                         Log in
                     </a>
@@ -52,7 +115,6 @@
                 }
                 else
                 {
-                    <!-- LOGGED IN – BIG BUTTONS -->
                     <a asp-page="/FindRoom" class="btn zb-btn-primary px-5 py-3" style="font-size:1.2rem;">
                         Create booking
                     </a>
@@ -63,6 +125,16 @@
                 }
             </div>
 
+            @*
+                Short state message.
+
+                Responsibility:
+                - Shows a simple sentence that explains what the user can or cannot do.
+
+                Why this exists:
+                - To make the login requirement explicit.
+                - To avoid users wondering why they cannot book a room.
+            *@
             <p class="small text-light mt-3 mb-0">
                 @if (loggedId == null)
                 {
@@ -76,14 +148,30 @@
 
         </div>
 
-        <!-- RIGHT SIDE – STEPS CARD -->
+        @*
+            <summary>
+            Right side of the hero section.
+
+            Responsibility:
+            - Displays a step-by-step guide tailored to the login state.
+            - For guests: explains the full flow from account creation to booking.
+            - For logged-in users: focuses on booking and managing reservations.
+
+            Why this section exists:
+            - To visually explain the process in small, clear steps.
+            - To reduce uncertainty for first-time users.
+            </summary>
+        *@
         <div class="col-lg-6">
             <div class="zb-hero-card shadow-sm">
                 <h5 class="mb-3 text-light">Next steps</h5>
 
+                @*
+                    The steps are different for guests and logged-in users.
+                    This avoids showing unnecessary steps and keeps the flow simple.
+                *@
                 @if (loggedId == null)
                 {
-                    <!-- STEPS FOR NOT LOGGED IN -->
                     <ul class="list-unstyled mb-3 small text-light">
                         <li class="d-flex mb-2">
                             <span class="zb-step-number me-2">1</span>
@@ -117,7 +205,6 @@
                 }
                 else
                 {
-                    <!-- STEPS FOR LOGGED IN USERS -->
                     <ul class="list-unstyled mb-3 small text-light">
                         <li class="d-flex mb-2">
                             <span class="zb-step-number me-2">1</span>
@@ -143,6 +230,15 @@
                     </ul>
                 }
 
+                @*
+                    Metadata for context.
+
+                    Responsibility:
+                    - States that the system is a Datamatiker project from Zealand Roskilde.
+
+                    Why this exists:
+                    - Gives reviewers and teachers quick context about origin and purpose.
+                *@
                 <div class="zb-hero-meta small text-light">
                     <div>Developed as part of a Datamatiker project</div>
                     <div>Zealand · Roskilde</div>
@@ -153,7 +249,19 @@
     </div>
 </section>
 
-<!-- BOTTOM SECTION – ONLY SHOW WHEN NOT LOGGED IN -->
+@*
+    <summary>
+    Bottom information section.
+
+    Responsibility:
+    - Only shown for users who are not logged in.
+    - Explains why the system is useful and highlights key benefits.
+
+    Why this section exists:
+    - Acts as a short “sales pitch” to motivate new users to start using the system.
+    - Connects the system to real needs: overview, no double bookings, and familiar design.
+    </summary>
+*@
 @if (loggedId == null)
 {
     <section class="my-5">
@@ -169,7 +277,6 @@
                     <h5 class="mb-2">Overview of rooms</h5>
                     <p class="small mb-0">
                         View all relevant rooms filtered by campus, size and equipment.
-          
                     </p>
                 </div>
             </div>

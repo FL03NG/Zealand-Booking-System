@@ -1,25 +1,79 @@
+/* 
+    <summary>
+    Global stylesheet for the Zealand Booking System.
+
+    Responsibility:
+    - Defines the color theme, layout rules and reusable UI components.
+    - Ensures consistent styling across all Razor Pages.
+    - Implements Zealand-inspired black/yellow design for a clear identity.
+
+    Why this file exists:
+    - To centralize all design decisions instead of having inline styles everywhere.
+    - Makes the system easier to maintain and visually consistent.
+    </summary>
+*/
+
+/* ------------------------------------------- */
+/* Color variables                              */
+/* ------------------------------------------- */
+
+/* 
+    <summary>
+    Global CSS variables storing theme colors.
+    Why:
+    - Allows easy color updates in one place.
+    - Ensures visual consistency across all components.
+    </summary>
+*/
 :root {
-    --zb-bg: #000000; /* Sort baggrund */
-    --zb-bg-alt: #111111; /* Mørk grå til kort */
-    --zb-yellow: #ffe97a; /* Lys gul */
-    --zb-yellow-soft: #fff4a3;
-    --zb-text: #ffe97a;
-    --zb-muted: #9b9b9b;
+    --zb-bg: #000000; /* Base black background */
+    --zb-bg-alt: #111111; /* Slightly lighter black for cards */
+    --zb-yellow: #ffe97a; /* Main yellow accent */
+    --zb-yellow-soft: #fff4a3; /* Softer yellow for hover effects */
+    --zb-text: #ffe97a; /* Default text color */
+    --zb-muted: #9b9b9b; /* Subtle gray for secondary text */
 }
 
-/* Hele siden */
+/* ------------------------------------------- */
+/* Base page styling                            */
+/* ------------------------------------------- */
 
+/*
+    <summary>
+    General body styling.
+    Why:
+    - Ensures the entire application uses the same dark theme.
+    - Sets a modern, system-friendly font.
+    </summary>
+*/
 .zb-body {
     background-color: var(--zb-bg) !important;
     color: var(--zb-text);
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-/* Sørg for at container ikke sætter hvid baggrund */
+/*
+    <summary>
+    Makes Bootstrap containers transparent.
+    Why:
+    - Avoids white boxes appearing on dark background pages.
+    </summary>
+*/
 .container {
     background-color: transparent;
 }
-/* Knappen for "Book lokalet" */
+
+/* ------------------------------------------- */
+/* Buttons                                      */
+/* ------------------------------------------- */
+
+/*
+    <summary>
+    Primary booking button styling.
+    Why:
+    - Creates a clear and attractive call-to-action for room booking.
+    </summary>
+*/
 .btn-book-room {
     background-color: var(--zb-yellow);
     color: #000000;
@@ -28,18 +82,40 @@
 }
 
     .btn-book-room:hover {
-        background-color: #ffef96; /* lidt lysere ved hover */
+        background-color: #ffef96; /* Brighter yellow on hover */
         border-color: #ffef96;
         color: #000000;
     }
-/*status boks(farve)*/
+
+/* ------------------------------------------- */
+/* Status Indicators                            */
+/* ------------------------------------------- */
+
+/*
+    <summary>
+    Small colored box used to show booking status.
+    Why:
+    - Provides a simple and visual indicator instead of text-only status labels.
+    </summary>
+*/
 .status-box {
     width: 20px;
     height: 20px;
     border-radius: 4px;
     display: inline-block;
 }
-/* Links og standard-tekst */
+
+/* ------------------------------------------- */
+/* Links                                        */
+/* ------------------------------------------- */
+
+/*
+    <summary>
+    Custom link styling to match theme.
+    Why:
+    - Ensures all links follow the yellow theme and remain readable on dark backgrounds.
+    </summary>
+*/
 a {
     color: var(--zb-yellow);
 }
@@ -48,8 +124,17 @@ a {
         color: var(--zb-yellow-soft);
     }
 
-/* Navbar – sort med tynd gul linje */
+/* ------------------------------------------- */
+/* Navbar                                       */
+/* ------------------------------------------- */
 
+/*
+    <summary>
+    Navigation bar styling.
+    Why:
+    - Ensures the navbar follows the same yellow/black theme as the rest of the site.
+    </summary>
+*/
 .zb-navbar {
     background-color: var(--zb-yellow);
     border-bottom: 1px solid var(--zb-yellow);
@@ -71,8 +156,17 @@ a {
         text-decoration: underline;
     }
 
-/* Hero-tekst – stor gul overskrift */
+/* ------------------------------------------- */
+/* Hero Section                                 */
+/* ------------------------------------------- */
 
+/*
+    <summary>
+    Main hero title styling.
+    Why:
+    - The title should be strong, readable, and immediately communicate the purpose.
+    </summary>
+*/
 .zb-hero-title {
     font-size: clamp(2.4rem, 4vw, 3.4rem);
     font-weight: 700;
@@ -83,8 +177,13 @@ a {
     color: var(--zb-muted);
 }
 
-/* Badge over overskrift */
-
+/*
+    <summary>
+    Badge above hero title.
+    Why:
+    - Provides a small label for context or user group (e.g., “For students and teachers”).
+    </summary>
+*/
 .zb-badge {
     display: inline-block;
     font-size: 0.75rem;
@@ -97,8 +196,18 @@ a {
     padding: 0.2rem 0.9rem;
 }
 
-/* Hero-card og andre kort i højre side */
+/* ------------------------------------------- */
+/* Cards                                        */
+/* ------------------------------------------- */
 
+/*
+    <summary>
+    Shared card styling (hero, forms, tables, info cards).
+    Why:
+    - Gives all cards a consistent rounded, modern look.
+    - Supports the dark UI theme with subtle borders.
+    </summary>
+*/
 .zb-hero-card,
 .zb-form-card,
 .zb-table-card,
@@ -109,8 +218,17 @@ a {
     padding: 1.5rem;
 }
 
-/* Step-numre (1,2,3) i gule cirkler */
+/* ------------------------------------------- */
+/* Step Numbers                                 */
+/* ------------------------------------------- */
 
+/*
+    <summary>
+    Small yellow circles for step numbers.
+    Why:
+    - Helps users visually follow process steps on the Index page.
+    </summary>
+*/
 .zb-step-number {
     width: 24px;
     height: 24px;
@@ -124,8 +242,17 @@ a {
     margin-top: 0.2rem;
 }
 
-/* Knapper – gul med sort tekst */
+/* ------------------------------------------- */
+/* Buttons (Primary / Secondary)                */
+/* ------------------------------------------- */
 
+/*
+    <summary>
+    Primary button (yellow background).
+    Why:
+    - Used for main actions such as creating a booking.
+    </summary>
+*/
 .zb-btn-primary {
     background-color: var(--zb-yellow);
     border-color: var(--zb-yellow);
@@ -139,6 +266,13 @@ a {
         color: #000000;
     }
 
+/*
+    <summary>
+    Secondary button (transparent background).
+    Why:
+    - Used for supporting actions while keeping visual hierarchy clear.
+    </summary>
+*/
 .zb-btn-secondary {
     background-color: transparent;
     border-color: var(--zb-yellow);
@@ -151,8 +285,17 @@ a {
         color: #000000;
     }
 
-/* Footer */
+/* ------------------------------------------- */
+/* Footer                                       */
+/* ------------------------------------------- */
 
+/*
+    <summary>
+    Footer styling.
+    Why:
+    - Keeps design consistent with the dark theme at the bottom of the page.
+    </summary>
+*/
 .zb-footer {
     background-color: #000000;
     border-top: 1px solid rgba(255, 233, 122, 0.3);
@@ -162,21 +305,42 @@ a {
     .zb-footer a {
         color: var(--zb-yellow-soft);
     }
-/* Tydeligere tekst i booking-listen (Lokale bookinger) */
 
-/* Header-tekst i tabellen */
+/* ------------------------------------------- */
+/* Table Styling (Booking List + User List)     */
+/* ------------------------------------------- */
+
+/*
+    <summary>
+    Table header styling.
+    Why:
+    - Ensures headers remain readable on dark backgrounds.
+    </summary>
+*/
 .zb-table thead th {
-    color: #ffe97a !important; /* gul */
+    color: #ffe97a !important;
     border-color: rgba(255, 233, 122, .2);
 }
 
-/* Selve rækkerne */
+/*
+    <summary>
+    Table row styling.
+    Why:
+    - Makes booking and user lists clear and consistent.
+    </summary>
+*/
 .zb-table tbody td {
-    color: #ffe97a !important; /* gul tekst */
+    color: #ffe97a !important;
     border-top: 1px solid rgba(255, 233, 122, .12);
 }
 
-/* Hvis der er brugt .table-striped et sted */
+/*
+    <summary>
+    Stripe effect for rows.
+    Why:
+    - Improves readability by separating table rows visually.
+    </summary>
+*/
 .table-striped.zb-table tbody tr:nth-of-type(odd) {
     background-color: #111111;
 }
@@ -185,13 +349,28 @@ a {
     background-color: #090909;
 }
 
-/* Hover-effekt, så man kan følge rækken */
+/*
+    <summary>
+    Row hover effect.
+    Why:
+    - Makes it easier for users to track a row horizontally.
+    </summary>
+*/
 .zb-table tbody tr:hover {
     background-color: #181818;
 }
-/* === FIX: Brugeroversigt tabel tekst skal være gul/hvid, ikke grå === */
 
-/* Tabel headere */
+/* ------------------------------------------- */
+/* User Overview Table Fix                      */
+/* ------------------------------------------- */
+
+/*
+    <summary>
+    Ensures all tables (even Bootstrap defaults) show yellow text.
+    Why:
+    - Some Bootstrap classes override text color, so these rules enforce consistency.
+    </summary>
+*/
 table.zb-table thead th,
 .table thead th,
 .table-bordered thead th {
@@ -199,25 +378,26 @@ table.zb-table thead th,
     border-color: rgba(255, 233, 122, 0.3) !important;
 }
 
-/* Tabel celler */
 table.zb-table tbody td,
 .table tbody td,
 .table-bordered tbody td {
     color: #ffe97a !important;
 }
 
-/* Hvis du bruger table-bordered */
 .table-bordered td, .table-bordered th {
     border-color: rgba(255, 233, 122, 0.25) !important;
 }
 
-/* Row hover – så man kan følge linjen */
 table.zb-table tbody tr:hover,
 .table tbody tr:hover {
     background-color: rgba(255, 233, 122, 0.08) !important;
 }
 
-/* Fjern Bootstrap striped hover grå */
+/*
+    <summary>
+    Fixes Bootstrap striped rows so they do not become gray on dark backgrounds.
+    </summary>
+*/
 .table-striped tbody tr:nth-of-type(odd),
 .table-striped tbody tr:nth-of-type(even) {
     color: #ffe97a !important;
