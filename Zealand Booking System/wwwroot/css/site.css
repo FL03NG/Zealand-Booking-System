@@ -402,3 +402,15 @@ table.zb-table tbody tr:hover,
 .table-striped tbody tr:nth-of-type(even) {
     color: #ffe97a !important;
 }
+
+.zb-alert {
+    width: 100%;
+    padding: 1rem 1.5rem;
+    border-radius: 0.75rem;
+    margin: 1rem 0;
+    background-color: #d6f8ff; /* samme blå som din kasse */
+    color: #013746; /* mørk tekst */
+    border: 1px solid rgba(1, 55, 70, 0.35);
+    font-size: 1.05rem;
+    font-weight: 500;
+}

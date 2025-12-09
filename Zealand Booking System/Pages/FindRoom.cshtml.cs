@@ -26,6 +26,11 @@ namespace Zealand_Booking_System.Pages
         /// Service responsible for booking logic and room availability rules.
         /// </summary>
         private readonly BookingService _bookingService;
+
+        /// <summary>
+        /// Message shown to the user (e.g. after updating the list or creating a booking).
+        /// </summary>
+        public string Message { get; private set; }
         /// <summary>
         /// Initializes required repositories and composes the booking service.
         /// </summary>
@@ -85,6 +90,7 @@ namespace Zealand_Booking_System.Pages
                 SelectedDate = DateTime.Today;
             }
             LoadRooms();
+            Message = "Listen er opdateret.";
         }
         /// <summary>
         /// Creates a booking for the selected room.
