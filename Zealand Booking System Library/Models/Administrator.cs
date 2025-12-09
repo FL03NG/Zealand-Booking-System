@@ -23,7 +23,6 @@ namespace Zealand_Booking_System_Library.Models
         /// has administrator permissions.
         /// </summary>
         public override string Role { get; set; } = "Administrator";
-
         public Administrator() : base() { }
         /// <summary>
         /// Allows creating an admin account while still reusing the base account setup,

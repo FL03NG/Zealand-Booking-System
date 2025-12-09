@@ -127,7 +127,7 @@
                                 Destructive and administrative actions are
                                 restricted to authorized roles only.
                             *@
-                            <form method="post" asp-page-handler="Delete" class="d-inline">
+                            <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Er du sikker på at du vil slette dette lokale?');">
                                 <input type="hidden" name="roomID" value="@room.RoomID" />
                                 <button type="submit" class="btn btn-danger btn-sm">Slet</button>
                             </form>
