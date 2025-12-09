@@ -91,7 +91,7 @@ namespace Zealand_Booking_System.Pages
                     .Where(r => r.RoomType.ToString() == RoomTypeFilter)
                     .ToList();
             }
-            Room = allRooms;
+            Rooms = allRooms;
         }
         /// <summary>
         /// Handles creation of a new room.
@@ -134,7 +134,7 @@ namespace Zealand_Booking_System.Pages
         {
             EditRoomID = roomID;
             EditRoom = _roomService.GetRoomById(roomID);
-            Room = _roomService.GetAllRooms();
+            Rooms = _roomService.GetAllRooms();
             return Page();
         }
         /// <summary>
