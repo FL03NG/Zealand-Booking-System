@@ -141,7 +141,10 @@
                                         @if (allowedRoles.Contains(role) || booking.AccountID == accountId)
                                         {
                                             <!-- DELETE -->
-                                            <form method="post" asp-page-handler="Delete" class="d-inline">
+                                            <form method="post"
+                                                  asp-page-handler="Delete"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Er du sikker på, at du vil slette denne booking?');">
                                                 <input type="hidden" name="bookingID" value="@booking.BookingID" />
                                                 <button type="submit" class="btn btn-danger btn-sm">Slet</button>
                                             </form>

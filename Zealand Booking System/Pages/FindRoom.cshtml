@@ -122,12 +122,16 @@
                             Booking is handled via POST to preserve state
                             and ensure the correct filter context is reused.
                         *@
-                        <form method="post">
+                        <form method="post"
+                              onsubmit="return confirm('Vil du booke dette lokale på den valgte dato og tidspunkt?');">
                             <input type="hidden" name="RoomID" value="@avail.Room.RoomID" />
                             <input type="hidden" name="SelectedDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
                             <input type="hidden" name="SelectedTimeSlot" value="@Model.SelectedTimeSlot" />
                             <input type="hidden" name="SelectedRoomType" value="@Model.SelectedRoomType" />
-                            <button type="submit" asp-page-handler="Book" class="btn btn-sm btn-book-room">
+
+                            <button type="submit"
+                                    asp-page-handler="Book"
+                                    class="btn btn-sm btn-book-room">
                                 Book lokalet
                             </button>
                         </form>
