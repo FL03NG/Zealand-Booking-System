@@ -58,7 +58,14 @@
                 }
             </select>
         </div>
-
+        <div class="col-md-3">
+            <label asp-for="SelectedSmartBoard" class="form-label">Smartboard</label>
+            <select asp-for="SelectedSmartBoard" class="form-select">
+                <option value="">Alle</option>
+                <option value="true">Kun med smartboard</option>
+                <option value="false">Kun uden smartboard</option>
+            </select>
+        </div>
         <div class="col-md-3 d-flex align-items-end">
             @*
                 Submitting the form refreshes the list based on
@@ -79,6 +86,7 @@
             <th>Lokale</th>
             <th>Type</th>
             <th>Lokation</th>
+            <th>Smartboard</th>
             <th>Bookings</th>
             <th>Handling</th>
         </tr>
@@ -107,6 +115,7 @@
                     <td>@avail.Room.RoomName</td>
                     <td>@avail.Room.RoomType</td>
                     <td>@avail.Room.RoomLocation</td>
+                    <td>@(avail.Room.HasSmartBoard ? "Ja" : "Nej")</td>
                     <td>@avail.CurrentBookings / @avail.MaxBookings</td>
                     <td>
                         @*

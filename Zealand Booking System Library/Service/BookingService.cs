@@ -257,7 +257,7 @@ namespace Zealand_Booking_System_Library.Service
         ///   colors and status texts (green/yellow/red).
         /// - Keeps the availability logic centralized in the service layer.
         /// </summary>
-        public List<RoomAvailability> GetRoomAvailability(DateTime date, TimeSlot timeSlot, RoomType? roomType)
+        public List<RoomAvailability> GetRoomAvailability(DateTime date, TimeSlot timeSlot, RoomType? roomType, bool? selectedSmartBoard)
         {
             List<Room> allRooms = _roomRepo.GetAllRooms();
             List<Booking> allBookings = _bookingRepo.GetAll();
@@ -273,7 +273,13 @@ namespace Zealand_Booking_System_Library.Service
                 {
                     continue;
                 }
-
+                if (selectedSmartBoard.HasValue)
+                {
+                    if (room.HasSmartBoard != selectedSmartBoard.Value)
+                    {
+                        continue;
+                    }
+                }
                 int maxBookingsForRoom;
 
                 if (room.RoomType == RoomType.ClassRoom)

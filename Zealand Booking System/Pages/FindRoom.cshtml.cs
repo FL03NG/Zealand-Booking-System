@@ -52,6 +52,8 @@ namespace Zealand_Booking_System.Pages
         /// </summary>
         [BindProperty]
         public RoomType? SelectedRoomType { get; set; }
+        [BindProperty]
+        public bool? SelectedSmartBoard { get; set; }
         /// <summary>
         /// Identifies the room the user wants to book.
         /// Bound from the booking form submission.
@@ -127,7 +129,7 @@ namespace Zealand_Booking_System.Pages
         /// </summary>
         private void LoadRooms()
         {
-            Rooms = _bookingService.GetRoomAvailability(SelectedDate, SelectedTimeSlot, SelectedRoomType);
+            Rooms = _bookingService.GetRoomAvailability(SelectedDate, SelectedTimeSlot, SelectedRoomType, SelectedSmartBoard);
         }
     }
 }

@@ -53,6 +53,7 @@
                         <th>Booking ID</th>
                         <th>Account</th>
                         <th>Room</th>
+                        <th>Smartboard</th>
                         <th>Dato</th>
                         <th>Tidsrum</th>
                         <th>Rolle</th>
@@ -119,7 +120,8 @@
 
                                     <!-- ROOM NAME -->
                                     <td>@(booking.Room != null ? booking.Room.RoomName : $"ID: {booking.RoomID}")</td>
-
+                                    <!-- SMARTBOARD -->
+                                    <td>@(booking.Room != null && booking.Room.HasSmartBoard? "Ja" : "Nej")</td>
                                     <!-- DATE -->
                                     <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
 
