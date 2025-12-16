@@ -6,7 +6,7 @@
         The page title is set dynamically so it can be reused
         in the shared layout and browser metadata.
     */
-    ViewData["Title"] = "Find ledige lokaler";
+    ViewData["Title"] = "Find available rooms";
 }
 <h1>Find ledige lokaler</h1>
 @*
@@ -25,12 +25,12 @@
 <form method="post" class="mb-3">
     <div class="row g-2">
         <div class="col-md-3">
-            <label asp-for="SelectedDate" class="form-label">Dato</label>
+            <label asp-for="SelectedDate" class="form-label">Date</label>
             <input asp-for="SelectedDate" type="date" class="form-control" />
         </div>
 
         <div class="col-md-3">
-            <label asp-for="SelectedTimeSlot" class="form-label">Tidspunkt</label>
+            <label asp-for="SelectedTimeSlot" class="form-label">Timeslot</label>
             @*
                 Enum-based dropdown ensures valid, predefined values
                 and keeps UI and domain logic aligned.
@@ -42,7 +42,7 @@
         </div>
 
         <div class="col-md-3">
-            <label asp-for="SelectedRoomType" class="form-label">Lokaletype</label>
+            <label asp-for="SelectedRoomType" class="form-label">Roomtype</label>
             @*
                 Room type filtering is optional to allow broad searches
                 when users are unsure about requirements.
@@ -61,9 +61,9 @@
         <div class="col-md-3">
             <label asp-for="SelectedSmartBoard" class="form-label">Smartboard</label>
             <select asp-for="SelectedSmartBoard" class="form-select">
-                <option value="">Alle</option>
-                <option value="true">Kun med smartboard</option>
-                <option value="false">Kun uden smartboard</option>
+                <option value="">All</option>
+                <option value="true">With smartboard</option>
+                <option value="false">Without smartboard</option>
             </select>
         </div>
         <div class="col-md-3 d-flex align-items-end">
@@ -71,7 +71,7 @@
                 Submitting the form refreshes the list based on
                 selected criteria instead of loading a new page.
             *@
-            <button type="submit" class="btn btn-primary w-100">Opdater liste</button>
+            <button type="submit" class="btn btn-primary w-100">Opdate list</button>
         </div>
     </div>
 </form>
@@ -83,12 +83,12 @@
     <thead>
         <tr>
             <th>Status</th>
-            <th>Lokale</th>
+            <th>Room</th>
             <th>Type</th>
-            <th>Lokation</th>
+            <th>Location</th>
             <th>Smartboard</th>
             <th>Bookings</th>
-            <th>Handling</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
@@ -115,7 +115,7 @@
                     <td>@avail.Room.RoomName</td>
                     <td>@avail.Room.RoomType</td>
                     <td>@avail.Room.RoomLocation</td>
-                    <td>@(avail.Room.HasSmartBoard ? "Ja" : "Nej")</td>
+                    <td>@(avail.Room.HasSmartBoard ? "Yes" : "No")</td>
                     <td>@avail.CurrentBookings / @avail.MaxBookings</td>
                     <td>
                         @*
@@ -123,7 +123,7 @@
                             and ensure the correct filter context is reused.
                         *@
                         <form method="post"
-                              onsubmit="return confirm('Vil du booke dette lokale på den valgte dato og tidspunkt?');">
+                              onsubmit="return confirm('Do you want to book this room on the chosen date?');">
                             <input type="hidden" name="RoomID" value="@avail.Room.RoomID" />
                             <input type="hidden" name="SelectedDate" value="@Model.SelectedDate.ToString("yyyy-MM-dd")" />
                             <input type="hidden" name="SelectedTimeSlot" value="@Model.SelectedTimeSlot" />
@@ -132,7 +132,7 @@
                             <button type="submit"
                                     asp-page-handler="Book"
                                     class="btn btn-sm btn-book-room">
-                                Book lokalet
+                                Book room
                             </button>
                         </form>
                     </td>

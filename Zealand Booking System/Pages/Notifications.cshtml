@@ -17,7 +17,7 @@
 @page
 @model Zealand_Booking_System.Pages.NotificationsModel
 
-<h2>Dine notifikationer</h2>
+<h2>Your notifications</h2>
 
 @*
     If the user has no unread notifications, we show a simple message.
@@ -26,7 +26,7 @@
 *@
 @if (Model.Notifications.Count == 0)
 {
-    <p>Du har ingen nye notifikationer.</p>
+    <p>You have no notifications.</p>
 }
 else
 {

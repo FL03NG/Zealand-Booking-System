@@ -56,7 +56,7 @@ namespace Zealand_Booking_System.Pages.Accounts
         {
             if (string.IsNullOrWhiteSpace(Username) || string.IsNullOrWhiteSpace(Password))
             {
-                ErrorMessage = "Udfyld alle felter.";
+                ErrorMessage = "Fill all fields";
                 return Page();
             }
             // Instantiate user based on the selected role
@@ -72,11 +72,11 @@ namespace Zealand_Booking_System.Pages.Accounts
             try
             {
                 _userService.Create(newUser, Role);
-                SuccessMessage = "Bruger oprettet!";
+                SuccessMessage = "User created";
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Fejl: {ex.Message}";
+                ErrorMessage = $"Error: {ex.Message}";
             }
             return RedirectToPage("/Accounts/Login");
         }

@@ -7,7 +7,7 @@
         It supports searching, inline editing, and deletion while keeping all
         management actions in one consolidated interface.
     */
-    ViewData["Title"] = "Brugeroversigt";
+    ViewData["Title"] = "User list";
 }
 
 <section class="my-4 my-md-5">
@@ -18,9 +18,9 @@
     -->
     <div class="zb-form-card mb-4">
         <form method="post" asp-page-handler="Search" class="mb-0">
-            <label asp-for="SearchName" class="form-label">Søg på brugernavn</label>
+            <label asp-for="SearchName" class="form-label">Search username</label>
             <div class="input-group">
-                <input asp-for="SearchName" class="form-control" placeholder="Søg på brugernavn..." />
+                <input asp-for="SearchName" class="form-control" placeholder="Search username..." />
                 <button type="submit" class="btn zb-btn-primary">
                     Søg
                 </button>
@@ -41,7 +41,7 @@
     *@
     @if (Model.Users == null || Model.Users.Count == 0)
     {
-        <p>Der er ingen brugere at vise.</p>
+        <p>There are no users.</p>
     }
     else
     {
@@ -55,9 +55,9 @@
                     <thead>
                         <tr>
                             <th>AccountID</th>
-                            <th>Brugernavn</th>
-                            <th>Rolle</th>
-                            <th>Handling</th>
+                            <th>Username</th>
+                            <th>Role</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -93,8 +93,8 @@
                                     </td>
 
                                     <td>
-                                        <button type="submit" class="btn btn-success btn-sm">Gem</button>
-                                        <a asp-page="./UserList" class="btn zb-btn-secondary btn-sm">Fortryd</a>
+                                        <button type="submit" class="btn btn-success btn-sm">Save</button>
+                                        <a asp-page="./UserList" class="btn zb-btn-secondary btn-sm">Regret</a>
                                     </td>
                                     </form>
                                 </tr>
@@ -114,13 +114,13 @@
                                             Deletion is handled via POST to avoid
                                             accidental actions through link navigation.
                                         *@
-                                        <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Er du sikker på at du vil slette denne bruger?')">
+                                        <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
                                             <input type="hidden" name="accountID" value="@user.AccountID" />
-                                            <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+                                            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                         </form>
                                         <form method="post" asp-page-handler="StartEdit" class="d-inline">
                                             <input type="hidden" name="accountID" value="@user.AccountID" />
-                                            <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
+                                            <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                                         </form>
                                     </td>
                                 </tr>

@@ -48,7 +48,7 @@ namespace Zealand_Booking_System.Pages.Accounts
             var user = _userService.Login(Username, Password);
             if (user == null)
             {
-                ErrorMessage = "Forkert username eller password.";
+                ErrorMessage = "Wrong username or password.";
                 return Page();
             }
             // Persist user info in session for later authentication checks
