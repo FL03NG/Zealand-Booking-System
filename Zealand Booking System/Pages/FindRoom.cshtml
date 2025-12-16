@@ -55,7 +55,7 @@
                 when users are unsure about requirements.
             *@
             <select asp-for="SelectedRoomType" class="form-select">
-                <option value="">Alle typer</option>
+                <option value="">All types</option>
                 @foreach (RoomType type in Enum.GetValues(typeof(RoomType)))
                 {
                     bool selected = Model.SelectedRoomType.HasValue && Model.SelectedRoomType.Value == type;
