@@ -92,7 +92,7 @@ namespace Zealand_Booking_System.Pages
                 SelectedDate = DateTime.Today;
             }
             LoadRooms();
-            Message = "Listen er opdateret.";
+            Message = "The list has been opdated.";
         }
         /// <summary>
         /// Creates a booking for the selected room.
