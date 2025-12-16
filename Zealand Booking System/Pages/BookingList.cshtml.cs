@@ -110,7 +110,7 @@ namespace Zealand_Booking_System.Pages.Shared
                     $"Your booking at {booking.BookingDate:dd-MM-yyyy} has been deleted."
                 );
 
-                Message = "Booking slettet!";
+                Message = "Booking deleted!";
             }
             catch (Exception ex)
             {

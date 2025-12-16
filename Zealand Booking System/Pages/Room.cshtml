@@ -39,7 +39,7 @@
                     or very specific searches depending on the user's needs.
                 *@
                 <select name="RoomTypeFilter" id="RoomTypeFilter" class="form-select">
-                    <option value="">Alle</option>
+                    <option value="">All</option>
                     @foreach (var type in Enum.GetValues(typeof(Zealand_Booking_System_Library.Models.RoomType)))
                     {
                         if (Model.RoomTypeFilter == type.ToString())
