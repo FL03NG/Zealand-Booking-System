@@ -90,7 +90,7 @@ namespace Zealand_Booking_System.Pages.Accounts
         {
             UserCollectionRepo repo = new UserCollectionRepo(_connectionString);
             repo.UpdateUser(EditUser);
-            Message = "Bruger opdateret!";
+            Message = "User saved";
             LoadData();
             return Page();
         }
@@ -102,7 +102,7 @@ namespace Zealand_Booking_System.Pages.Accounts
         {
             UserCollectionRepo repo = new UserCollectionRepo(_connectionString);
             repo.DeleteUser(accountID);
-            Message = "Bruger slettet!";
+            Message = "User deleted";
             LoadData();
             return Page();
         }

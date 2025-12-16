@@ -16,7 +16,7 @@
         The room management section provides both overview and
         administrative actions in one place to reduce navigation complexity.
     -->
-    <h2 class="zb-section-title mb-3">Lokaler</h2>
+    <h2 class="zb-section-title mb-3">Rooms</h2>
     <div class="zb-form-card mb-4">
         @*
             Search and filtering are handled via GET so results
@@ -24,16 +24,16 @@
         *@
         <form method="get" class="row g-2 align-items-end">
             <div class="col-md-6">
-                <label for="SearchString" class="form-label">Søg efter lokaler</label>
+                <label for="SearchString" class="form-label">Search rooms</label>
                 <input type="text"
                        name="SearchString"
                        id="SearchString"
                        value="@Model.SearchString"
-                       placeholder="Søg efter lokaler..."
+                       placeholder="Search rooms..."
                        class="form-control" />
             </div>
             <div class="col-md-4">
-                <label for="RoomTypeFilter" class="form-label">Sortér efter RoomType</label>
+                <label for="RoomTypeFilter" class="form-label">Sort Roomtype</label>
                 @*
                     Room type filtering is optional to allow broad
                     or very specific searches depending on the user's needs.
@@ -54,7 +54,7 @@
                 </select>
             </div>
             <div class="col-md-2 d-grid">
-                <button type="submit" class="btn zb-btn-secondary mt-2">Søg</button>
+                <button type="submit" class="btn zb-btn-secondary mt-2">Search</button>
             </div>
         </form>
     </div>
@@ -77,22 +77,22 @@
                             <input asp-for="EditRoom.RoomID" type="hidden" />
 
                             <div class="mb-2">
-                                <label class="form-label">Lokalenavn</label>
+                                <label class="form-label">Room</label>
                                 <input asp-for="EditRoom.RoomName" class="form-control" />
                             </div>
 
                             <div class="mb-2">
-                                <label class="form-label">Lokation</label>
+                                <label class="form-label">Location</label>
                                 <input asp-for="EditRoom.RoomLocation" class="form-control" />
                             </div>
 
                             <div class="mb-2">
-                                <label class="form-label">Beskrivelse</label>
+                                <label class="form-label">Description</label>
                                 <textarea asp-for="EditRoom.RoomDescription" class="form-control"></textarea>
                             </div>
 
                             <div class="mb-2">
-                                <label class="form-label">Lokaletype</label>
+                                <label class="form-label">Roomtype</label>
                                 <select asp-for="EditRoom.RoomType"
                                         asp-items="Html.GetEnumSelectList<Zealand_Booking_System_Library.Models.RoomType>()"
                                         class="form-select">
@@ -101,11 +101,11 @@
 
                             <div class="form-check mb-2">
                                 <input asp-for="EditRoom.HasSmartBoard" class="form-check-input" type="checkbox" />
-                                <label asp-for="EditRoom.HasSmartBoard" class="form-check-label">Har smartboard</label>
+                                <label asp-for="EditRoom.HasSmartBoard" class="form-check-label">Has smartboard</label>
                             </div>
 
-                            <button type="submit" class="btn btn-success btn-sm mt-1">Gem</button>
-                            <a href="/Room" class="btn zb-btn-secondary btn-sm mt-1">Fortryd</a>
+                            <button type="submit" class="btn btn-success btn-sm mt-1">Save</button>
+                            <a href="/Room" class="btn zb-btn-secondary btn-sm mt-1">Regret</a>
                         </form>
                     }
                     else
@@ -116,9 +116,9 @@
                         *@
                         <h5 class="card-title">@room.RoomName</h5>
                         <p class="small">
-                            Lokation: @room.RoomLocation <br />
+                            Location: @room.RoomLocation <br />
                             Type: @room.RoomType <br />
-                            Smartboard: @(room.HasSmartBoard ? "Ja" : "Nej") <br />
+                            Smartboard: @(room.HasSmartBoard ? "Yes" : "No") <br />
                             @room.RoomDescription
                         </p>
                         @if (allowedRoles.Contains(role))
@@ -155,7 +155,7 @@
             to reduce accidental changes and improve clarity.
         *@
         <div class="zb-form-card mt-5">
-            <h3 class="mb-3">Opret nyt lokale</h3>
+            <h3 class="mb-3">Create new room</h3>
             <form method="post">
                 @Html.AntiForgeryToken()
                 <div class="mb-2">
@@ -167,7 +167,7 @@
                     <input asp-for="NewRoom.RoomLocation" id="RoomLocation" required class="form-control" />
                 </div>
                 <div class="mb-2">
-                    <label for="RoomDescription" class="form-label">Beskrivelse</label>
+                    <label for="RoomDescription" class="form-label">Description</label>
                     <textarea asp-for="NewRoom.RoomDescription" id="RoomDescription" class="form-control"></textarea>
                 </div>
                 <div class="mb-2">
@@ -182,7 +182,7 @@
                     <input asp-for="NewRoom.HasSmartBoard" class="form-check-input" type="checkbox" />
                     <label asp-for="NewRoom.HasSmartBoard" class="form-check-label">Has smartboard</label>
                 </div>
-                <button type="submit" class="btn zb-btn-primary mt-2">Create lokale</button>
+                <button type="submit" class="btn zb-btn-primary mt-2">Create room</button>
             </form>
         </div>
     }
