@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using Zealand_Booking_System_Library.Models;
@@ -18,13 +19,13 @@ namespace Zealand_Booking_System.Pages.Shared
         public List<Room> Rooms { get; private set; }
         public List<Account> Users { get; private set; }
 
-        [BindProperty] 
+        [BindProperty]
         public Booking NewBooking { get; set; }
-        [BindProperty] 
+        [BindProperty]
         public string SearchName { get; set; }
-        [BindProperty] 
+        [BindProperty]
         public int EditBookingID { get; set; }
-        [BindProperty] 
+        [BindProperty]
         public Booking EditBooking { get; set; }
 
         private readonly BookingService _bookingService;
@@ -36,9 +37,9 @@ namespace Zealand_Booking_System.Pages.Shared
 
         public BookingListModel()
         {
-            var bookingRepo = new BookingCollectionRepo(_connectionString);
-            var roomRepo = new RoomCollectionRepo(_connectionString);
-            var userRepo = new UserCollectionRepo(_connectionString);
+            BookingCollectionRepo bookingRepo = new BookingCollectionRepo(_connectionString);
+            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
+            UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
 
             _bookingService = new BookingService(bookingRepo, roomRepo);
 
@@ -70,14 +71,16 @@ namespace Zealand_Booking_System.Pages.Shared
         {
             LoadData();
             if (string.IsNullOrWhiteSpace(SearchName))
+            {
                 return;
+            }
 
             string searchLower = SearchName.ToLower();
             List<Booking> filtered = new List<Booking>();
 
-            foreach (var booking in Bookings)
+            foreach (Booking booking in Bookings)
             {
-                string username = booking.Account?.Username;
+                string username = booking.Account != null ? booking.Account.Username : null;
 
                 if (!string.IsNullOrEmpty(username) &&
                     username.ToLower().Contains(searchLower))
@@ -91,19 +94,30 @@ namespace Zealand_Booking_System.Pages.Shared
 
         public IActionResult OnPostDelete(int bookingID)
         {
-            var booking = _bookingService.GetBookingById(bookingID);
+            try
+            {
+                string role = HttpContext.Session.GetString("Role");
 
-            _bookingService.Delete(bookingID);
+                Booking booking = _bookingService.GetBookingById(bookingID);
 
-            var noteRepo = new NotificationCollectionRepo(_connectionString);
-            var noteService = new NotificationService(noteRepo);
+                _bookingService.Delete(bookingID, role);
 
-            noteService.Create(
-                booking.AccountID,
-                $"Your booking at {booking.BookingDate:dd-MM-yyyy} has been deleted."
-            );
+                NotificationCollectionRepo noteRepo = new NotificationCollectionRepo(_connectionString);
+                NotificationService noteService = new NotificationService(noteRepo);
 
-            Message = "Booking slettet!";
+                noteService.Create(
+                    booking.AccountID,
+                    $"Your booking at {booking.BookingDate:dd-MM-yyyy} has been deleted."
+                );
+
+                Message = "Booking slettet!";
+            }
+            catch (Exception ex)
+            {
+                // Fx hvis Teacher bryder 3-dages-reglen
+                Message = "Error: " + ex.Message;
+            }
+
             LoadData();
             return Page();
         }
@@ -121,7 +135,9 @@ namespace Zealand_Booking_System.Pages.Shared
         {
             try
             {
-                _bookingService.Update(EditBooking);
+                string role = HttpContext.Session.GetString("Role");
+
+                _bookingService.Update(EditBooking, role);
                 Message = "Booking has been editet!";
             }
             catch (Exception ex)
@@ -135,22 +151,20 @@ namespace Zealand_Booking_System.Pages.Shared
             return Page();
         }
 
-        
         private void LoadData()
         {
             Bookings = _bookingService.GetAll();
 
-          
-            foreach (var booking in Bookings)
+            foreach (Booking booking in Bookings)
             {
                 booking.Account = _userService.GetById(booking.AccountID);
                 // Nu bliver booking.Account = Student / Teacher / Administrator
             }
 
-            var roomRepo = new RoomCollectionRepo(_connectionString);
+            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
             Rooms = roomRepo.GetAllRooms();
 
-            var userRepo = new UserCollectionRepo(_connectionString);
+            UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
             Users = userRepo.GetAllUsers();
         }
     }

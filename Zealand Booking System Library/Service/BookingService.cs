@@ -154,11 +154,26 @@ namespace Zealand_Booking_System_Library.Service
 
         /// <summary>
         /// Deletes a booking by its ID.
-        /// Why:
-        /// - Used when users or admins want to cancel or remove bookings.
+        /// Enforces that Teachers can only delete a booking
+        /// if there are at least 3 days until the booking date.
+        ///
+        /// Administrators are not restricted by this rule.
         /// </summary>
-        public void Delete(int id)
+        public void Delete(int id, string role)
         {
+            Booking booking = _bookingRepo.GetBookingById(id);
+
+            if (booking == null)
+            {
+                throw new Exception("Bookingen findes ikke.");
+            }
+
+            // Kun Teacher skal have 3 dages varsel.
+            if (role == "Teacher")
+            {
+                EnsureThreeDaysNotice(booking);
+            }
+
             _bookingRepo.Delete(id);
         }
 
@@ -173,20 +188,25 @@ namespace Zealand_Booking_System_Library.Service
         }
 
         /// <summary>
-        /// Updates an existing booking after re-checking capacity rules.
+        /// Updates an existing booking after re-checking capacity rules
+        /// and enforcing a 3-day notice rule for Teachers.
         ///
         /// Rules enforced:
         /// - The room must still exist.
         /// - ClassRoom: max 2 bookings per time slot.
         /// - Other rooms: max 1 booking per time slot.
         /// - The booking being updated does not count against itself.
-        ///
-        /// Why:
-        /// - Prevents users from changing a booking into a slot that
-        ///   would violate the capacity rules.
+        /// - A Teacher can only change a booking if there are at least 3 days
+        ///   until the booking date.
         /// </summary>
-        public void Update(Booking booking)
+        public void Update(Booking booking, string role)
         {
+            // Kun Teacher skal have 3 dages varsel.
+            if (role == "Teacher")
+            {
+                EnsureThreeDaysNotice(booking);
+            }
+
             // 1) Find the room for this booking.
             Room room = _roomRepo.GetRoomById(booking.RoomID);
             if (room == null)
@@ -338,6 +358,26 @@ namespace Zealand_Booking_System_Library.Service
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Ensures that there are at least 3 days until the booking date.
+        /// Why:
+        /// - Used by Delete and Update to enforce the "3 dages varsel" rule
+        ///   for Teachers.
+        /// </summary>
+        private void EnsureThreeDaysNotice(Booking booking)
+        {
+            DateTime today = DateTime.Now.Date;
+            DateTime bookingDate = booking.BookingDate.Date;
+
+            TimeSpan difference = bookingDate - today;
+            double daysUntilBooking = difference.TotalDays;
+
+            if (daysUntilBooking < 3)
+            {
+                throw new Exception("Bookingen kan kun ændres eller slettes med mindst 3 dages varsel.");
+            }
         }
     }
 }

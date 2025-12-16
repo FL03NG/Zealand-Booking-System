@@ -9,6 +9,13 @@
     ViewData["Title"] = "Find available rooms";
 }
 <h1>Find ledige lokaler</h1>
+@if (!string.IsNullOrEmpty(Model.Message))
+{
+    <div class="zb-alert">
+        @Model.Message
+    </div>
+}
+
 @*
     Temporary feedback messages are shown here to give users
     immediate confirmation after actions like bookings or updates.
