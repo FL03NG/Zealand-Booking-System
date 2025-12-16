@@ -27,7 +27,7 @@
 }
 
 <section class="my-4 my-md-5">
-    <h2 class="zb-section-title mb-3">Lokale bookinger</h2>
+    <h2 class="zb-section-title mb-3">Room bookings</h2>
 
     @* Shows status messages (e.g., after delete/edit) *@
     @if (!string.IsNullOrEmpty(Model.Message))
@@ -38,9 +38,9 @@
     <!-- 🔎 SEARCH FORM -->
     <div class="zb-form-card mb-4">
         <form method="post" asp-page-handler="Search" class="mb-0">
-            <label for="SearchName" class="form-label">Søg efter booking (brugernavn)</label>
-            <input asp-for="SearchName" id="SearchName" class="form-control" placeholder="Skriv fx 'lars'" />
-            <button type="submit" class="btn zb-btn-secondary mt-2">Søg</button>
+            <label for="SearchName" class="form-label">Search after booking (Username)</label>
+            <input asp-for="SearchName" id="SearchName" class="form-control" placeholder="Write a 'Name'" />
+            <button type="submit" class="btn zb-btn-secondary mt-2">Search</button>
         </form>
     </div>
 
@@ -83,7 +83,7 @@
 
                                             <!-- EDIT DATE -->
                                             <div class="mb-2">
-                                                <label for="EditBooking_BookingDate" class="form-label">Dato</label>
+                                                <label for="EditBooking_BookingDate" class="form-label">Date</label>
                                                 <input asp-for="EditBooking.BookingDate"
                                                        id="EditBooking_BookingDate"
                                                        type="date"
@@ -92,7 +92,7 @@
 
                                             <!-- EDIT TIMESLOT -->
                                             <div class="mb-2">
-                                                <label for="EditBooking_TimeSlot" class="form-label">Tidsrum</label>
+                                                <label for="EditBooking_TimeSlot" class="form-label">Time</label>
                                                 <select asp-for="EditBooking.TimeSlot"
                                                         id="EditBooking_TimeSlot"
                                                         class="form-select">
@@ -103,8 +103,8 @@
                                                 </select>
                                             </div>
 
-                                            <button type="submit" class="btn btn-success btn-sm">Gem</button>
-                                            <a asp-page="./BookingList" class="btn zb-btn-secondary btn-sm">Fortryd</a>
+                                            <button type="submit" class="btn btn-success btn-sm">Save</button>
+                                            <a asp-page="./BookingList" class="btn zb-btn-secondary btn-sm">Regret</a>
                                         </form>
                                     </td>
                                 </tr>
@@ -121,7 +121,7 @@
                                     <!-- ROOM NAME -->
                                     <td>@(booking.Room != null ? booking.Room.RoomName : $"ID: {booking.RoomID}")</td>
                                     <!-- SMARTBOARD -->
-                                    <td>@(booking.Room != null && booking.Room.HasSmartBoard? "Ja" : "Nej")</td>
+                                    <td>@(booking.Room != null && booking.Room.HasSmartBoard? "Yes" : "No")</td>
                                     <!-- DATE -->
                                     <td>@booking.BookingDate.ToString("dd-MM-yyyy")</td>
 
@@ -144,9 +144,9 @@
                                             <form method="post"
                                                   asp-page-handler="Delete"
                                                   class="d-inline"
-                                                  onsubmit="return confirm('Er du sikker på, at du vil slette denne booking?');">
+                                                  onsubmit="return confirm('Are you sure you want to delete this booking?');">
                                                 <input type="hidden" name="bookingID" value="@booking.BookingID" />
-                                                <button type="submit" class="btn btn-danger btn-sm">Slet</button>
+                                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                             </form>
 
                                             <!-- EDIT (admins/teachers only) -->
@@ -154,7 +154,7 @@
                                             {
                                                 <form method="post" asp-page-handler="StartEdit" class="d-inline">
                                                     <input type="hidden" name="bookingID" value="@booking.BookingID" />
-                                                    <button type="submit" class="btn btn-warning btn-sm">Rediger</button>
+                                                    <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                                                 </form>
                                             }
                                         }
@@ -167,7 +167,7 @@
                     {
                         <!-- NO BOOKINGS FOUND -->
                         <tr>
-                            <td colspan="7" class="text-center">Ingen bookinger fundet</td>
+                            <td colspan="7" class="text-center">No bookings found</td>
                         </tr>
                     }
 
