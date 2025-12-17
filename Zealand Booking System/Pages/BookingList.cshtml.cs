@@ -261,20 +261,23 @@ namespace Zealand_Booking_System.Pages.Shared
         {
             // Load bookings via service (business layer)
             Bookings = _bookingService.GetAll();
+            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
+            Rooms = roomRepo.GetAllRooms();
 
             // Attach Account object for each booking so the UI can show username etc.
             foreach (Booking booking in Bookings)
             {
                 booking.Account = _userService.GetById(booking.AccountID);
-                // booking.Account will be Student / Teacher / Administrator
+                booking.Room = roomRepo.GetRoomById(booking.RoomID);
+                // Nu bliver booking.Account = Student / Teacher / Administrator
             }
 
             // Load rooms and users for UI dropdowns or display fields
             RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
             Rooms = roomRepo.GetAllRooms();
 
-            UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
-            Users = userRepo.GetAllUsers();
+            //UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
+            //Users = userRepo.GetAllUsers();
         }
     }
 }
