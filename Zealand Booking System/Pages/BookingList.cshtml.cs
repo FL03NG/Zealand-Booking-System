@@ -272,10 +272,6 @@ namespace Zealand_Booking_System.Pages.Shared
                 // Nu bliver booking.Account = Student / Teacher / Administrator
             }
 
-            // Load rooms and users for UI dropdowns or display fields
-            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
-            Rooms = roomRepo.GetAllRooms();
-
             //UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
             //Users = userRepo.GetAllUsers();
         }
