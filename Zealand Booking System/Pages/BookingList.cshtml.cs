@@ -154,18 +154,20 @@ namespace Zealand_Booking_System.Pages.Shared
         private void LoadData()
         {
             Bookings = _bookingService.GetAll();
+            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
+            Rooms = roomRepo.GetAllRooms();
 
             foreach (Booking booking in Bookings)
             {
                 booking.Account = _userService.GetById(booking.AccountID);
+                booking.Room = roomRepo.GetRoomById(booking.RoomID);
                 // Nu bliver booking.Account = Student / Teacher / Administrator
             }
 
-            RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
-            Rooms = roomRepo.GetAllRooms();
+            
 
-            UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
-            Users = userRepo.GetAllUsers();
+            //UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
+            //Users = userRepo.GetAllUsers();
         }
     }
 }
