@@ -1,27 +1,33 @@
-﻿@page
+﻿@*
+    Page: Room.cshtml
+
+    Responsibility:
+    - Shows all rooms in the system.
+    - Lets admins and teachers create, edit, and delete rooms.
+
+    Why this page exists:
+    - To give a clear overview of available rooms.
+    - To manage rooms in one place instead of multiple pages.
+*@
+@page
 @model Zealand_Booking_System.Pages.RoomModel
 @{
-    /*
-        User role and identity are retrieved from session data
-        to control which actions and UI elements are available.
-        This keeps authorization logic consistent with the rest of the application.
-    */
+    // Read user role from session to control access
     string role = HttpContext.Session.GetString("Role");
     int? accountId = HttpContext.Session.GetInt32("AccountID");
-    // Only users with these roles are allowed to manage rooms
+
+    // Only these roles are allowed to manage rooms
     string[] allowedRoles = new[] { "Administrator", "Teacher" };
 }
+
 <section class="my-4 my-md-5">
-    <!--
-        The room management section provides both overview and
-        administrative actions in one place to reduce navigation complexity.
-    -->
     <h2 class="zb-section-title mb-3">Rooms</h2>
+
+    @*
+        Search and filter form.
+        Uses GET so the result can be refreshed or bookmarked.
+    *@
     <div class="zb-form-card mb-4">
-        @*
-            Search and filtering are handled via GET so results
-            can be bookmarked, shared, and refreshed safely.
-        *@
         <form method="get" class="row g-2 align-items-end">
             <div class="col-md-6">
                 <label for="SearchString" class="form-label">Search rooms</label>
@@ -32,46 +38,41 @@
                        placeholder="Search rooms..."
                        class="form-control" />
             </div>
+
             <div class="col-md-4">
-                <label for="RoomTypeFilter" class="form-label">Sort Roomtype</label>
-                @*
-                    Room type filtering is optional to allow broad
-                    or very specific searches depending on the user's needs.
-                *@
+                <label for="RoomTypeFilter" class="form-label">Room type</label>
                 <select name="RoomTypeFilter" id="RoomTypeFilter" class="form-select">
                     <option value="">All</option>
                     @foreach (var type in Enum.GetValues(typeof(Zealand_Booking_System_Library.Models.RoomType)))
                     {
-                        if (Model.RoomTypeFilter == type.ToString())
-                        {
-                            <option value="@type" selected>@type</option>
-                        }
-                        else
-                        {
-                            <option value="@type">@type</option>
-                        }
+                        <option value="@type" selected="@(Model.RoomTypeFilter == type.ToString())">
+                            @type
+                        </option>
                     }
                 </select>
             </div>
+
             <div class="col-md-2 d-grid">
                 <button type="submit" class="btn zb-btn-secondary mt-2">Search</button>
             </div>
         </form>
     </div>
-    <!--
-        Rooms are displayed as cards instead of a table to improve readability
-        and support responsive layouts on smaller screens.
-    -->
+
+    @*
+        Rooms are shown as cards.
+        This makes them easier to read than a large table.
+    *@
     <div class="row gy-4">
         @foreach (var room in Model.Rooms)
         {
             <div class="col-md-6 col-lg-4">
                 <div class="zb-info-card h-100">
+
                     @if (Model.EditRoomID == room.RoomID)
                     {
                         @*
-                            Edit mode replaces display mode inline
-                            to keep context and avoid navigating away.
+                            Edit mode for a single room.
+                            Only one room can be edited at a time.
                         *@
                         <form method="post" asp-page-handler="SaveEdit">
                             <input asp-for="EditRoom.RoomID" type="hidden" />
@@ -92,7 +93,7 @@
                             </div>
 
                             <div class="mb-2">
-                                <label class="form-label">Roomtype</label>
+                                <label class="form-label">Room type</label>
                                 <select asp-for="EditRoom.RoomType"
                                         asp-items="Html.GetEnumSelectList<Zealand_Booking_System_Library.Models.RoomType>()"
                                         class="form-select">
@@ -100,47 +101,57 @@
                             </div>
 
                             <div class="form-check mb-2">
-                                <input asp-for="EditRoom.HasSmartBoard" class="form-check-input" type="checkbox" />
-                                <label asp-for="EditRoom.HasSmartBoard" class="form-check-label">Has smartboard</label>
+                                <input asp-for="EditRoom.HasSmartBoard"
+                                       class="form-check-input"
+                                       type="checkbox" />
+                                <label asp-for="EditRoom.HasSmartBoard"
+                                       class="form-check-label">
+                                    Has smartboard
+                                </label>
                             </div>
 
-                            <button type="submit" class="btn btn-success btn-sm mt-1">Save</button>
-                            <a href="/Room" class="btn zb-btn-secondary btn-sm mt-1">Regret</a>
+                            <button type="submit" class="btn btn-success btn-sm">Save</button>
+                            <a href="/Room" class="btn zb-btn-secondary btn-sm">Cancel</a>
                         </form>
                     }
                     else
                     {
                         @*
-                            Display mode focuses on readability and quick actions,
-                            keeping details concise but informative.
+                            Normal view mode.
+                            Shows room details and available actions.
                         *@
-                        <h5 class="card-title">@room.RoomName</h5>
+                        <h5>@room.RoomName</h5>
                         <p class="small">
                             Location: @room.RoomLocation <br />
                             Type: @room.RoomType <br />
                             Smartboard: @(room.HasSmartBoard ? "Yes" : "No") <br />
                             @room.RoomDescription
                         </p>
+
+                        @*
+                            Only admins and teachers can edit or delete rooms.
+                        *@
                         @if (allowedRoles.Contains(role))
                         {
-                            @*
-                                Destructive and administrative actions are
-                                restricted to authorized roles only.
-                            *@
-                            <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this room?');">
+                            <form method="post"
+                                  asp-page-handler="Delete"
+                                  class="d-inline"
+                                  onsubmit="return confirm('Are you sure?');">
                                 <input type="hidden" name="roomID" value="@room.RoomID" />
                                 <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                             </form>
+
                             <form method="post" asp-page-handler="StartEdit" class="d-inline">
                                 <input type="hidden" name="roomID" value="@room.RoomID" />
                                 <button type="submit" class="btn btn-warning btn-sm">Edit</button>
                             </form>
                         }
+
                         @*
-                            Booking is always available to keep room usage
-                            accessible even when management permissions are limited.
+                            Booking is available for all users.
                         *@
-                        <a asp-page="/CreateBooking" class="btn zb-btn-primary btn-sm mt-1">
+                        <a asp-page="/CreateBooking"
+                           class="btn zb-btn-primary btn-sm mt-1">
                             Book room
                         </a>
                     }
@@ -148,42 +159,4 @@
             </div>
         }
     </div>
-    @if (allowedRoles.Contains(role))
-    {
-        @*
-            Room creation is separated visually and logically
-            to reduce accidental changes and improve clarity.
-        *@
-        <div class="zb-form-card mt-5">
-            <h3 class="mb-3">Create new room</h3>
-            <form method="post">
-                @Html.AntiForgeryToken()
-                <div class="mb-2">
-                    <label for="RoomName" class="form-label">Roomname</label>
-                    <input asp-for="NewRoom.RoomName" id="RoomName" required class="form-control" />
-                </div>
-                <div class="mb-2">
-                    <label for="RoomLocation" class="form-label">Location</label>
-                    <input asp-for="NewRoom.RoomLocation" id="RoomLocation" required class="form-control" />
-                </div>
-                <div class="mb-2">
-                    <label for="RoomDescription" class="form-label">Description</label>
-                    <textarea asp-for="NewRoom.RoomDescription" id="RoomDescription" class="form-control"></textarea>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Roomtype</label>
-                    <select asp-for="NewRoom.RoomType"
-                            asp-items="Html.GetEnumSelectList<Zealand_Booking_System_Library.Models.RoomType>()"
-                            class="form-select">
-                        <option value="">-- Choose type --</option>
-                    </select>
-                </div>
-                <div class="form-check mb-2">
-                    <input asp-for="NewRoom.HasSmartBoard" class="form-check-input" type="checkbox" />
-                    <label asp-for="NewRoom.HasSmartBoard" class="form-check-label">Has smartboard</label>
-                </div>
-                <button type="submit" class="btn zb-btn-primary mt-2">Create room</button>
-            </form>
-        </div>
-    }
 </section>

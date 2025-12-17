@@ -1,41 +1,48 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Zealand_Booking_System_Library.Repository;
 using Zealand_Booking_System_Library.Models;
+using Zealand_Booking_System_Library.Repository;
 
 namespace Zealand_Booking_System_Library.Service
 {
     /// <summary>
-    /// Handles business rules related to rooms.
-    /// This service acts as a protective layer between the UI and the repository,
-    /// ensuring that only valid room data is saved or modified.
+    /// Handles rules for working with rooms.
+    ///
+    /// What this class does:
+    /// - Checks that room data is valid.
+    /// - Controls when rooms can be created, updated, or deleted.
+    ///
+    /// Why this class exists:
+    /// - To keep business rules out of the UI.
+    /// - To make sure only valid rooms are saved in the database.
     /// </summary>
     public class RoomService
     {
         /// <summary>
-        /// Repository dependency injected to keep the service focused on rules
-        /// rather than data access details.
+        /// Repository used to read and write room data.
         /// </summary>
         private readonly IRoomRepository _roomRepo;
 
+        /// <summary>
+        /// Creates the service and receives the room repository.
+        /// </summary>
         public RoomService(IRoomRepository roomRepo)
         {
             _roomRepo = roomRepo;
         }
+
         /// <summary>
-        /// Returns a single room by ID, relying on the repository to handle data retrieval.
-        /// Keeping this method simple avoids duplicating repository logic.
+        /// Returns one room by its ID.
+        /// Used when viewing or editing a room.
         /// </summary>
         public Room GetRoomById(int roomID)
         {
             return _roomRepo.GetRoomById(roomID);
         }
+
         /// <summary>
-        /// Validates room data before saving it, so invalid rooms never reach the data layer.
-        /// This protects the system from inconsistent or incomplete room entries.
+        /// Creates a new room after checking the input.
+        /// Prevents empty or invalid room data.
         /// </summary>
         public void AddRoom(Room room)
         {
@@ -43,37 +50,41 @@ namespace Zealand_Booking_System_Library.Service
                 throw new ArgumentNullException(nameof(room));
 
             if (string.IsNullOrWhiteSpace(room.RoomName))
-                throw new ArgumentException("RoomName cannot be empty.");
+                throw new ArgumentException("Room name is required.");
 
             if (string.IsNullOrWhiteSpace(room.RoomLocation))
-                throw new ArgumentException("RoomLocation cannot be empty.");
+                throw new ArgumentException("Room location is required.");
 
             if (!Enum.IsDefined(typeof(RoomType), room.RoomType))
-                throw new ArgumentException("Invalid RoomType.");
+                throw new ArgumentException("Invalid room type.");
 
             _roomRepo.AddRoom(room);
         }
+
         /// <summary>
-        /// Ensures a valid ID before attempting deletion,
-        /// preventing unnecessary or unsafe repository calls.
+        /// Deletes a room using its ID.
+        /// Ensures the ID is valid before deleting.
         /// </summary>
         public void DeleteRoom(int id)
         {
             if (id <= 0)
-                throw new ArgumentException("Invalid room ID");
+                throw new ArgumentException("Invalid room ID.");
+
             _roomRepo.DeleteRoom(id);
         }
+
         /// <summary>
-        /// Retrieves all rooms through the repository,
-        /// keeping the service free from data access responsibility.
+        /// Returns all rooms in the system.
+        /// Used for lists and overviews.
         /// </summary>
         public List<Room> GetAllRooms()
         {
             return _roomRepo.GetAllRooms();
         }
+
         /// <summary>
-        /// Verifies that updated room data is valid before it replaces existing data,
-        /// ensuring the system stays consistent over time.
+        /// Updates an existing room.
+        /// Checks all values before saving changes.
         /// </summary>
         public void UpdateRoom(Room room)
         {
@@ -81,16 +92,17 @@ namespace Zealand_Booking_System_Library.Service
                 throw new ArgumentNullException(nameof(room));
 
             if (room.RoomID <= 0)
-                throw new ArgumentException("RoomID must be a positive number.");
+                throw new ArgumentException("Invalid room ID.");
 
             if (string.IsNullOrWhiteSpace(room.RoomName))
-                throw new ArgumentException("RoomName cannot be empty.");
+                throw new ArgumentException("Room name is required.");
 
             if (string.IsNullOrWhiteSpace(room.RoomLocation))
-                throw new ArgumentException("RoomLocation cannot be empty.");
+                throw new ArgumentException("Room location is required.");
 
             if (!Enum.IsDefined(typeof(RoomType), room.RoomType))
-                throw new ArgumentException("Invalid RoomType.");
+                throw new ArgumentException("Invalid room type.");
+
             _roomRepo.UpdateRoom(room);
         }
     }

@@ -1,11 +1,10 @@
 ﻿@page
 @model Zealand_Booking_System.Pages.Accounts.RegisterModel
 @{
-    /*
-        This page provides a controlled way to create new user accounts.
-        It is primarily intended for administrative or guided registration
-        to ensure roles and credentials follow system rules.
-    */
+    @*
+    Page for creating new user accounts.
+    Used to register users with a selected role.
+    *@
     Layout = "_Layout";
 }
 
@@ -47,8 +46,7 @@
 
     <button type="submit">Create User</button>
     @*
-        Error and success messages are rendered explicitly to give
-        immediate feedback after form submission.
+    Shows an error or success message after submit.
     *@
     <p style="color:red">@Model.ErrorMessage</p>
     <p style="color:green">@Model.SuccessMessage</p>

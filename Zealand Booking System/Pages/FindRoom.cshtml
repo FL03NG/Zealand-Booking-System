@@ -2,10 +2,15 @@
 @model Zealand_Booking_System.Pages.FindRoomsModel
 @using Zealand_Booking_System_Library.Models
 @{
-    /*
-        The page title is set dynamically so it can be reused
-        in the shared layout and browser metadata.
-    */
+    @*
+    Responsibility:
+    - Shows available rooms based on selected filters.
+    - Lets the user create a booking.
+
+    Why this page exists:
+    - To make it easy to find and book free rooms.
+    - To give a clear overview of room availability.
+    *@
     ViewData["Title"] = "Find available rooms";
 }
 <h1>Find available rooms</h1>
@@ -107,12 +112,15 @@
                     Visual status indicators reduce cognitive load
                     by communicating availability at a glance.
                 *@
-                string boxColor = avail.StatusColor switch
+                string boxColor = "bg-danger";
+                if (avail.StatusColor == "green")
                 {
-                    "green" => "bg-success",
-                    "yellow" => "bg-warning",
-                    _ => "bg-danger"
-                };
+                    boxColor = "bg-success";
+                }
+                else if (avail.StatusColor == "yellow")
+                {
+                    boxColor = "bg-warning";
+                }
 
                 <tr>
                     <!-- Farvekasse -->

@@ -1,28 +1,22 @@
 ﻿@*
-    <summary>
-    Page: Notifications.cshtml
+    Page: Notifications
 
     Responsibility:
-    - Displays all unread notifications for the logged-in user.
-    - Allows the user to mark each notification as read.
+    - Shows unread notifications for the logged-in user.
+    - Lets the user mark notifications as read.
 
     Why this page exists:
-    - To give users a clear overview of system messages such as booking cancellations
-      or important updates.
-    - To allow simple interaction (marking notifications as read) without navigating
-      to other pages.
-    </summary>
+    - To show important system messages in one place.
+    - To allow simple interaction without extra navigation.
 *@
-
 @page
 @model Zealand_Booking_System.Pages.NotificationsModel
 
 <h2>Your notifications</h2>
 
 @*
-    If the user has no unread notifications, we show a simple message.
-    Why:
-    - Gives clear feedback and prevents empty UI elements from appearing.
+    If there are no unread notifications,
+    show a simple message instead of an empty page.
 *@
 @if (Model.Notifications.Count == 0)
 {
@@ -31,13 +25,9 @@
 else
 {
     @*
-        For each unread notification we display:
+        Each notification shows:
         - The message text
-        - A small button to mark it as read
-
-        Why:
-        - Keeps the interface minimal and focused on actions the user can take now.
-        - Uses a POST handler to update notification state securely.
+        - A button to mark it as read
     *@
     foreach (var n in Model.Notifications)
     {

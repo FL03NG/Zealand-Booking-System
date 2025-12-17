@@ -6,51 +6,59 @@ using Zealand_Booking_System_Library.Service;
 namespace Zealand_Booking_System.Pages.Accounts
 {
     /// <summary>
-    /// PageModel responsible for registering new users.
-    /// Handles input from the registration form, creates the appropriate user type,
-    /// and interacts with the UserService to persist the new account.
+    /// Responsibility:
+    /// - Handles user registration.
+    /// - Creates a new user based on the selected role.
+    ///
+    /// Why this page exists:
+    /// - To allow new users to create an account.
+    /// - To keep registration logic separate from other pages.
     /// </summary>
     public class RegisterModel : PageModel
     {
         /// <summary>
-        /// Service responsible for managing user accounts.
+        /// Used to create and manage users.
         /// </summary>
         private readonly UserService _userService;
+
         /// <summary>
-        /// Initializes a new instance of the RegisterModel with a given UserService.
+        /// Creates the PageModel and receives the UserService.
         /// </summary>
-        /// <param name="service">The user service for managing accounts.</param>
         public RegisterModel(UserService service)
         {
             _userService = service;
         }
+
         /// <summary>
-        /// Username entered by the user in the registration form.
+        /// Username from the registration form.
         /// </summary>
         [BindProperty]
         public string Username { get; set; }
+
         /// <summary>
-        /// Password entered by the user in the registration form.
+        /// Password from the registration form.
         /// </summary>
         [BindProperty]
         public string Password { get; set; }
+
         /// <summary>
         /// Selected role for the new user.
         /// </summary>
         [BindProperty]
         public string Role { get; set; }
+
         /// <summary>
-        /// Error message to display in case of invalid input or failure.
+        /// Message shown if something goes wrong.
         /// </summary>
         public string ErrorMessage { get; set; }
+
         /// <summary>
-        /// Success message to display after successful user creation.
+        /// Message shown when the user is created.
         /// </summary>
         public string SuccessMessage { get; set; }
+
         /// <summary>
-        /// Handles POST requests from the registration form.
-        /// Validates input, creates the appropriate user type, and persists it using UserService.
-        /// Sets success or error messages accordingly.
+        /// Handles the registration form submission.
         /// </summary>
         public IActionResult OnPost()
         {
@@ -59,16 +67,19 @@ namespace Zealand_Booking_System.Pages.Accounts
                 ErrorMessage = "Fill all fields";
                 return Page();
             }
-            // Instantiate user based on the selected role
-            var newUser = Role switch
+
+            // Create user based on selected role
+            Account newUser = Role switch
             {
                 "Administrator" => new Administrator(),
                 "Teacher" => new Teacher(),
                 "Student" => new Student(),
-                _ => new Zealand_Booking_System_Library.Models.Account()
+                _ => new Account()
             };
+
             newUser.Username = Username;
-            newUser.PasswordHash = Password; // Note: Password stored as plain text for now
+            newUser.PasswordHash = Password; // stored as plain text --> Password hashing is handled in the service layer
+
             try
             {
                 _userService.Create(newUser, Role);
@@ -76,8 +87,9 @@ namespace Zealand_Booking_System.Pages.Accounts
             }
             catch (Exception ex)
             {
-                ErrorMessage = $"Error: {ex.Message}";
+                ErrorMessage = "Error: " + ex.Message;
             }
+
             return RedirectToPage("/Accounts/Login");
         }
     }

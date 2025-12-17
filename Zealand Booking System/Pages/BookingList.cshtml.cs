@@ -21,56 +21,49 @@ namespace Zealand_Booking_System.Pages.Shared
     /// The page keeps UI concerns here, while business rules (e.g. 3-day rule, double booking)
     /// are delegated to the service layer.
     /// </summary>
+  
     public class BookingListModel : PageModel
-    {
-        /// <summary>
-        /// Connection string used to configure repository access.
-        /// Persistence details remain encapsulated within repositories.
-        /// </summary>
+    {/// <summary>
+     /// Database connection string used by the repositories.
+     /// </summary>
         private readonly string _connectionString =
             "Server =(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True";
 
         /// <summary>
-        /// All bookings shown in the list.
-        /// Can be replaced with a filtered list during search.
+        /// Bookings shown on the page.
         /// </summary>
         public List<Booking> Bookings { get; private set; }
 
         /// <summary>
-        /// List of rooms used for dropdowns / display.
-        /// Loaded from the room repository.
+        /// Rooms used for display and dropdowns.
         /// </summary>
         public List<Room> Rooms { get; private set; }
 
         /// <summary>
-        /// List of users used for dropdowns / display.
-        /// Loaded from the user repository.
+        /// Users used for display (if needed).
         /// </summary>
         public List<Account> Users { get; private set; }
 
         /// <summary>
-        /// Booking bound from the "create booking" form.
+        /// New booking from the create form.
         /// </summary>
         [BindProperty]
         public Booking NewBooking { get; set; }
 
         /// <summary>
-        /// Search text bound from the search form.
-        /// Used to filter bookings by username.
+        /// Search text from the form.
         /// </summary>
         [BindProperty]
         public string SearchName { get; set; }
 
         /// <summary>
-        /// The booking id currently being edited.
-        /// Used to toggle edit mode in the UI.
+        /// Booking id currently in edit mode.
         /// </summary>
         [BindProperty]
         public int EditBookingID { get; set; }
 
         /// <summary>
-        /// The booking being edited.
-        /// Bound from the edit form when saving.
+        /// Booking being edited.
         /// </summary>
         [BindProperty]
         public Booking EditBooking { get; set; }
@@ -80,24 +73,22 @@ namespace Zealand_Booking_System.Pages.Shared
         // ----------------------------
 
         /// <summary>
-        /// Service responsible for booking logic and rules (create/update/delete/availability).
-        /// Keeps business logic out of the UI layer.
+        /// Handles booking rules and actions (create/update/delete/availability).
         /// </summary>
         private readonly BookingService _bookingService;
 
         /// <summary>
-        /// Service responsible for retrieving users as the correct subtype
-        /// (Student / Teacher / Administrator) based on repository data.
+        /// Loads users and returns the correct type (Student/Teacher/Admin).
         /// </summary>
         private readonly UserService _userService;
 
         /// <summary>
-        /// Status message shown on the page after actions (create/edit/delete/search errors).
+        /// Message shown after actions (create/edit/delete).
         /// </summary>
         public string Message { get; private set; }
 
         /// <summary>
-        /// Initializes repositories and composes required services for this page.
+        /// Creates repositories and services for this page.
         /// </summary>
         public BookingListModel()
         {
@@ -106,14 +97,11 @@ namespace Zealand_Booking_System.Pages.Shared
             UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
 
             _bookingService = new BookingService(bookingRepo, roomRepo);
-
-            // UserService can return the proper subtype: Student/Teacher/Admin
             _userService = new UserService(userRepo);
         }
 
         /// <summary>
-        /// Default GET handler.
-        /// Loads all data required for the list view.
+        /// Loads data for the page.
         /// </summary>
         public void OnGet()
         {
@@ -121,8 +109,7 @@ namespace Zealand_Booking_System.Pages.Shared
         }
 
         /// <summary>
-        /// Handles create booking form submission.
-        /// Delegates booking validation/rules to the service layer.
+        /// Creates a booking from the form.
         /// </summary>
         public void OnPost()
         {
@@ -140,8 +127,7 @@ namespace Zealand_Booking_System.Pages.Shared
         }
 
         /// <summary>
-        /// Handles searching bookings by username.
-        /// Loads the full dataset and then filters the bookings list in-memory.
+        /// Searches bookings by username.
         /// </summary>
         public void OnPostSearch()
         {
@@ -157,7 +143,6 @@ namespace Zealand_Booking_System.Pages.Shared
 
             foreach (Booking booking in Bookings)
             {
-                // Account is attached in LoadData()
                 string username = booking.Account != null ? booking.Account.Username : null;
 
                 if (!string.IsNullOrEmpty(username) &&
@@ -171,24 +156,20 @@ namespace Zealand_Booking_System.Pages.Shared
         }
 
         /// <summary>
-        /// Deletes a booking.
-        /// Uses the current session role to enforce role-based rules in the service layer
-        /// (e.g. teachers might be limited by the 3-day rule).
-        /// Also creates a notification for the booking owner after deletion.
+        /// Deletes a booking and creates a notification for the user.
         /// </summary>
-        /// <param name="bookingID">Id of the booking to delete.</param>
         public IActionResult OnPostDelete(int bookingID)
         {
             try
             {
                 string role = HttpContext.Session.GetString("Role");
 
-                // Retrieve booking before deletion (needed for notification message)
+                // Get booking first so we can use the data in the notification
                 Booking booking = _bookingService.GetBookingById(bookingID);
 
                 _bookingService.Delete(bookingID, role);
 
-                // Create notification after successful deletion
+                // Create notification after delete
                 NotificationCollectionRepo noteRepo = new NotificationCollectionRepo(_connectionString);
                 NotificationService noteService = new NotificationService(noteRepo);
 
@@ -201,7 +182,6 @@ namespace Zealand_Booking_System.Pages.Shared
             }
             catch (Exception ex)
             {
-                // Example: Teacher violates the 3-day rule
                 Message = "Error: " + ex.Message;
             }
 
@@ -210,12 +190,11 @@ namespace Zealand_Booking_System.Pages.Shared
         }
 
         /// <summary>
-        /// Starts editing mode for a specific booking.
-        /// Loads the booking into EditBooking so the UI can render inputs with existing values.
+        /// Starts edit mode for one booking.
         /// </summary>
         public IActionResult OnPostStartEdit(int bookingID)
         {
-            Message = "Editing startet";
+            Message = "Editing started";
             EditBookingID = bookingID;
             EditBooking = _bookingService.GetBookingById(bookingID);
 
@@ -224,8 +203,7 @@ namespace Zealand_Booking_System.Pages.Shared
         }
 
         /// <summary>
-        /// Saves edits for the selected booking.
-        /// Uses the current session role to enforce role-based rules in the service layer.
+        /// Saves the edited booking.
         /// </summary>
         public IActionResult OnPostSaveEdit()
         {
@@ -234,7 +212,7 @@ namespace Zealand_Booking_System.Pages.Shared
                 string role = HttpContext.Session.GetString("Role");
 
                 _bookingService.Update(EditBooking, role);
-                Message = "Booking has been editet!";
+                Message = "Booking updated!";
             }
             catch (Exception ex)
             {
@@ -248,27 +226,20 @@ namespace Zealand_Booking_System.Pages.Shared
         }
 
         /// <summary>
-        /// Loads bookings, users and rooms for the page.
-        /// Also attaches each booking's Account as the correct subtype (Student/Teacher/Admin)
-        /// so the UI can show usernames/roles correctly.
+        /// Loads bookings and rooms, and attaches user/room objects to each booking.
         /// </summary>
         private void LoadData()
         {
-            // Load bookings via service (business layer)
             Bookings = _bookingService.GetAll();
+
             RoomCollectionRepo roomRepo = new RoomCollectionRepo(_connectionString);
             Rooms = roomRepo.GetAllRooms();
 
-            // Attach Account object for each booking so the UI can show username etc.
             foreach (Booking booking in Bookings)
             {
                 booking.Account = _userService.GetById(booking.AccountID);
                 booking.Room = roomRepo.GetRoomById(booking.RoomID);
-                // Nu bliver booking.Account = Student / Teacher / Administrator
             }
-
-            //UserCollectionRepo userRepo = new UserCollectionRepo(_connectionString);
-            //Users = userRepo.GetAllUsers();
         }
     }
 }

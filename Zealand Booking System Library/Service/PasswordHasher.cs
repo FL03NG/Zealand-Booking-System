@@ -8,23 +8,31 @@ using Isopoh.Cryptography.Argon2;
 namespace Zealand_Booking_System_Library.Service
 {
     /// <summary>
-    /// Centralizes password hashing and verification logic.
-    /// This prevents security-sensitive code from being scattered across the system
-    /// and makes it easier to update or replace the hashing strategy later.
+    /// Handles password security.
+    ///
+    /// What this class does:
+    /// - Hashes passwords before they are saved.
+    /// - Checks passwords during login.
+    ///
+    /// Why this class exists:
+    /// - To keep all password logic in one place.
+    /// - To avoid using plain-text passwords.
+    /// - To make it easy to change hashing method later.
     /// </summary>
     public static class PasswordHasher
     {
         /// <summary>
-        /// Converts a plain-text password into a secure hash before storage,
-        /// so raw passwords are never persisted or passed around.
+        /// Hashes a plain password.
+        /// The result is safe to store in the database.
         /// </summary>
         public static string Hash(string password)
         {
             return Argon2.Hash(password);
         }
+
         /// <summary>
-        /// Verifies a password against an existing hash,
-        /// allowing authentication without exposing the original password.
+        /// Checks if a password matches a stored hash.
+        /// Used during login.
         /// </summary>
         public static bool Verify(string hash, string password)
         {
@@ -32,3 +40,4 @@ namespace Zealand_Booking_System_Library.Service
         }
     }
 }
+
