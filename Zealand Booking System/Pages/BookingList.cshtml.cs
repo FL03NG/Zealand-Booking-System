@@ -30,10 +30,6 @@ namespace Zealand_Booking_System.Pages.Shared
         private readonly string _connectionString =
             "Server =(localdb)\\MSSQLLocalDB;Database=RoomBooking;Trusted_Connection=True;TrustServerCertificate=True";
 
-        // ----------------------------
-        // Data exposed to the Razor Page
-        // ----------------------------
-
         /// <summary>
         /// All bookings shown in the list.
         /// Can be replaced with a filtered list during search.
@@ -217,7 +213,6 @@ namespace Zealand_Booking_System.Pages.Shared
         /// Starts editing mode for a specific booking.
         /// Loads the booking into EditBooking so the UI can render inputs with existing values.
         /// </summary>
-        /// <param name="bookingID">Id of the booking to edit.</param>
         public IActionResult OnPostStartEdit(int bookingID)
         {
             Message = "Editing startet";
