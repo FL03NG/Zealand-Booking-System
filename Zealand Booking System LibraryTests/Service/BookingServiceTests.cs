@@ -8,6 +8,11 @@ using Zealand_Booking_System_Library.Service;
 
 namespace Zealand_Booking_System_Library.Service.Tests
 {
+    /// <summary>
+    /// Tests for BookingService focusing on booking validation rules and
+    /// correct interaction with repository dependencies.
+    /// The tests use mocks to isolate business logic from data access.
+    /// </summary>
     [TestClass]
     public class BookingServiceTests
     {
@@ -15,9 +20,10 @@ namespace Zealand_Booking_System_Library.Service.Tests
         public void Add_ValidBooking_ShouldCallRepositoryAdd_Once()
         {
             // Arrange
+            // Mocks are used to isolate the service logic from database behavior
             var bookingRepoMock = new Mock<IBookingRepository>();
             var roomRepoMock = new Mock<IRoomRepository>();
-
+            // A valid room is required for a booking to be accepted
             var room = new Room
             {
                 RoomID = 1,
@@ -27,12 +33,12 @@ namespace Zealand_Booking_System_Library.Service.Tests
                 RoomLocation = "A-Bygning"
             };
 
-            // Når service spørger efter rummet, får den dette
+            // The service depends on room existence to validate bookings
             roomRepoMock
                 .Setup(r => r.GetRoomById(1))
                 .Returns(room);
 
-            // Ingen eksisterende bookinger
+            // No existing bookings ensures no conflicts during validation
             var existingBookings = new List<Booking>();
             bookingRepoMock
                 .Setup(b => b.GetAll())
@@ -52,8 +58,8 @@ namespace Zealand_Booking_System_Library.Service.Tests
             // Act
             service.Add(booking);
 
-            // Assert – der må ikke være kastet exception,
-            // og Add skal være kaldt præcis én gang med samme booking
+            // Assert
+            // Verifies that a valid booking results in exactly one repository call
             bookingRepoMock.Verify(b => b.Add(It.Is<Booking>(x =>
                 x.RoomID == booking.RoomID &&
                 x.AccountID == booking.AccountID &&
@@ -67,6 +73,7 @@ namespace Zealand_Booking_System_Library.Service.Tests
         public void Add_SameUserSameDaySameSlot_ShouldThrowException()
         {
             // Arrange
+            // Mocking repositories allows validation rules to be tested in isolation
             var bookingRepoMock = new Mock<IBookingRepository>();
             var roomRepoMock = new Mock<IRoomRepository>();
 
@@ -78,14 +85,14 @@ namespace Zealand_Booking_System_Library.Service.Tests
                 RoomDescription = "Møde",
                 RoomLocation = "B-Bygning"
             };
-
+            // The room must exist for the service to reach booking validation logic
             roomRepoMock
                 .Setup(r => r.GetRoomById(2))
                 .Returns(room);
 
             var dato = DateTime.Today;
 
-            // Eksisterende booking for samme bruger, samme dag og slot
+            // Existing booking represents a conflict scenario for the same user
             var existingBooking = new Booking
             {
                 RoomID = 2,
@@ -96,14 +103,12 @@ namespace Zealand_Booking_System_Library.Service.Tests
 
             var existingBookings = new List<Booking> { existingBooking };
 
-            // Når BookingService kalder GetAll(), får den denne liste
             bookingRepoMock
                 .Setup(b => b.GetAll())
                 .Returns(existingBookings);
 
             var service = new BookingService(bookingRepoMock.Object, roomRepoMock.Object);
 
-            // Ny booking med samme bruger, samme dato, samme tidsrum
             var newBooking = new Booking
             {
                 RoomID = 2,
@@ -113,13 +118,13 @@ namespace Zealand_Booking_System_Library.Service.Tests
             };
 
             // Act + Assert
+            // An exception is expected because the business rule forbids double bookings
             var ex = Assert.ThrowsException<Exception>(() => service.Add(newBooking));
 
-            // Her bruger vi præcis den tekst du har i BookingService:
-            // "Du har allerede en booking i dette tidsrum."
+            // The message confirms that the correct validation rule triggered the error
             Assert.AreEqual("Du har allerede en booking i dette tidsrum.", ex.Message);
 
-            // Og vi kan evt. også tjekke at Add IKKE blev kaldt
+            // Ensures that invalid bookings are never persisted
             bookingRepoMock.Verify(b => b.Add(It.IsAny<Booking>()), Times.Never);
         }
     }
