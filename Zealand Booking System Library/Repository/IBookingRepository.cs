@@ -8,53 +8,45 @@ using Zealand_Booking_System_Library.Models;
 namespace Zealand_Booking_System_Library.Repository
 {
     /// <summary>
-    /// Defines the contract for all booking repository implementations.
+    /// Interface: IBookingRepository
     ///
-    /// Responsibility:
-    /// - Specifies which operations the application requires for working with bookings.
-    /// - Ensures that services and Razor Pages do not depend on a specific database technology.
+    /// What it does:
+    /// - Defines the methods a booking repository must have.
     ///
-    /// Why this interface exists:
-    /// - Supports dependency injection and loose coupling.
-    /// - Allows the system to switch between different storage solutions 
-    ///   (SQL, in-memory, mock repository for unit tests) without changing logic elsewhere.
-    /// - Improves testability by allowing fake or mocked repositories.
+    /// Why this exists:
+    /// - So the service layer can work with bookings without caring if data comes from SQL,
+    ///   a fake repository, or another storage type.
+    /// - Makes the code easier to test and easier to change later.
     /// </summary>
     public interface IBookingRepository
     {
         /// <summary>
-        /// Creates a new booking and saves it in the storage layer.
-        /// Why:
-        /// - Central operation needed by Create Booking flow.
+        /// Adds a new booking to storage.
+        /// Used when a user creates a booking.
         /// </summary>
         public void Add(Booking booking);
 
         /// <summary>
-        /// Retrieves a single booking by its unique ID, including related data.
-        /// Why:
-        /// - Allows pages and services to load detailed booking information when editing or viewing.
+        /// Gets one booking by ID.
+        /// Used when editing or showing booking details.
         /// </summary>
         public Booking GetBookingById(int bookingID);
 
         /// <summary>
-        /// Deletes a booking using its ID.
-        /// Why:
-        /// - Needed for canceling bookings and managing data cleanup.
+        /// Deletes a booking by ID.
+        /// Used when a booking is cancelled or removed.
         /// </summary>
         public void Delete(int id);
 
         /// <summary>
-        /// Loads all bookings from the storage.
-        /// Why:
-        /// - Used by admin pages and booking lists.
-        /// - Provides a central place to define how bookings are fetched.
+        /// Gets all bookings from storage.
+        /// Used to show booking lists for users/admins.
         /// </summary>
         public List<Booking> GetAll();
 
         /// <summary>
         /// Updates an existing booking.
-        /// Why:
-        /// - Allows users or admins to modify reservation details.
+        /// Used when a booking is edited (date/time/user/etc.).
         /// </summary>
         public void Update(Booking booking);
     }

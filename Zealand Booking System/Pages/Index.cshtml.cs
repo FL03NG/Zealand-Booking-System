@@ -4,26 +4,25 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 namespace Zealand_Booking_System.Pages
 {
     /// <summary>
-    /// PageModel for the landing page of the Zealand Booking System.
+    /// Front page of the system.
     ///
     /// Responsibility:
-    /// - Handles requests to the front page (Index.cshtml).
-    /// - Provides a place for logging or future logic if needed.
+    /// - Displays the start page.
+    /// - Shows different UI depending on login state.
     ///
-    /// Why this class exists:
-    /// - Razor Pages require a PageModel to follow the page lifecycle.
-    /// - Allows the project to be extended later without modifying the UI file.
+    /// Why this page exists:
+    /// - To give users a clear starting point.
+    /// - To guide users to login, register, or book rooms.
     /// </summary>
     public class IndexModel : PageModel
     {
         /// <summary>
-        /// Logger injected by ASP.NET Core.
-        /// Useful for debugging, analytics or tracking page access.
+        /// Logger for this page.
         /// </summary>
         private readonly ILogger<IndexModel> _logger;
 
         /// <summary>
-        /// Constructor uses dependency injection to provide logging functionality.
+        /// Creates the PageModel and receives the logger.
         /// </summary>
         public IndexModel(ILogger<IndexModel> logger)
         {
@@ -31,18 +30,11 @@ namespace Zealand_Booking_System.Pages
         }
 
         /// <summary>
-        /// Called when the page is accessed with GET.
-        ///
-        /// Current behavior:
-        /// - No logic needed for this page (purely display content).
-        ///
-        /// Why:
-        /// - Index.cshtml dynamically handles UI based on session data,
-        ///   so the PageModel remains simple and clean.
+        /// Loads the page.
         /// </summary>
         public void OnGet()
         {
-            
+            // No logic needed here
         }
     }
 }

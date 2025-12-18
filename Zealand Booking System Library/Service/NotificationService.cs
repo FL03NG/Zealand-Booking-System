@@ -9,16 +9,15 @@ using Zealand_Booking_System_Library.Repository;
 namespace Zealand_Booking_System_Library.Service
 {
     /// <summary>
-    /// Service responsible for handling notification logic.
+    /// Handles notifications in the system.
     ///
-    /// Responsibility:
-    /// - Provides a simple API for creating, retrieving, and updating notifications.
-    /// - Acts as a layer between the UI/business logic and the repository.
+    /// What this class does:
+    /// - Creates notifications for users.
+    /// - Gets unread notifications.
     ///
     /// Why this class exists:
-    /// - To keep controllers/Razor Pages clean and free from repository calls.
-    /// - To allow future expansion (e.g., email notifications, batching, templates)
-    ///   without changing the rest of the system.
+    /// - To keep notification logic out of Razor Pages.
+    /// - To collect all notification rules in one place.
     /// </summary>
     public class NotificationService
     {

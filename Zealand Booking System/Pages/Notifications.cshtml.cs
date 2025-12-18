@@ -6,32 +6,30 @@ using Zealand_Booking_System_Library.Service;
 namespace Zealand_Booking_System.Pages
 {
     /// <summary>
-    /// PageModel responsible for displaying and updating user notifications.
+    /// PageModel for user notifications.
     ///
-    /// Responsibility:
+    /// What this class does:
     /// - Loads unread notifications for the logged-in user.
-    /// - Handles user actions such as marking a notification as read.
+    /// - Lets the user mark notifications as read.
     ///
     /// Why this class exists:
-    /// - To separate UI logic from business logic (NotificationService).
-    /// - To keep Razor Pages clean and maintainable.
+    /// - To show important system messages in one place.
+    /// - To give users an easy way to clear notifications.
     /// </summary>
     public class NotificationsModel : PageModel
     {
         /// <summary>
-        /// Service used to access notification operations such as getting unread messages
-        /// and marking them as read.
+        /// Service used to get and update notifications.
         /// </summary>
         private readonly NotificationService _service;
 
         /// <summary>
-        /// List of unread notifications to be displayed on the page.
-        /// Bound to the Razor Page for rendering.
+        /// List of unread notifications shown on the page.
         /// </summary>
         public List<Notification> Notifications { get; set; }
 
         /// <summary>
-        /// Constructor uses dependency injection to provide the notification service.
+        /// Creates the PageModel and receives the notification service.
         /// </summary>
         public NotificationsModel(NotificationService service)
         {
@@ -39,11 +37,9 @@ namespace Zealand_Booking_System.Pages
         }
 
         /// <summary>
-        /// Loads unread notifications when the page is accessed with GET.
-        ///
-        /// Why:
-        /// - Ensures users always see the most up-to-date list of notifications.
-        /// - If the user is not logged in, simply provide an empty list.
+        /// Runs when the page is loaded (GET).
+        /// Loads unread notifications for the logged-in user.
+        /// If the user is not logged in, the list is empty.
         /// </summary>
         public void OnGet()
         {
@@ -60,11 +56,8 @@ namespace Zealand_Booking_System.Pages
         }
 
         /// <summary>
-        /// Handles the action of marking a single notification as read.
-        ///
-        /// Why:
-        /// - Makes the update explicit and secure through a POST request.
-        /// - Redirects back to the page so the UI updates immediately.
+        /// Marks a notification as read.
+        /// Then reloads the page to update the list.
         /// </summary>
         public IActionResult OnPostMarkRead(int notificationID)
         {

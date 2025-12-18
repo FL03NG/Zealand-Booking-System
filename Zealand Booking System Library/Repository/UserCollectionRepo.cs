@@ -5,26 +5,35 @@ using Zealand_Booking_System_Library.Models;
 namespace Zealand_Booking_System_Library.Repository
 {
     /// <summary>
-    /// Responsible for persisting and retrieving user data from the database.
-    /// This repository centralizes all SQL logic related to accounts,
-    /// keeping data access separate from business rules and UI concerns.
+    /// Handles database access for users.
+    ///
+    /// Responsibility:
+    /// - Load, create, update and delete users.
+    /// - Convert database rows into Account objects.
+    ///
+    /// Why this class exists:
+    /// - To keep all SQL code in one place.
+    /// - To keep UI and services independent of the database.
     /// </summary>
     public class UserCollectionRepo : IUserRepository
     {
         /// <summary>
-        /// Stored once to avoid hard-coding connection details
-        /// and to make the repository easier to configure and test.
+        /// Connection string used to connect to the database.
+        /// Stored once so it is easy to change.
         /// </summary>
         private readonly string _connectionString;
 
+        /// <summary>
+        /// Creates the repository with a database connection string.
+        /// </summary>
         public UserCollectionRepo(string connectionString)
         {
             _connectionString = connectionString;
         }
+
         /// <summary>
-        /// Retrieves all users from the database.
-        /// Mapping is handled in a dedicated method to keep SQL logic
-        /// and object creation clearly separated.
+        /// Gets all users from the database.
+        /// Used for admin user lists.
         /// </summary>
         public List<Account> GetAllUsers()
         {
@@ -33,7 +42,6 @@ namespace Zealand_Booking_System_Library.Repository
             using (SqlConnection con = new SqlConnection(_connectionString))
             {
                 con.Open();
-
                 string query = "SELECT AccountID, Username, PasswordHash, AccountRole FROM Account";
 
                 using (SqlCommand cmd = new SqlCommand(query, con))
@@ -48,10 +56,10 @@ namespace Zealand_Booking_System_Library.Repository
 
             return users;
         }
+
         /// <summary>
-        /// Retrieves a single user by ID.
-        /// Returning null when no user is found allows the service layer
-        /// to decide how missing users should be handled.
+        /// Gets a user by ID.
+        /// Used when editing or displaying a specific user.
         /// </summary>
         public Account GetById(int accountId)
         {
@@ -77,10 +85,10 @@ namespace Zealand_Booking_System_Library.Repository
                 }
             }
         }
+
         /// <summary>
-        /// Retrieves a user by username.
-        /// This is primarily used for authentication, so password data
-        /// must be included even though it is security-sensitive.
+        /// Gets a user by username.
+        /// Used during login.
         /// </summary>
         public Account GetByUsername(string username)
         {
@@ -106,10 +114,10 @@ namespace Zealand_Booking_System_Library.Repository
                 }
             }
         }
+
         /// <summary>
         /// Creates a new user in the database.
-        /// The role is stored separately to allow role assignment
-        /// without coupling it too tightly to the Account model.
+        /// Used when registering users.
         /// </summary>
         public void CreateUser(Account user, string role)
         {
@@ -131,10 +139,10 @@ namespace Zealand_Booking_System_Library.Repository
                 }
             }
         }
+
         /// <summary>
-        /// Updates basic user information.
-        /// Password changes are intentionally excluded to keep
-        /// security-sensitive operations isolated.
+        /// Updates username and role for a user.
+        /// Does not update password.
         /// </summary>
         public void UpdateUser(Account user)
         {
@@ -142,9 +150,10 @@ namespace Zealand_Booking_System_Library.Repository
             {
                 conn.Open();
 
-                string sql = "UPDATE Account " +
-                             "SET Username = @Username, AccountRole = @AccountRole " +
-                             "WHERE AccountID = @AccountID";
+                string sql =
+                    "UPDATE Account " +
+                    "SET Username = @Username, AccountRole = @AccountRole " +
+                    "WHERE AccountID = @AccountID";
 
                 using (SqlCommand cmd = new SqlCommand(sql, conn))
                 {
@@ -156,66 +165,57 @@ namespace Zealand_Booking_System_Library.Repository
                 }
             }
         }
+
         /// <summary>
         /// Deletes a user and all related data.
-        /// Related records are removed first to maintain referential integrity
-        /// and avoid foreign key constraint violations.
+        /// This prevents orphaned records.
         /// </summary>
         public void DeleteUser(int accountId)
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
                 conn.Open();
-                // Related data is deleted explicitly to keep control
-                // over deletion order and side effects.
-                string deleteNotificationsSql = "DELETE FROM Notifications WHERE AccountID = @id";
-                using (SqlCommand deleteNotifCmd = new SqlCommand(deleteNotificationsSql, conn))
+
+                new SqlCommand("DELETE FROM Notifications WHERE AccountID = @id", conn)
                 {
-                    deleteNotifCmd.Parameters.AddWithValue("@id", accountId);
-                    deleteNotifCmd.ExecuteNonQuery();
-                }
-                string deleteBookingsSql = "DELETE FROM Booking WHERE AccountID = @id";
-                using (SqlCommand cmd = new SqlCommand(deleteBookingsSql, conn))
+                    Parameters = { new SqlParameter("@id", accountId) }
+                }.ExecuteNonQuery();
+
+                new SqlCommand("DELETE FROM Booking WHERE AccountID = @id", conn)
                 {
-                    cmd.Parameters.AddWithValue("@id", accountId);
-                    cmd.ExecuteNonQuery();
-                }
-                // Role-specific tables are cleared to avoid orphaned role records.
-                string deleteAdminSql = "DELETE FROM Administrator WHERE AdministratorID = @id";
-                using (SqlCommand cmd = new SqlCommand(deleteAdminSql, conn))
+                    Parameters = { new SqlParameter("@id", accountId) }
+                }.ExecuteNonQuery();
+
+                new SqlCommand("DELETE FROM Administrator WHERE AdministratorID = @id", conn)
                 {
-                    cmd.Parameters.AddWithValue("@id", accountId);
-                    cmd.ExecuteNonQuery();
-                }
-                string deleteTeacherSql = "DELETE FROM Teacher WHERE TeacherID = @id";
-                using (SqlCommand cmd = new SqlCommand(deleteTeacherSql, conn))
+                    Parameters = { new SqlParameter("@id", accountId) }
+                }.ExecuteNonQuery();
+
+                new SqlCommand("DELETE FROM Teacher WHERE TeacherID = @id", conn)
                 {
-                    cmd.Parameters.AddWithValue("@id", accountId);
-                    cmd.ExecuteNonQuery();
-                }
-                string deleteStudentSql = "DELETE FROM Student WHERE StudentID = @id";
-                using (SqlCommand cmd = new SqlCommand(deleteStudentSql, conn))
+                    Parameters = { new SqlParameter("@id", accountId) }
+                }.ExecuteNonQuery();
+
+                new SqlCommand("DELETE FROM Student WHERE StudentID = @id", conn)
                 {
-                    cmd.Parameters.AddWithValue("@id", accountId);
-                    cmd.ExecuteNonQuery();
-                }
-                // Finally, the account itself is deleted once dependencies are removed.
-                string deleteAccountSql = "DELETE FROM Account WHERE AccountID = @id";
-                using (SqlCommand cmd = new SqlCommand(deleteAccountSql, conn))
+                    Parameters = { new SqlParameter("@id", accountId) }
+                }.ExecuteNonQuery();
+
+                new SqlCommand("DELETE FROM Account WHERE AccountID = @id", conn)
                 {
-                    cmd.Parameters.AddWithValue("@id", accountId);
-                    cmd.ExecuteNonQuery();
-                }
+                    Parameters = { new SqlParameter("@id", accountId) }
+                }.ExecuteNonQuery();
             }
         }
+
         /// <summary>
-        /// Converts raw database data into a domain object.
-        /// Role-based instantiation is handled here so the rest of the system
-        /// can work with proper polymorphic objects.
+        /// Converts database data into the correct Account type.
+        /// Ensures correct role (Admin / Teacher / Student).
         /// </summary>
         private Account MapToAccount(SqlDataReader reader)
         {
             string role = reader.GetString(reader.GetOrdinal("AccountRole"));
+
             Account account = role switch
             {
                 "Administrator" => new Administrator(),
@@ -223,10 +223,12 @@ namespace Zealand_Booking_System_Library.Repository
                 "Student" => new Student(),
                 _ => new Account()
             };
+
             account.AccountID = reader.GetInt32(reader.GetOrdinal("AccountID"));
             account.Username = reader.GetString(reader.GetOrdinal("Username"));
             account.PasswordHash = reader.GetString(reader.GetOrdinal("PasswordHash"));
             account.Role = role;
+
             return account;
         }
     }

@@ -2,20 +2,22 @@
 @model Zealand_Booking_System.Pages.Accounts.UserListModel
 @using Zealand_Booking_System_Library.Models
 @{
-    /*
-        This page provides administrators with an overview of all user accounts.
-        It supports searching, inline editing, and deletion while keeping all
-        management actions in one consolidated interface.
-    */
+    /// <summary>
+    /// Responsibility:
+    /// - Shows a list of all users.
+    /// - Allows searching, editing, and deleting accounts.
+    ///
+    /// Why this page exists:
+    /// - To give administrators an overview of users.
+    /// - To manage user accounts in one place.
+    /// </summary>
     ViewData["Title"] = "User list";
 }
 
 <section class="my-4 my-md-5">
     <h1 class="zb-section-title mb-3">Userlist</h1>
-    <!--
-        Searching is implemented as a server-side post to ensure results
-        remain consistent with backend validation and authorization.
-    -->
+
+    <!-- Search is handled with POST and a page handler -->
     <div class="zb-form-card mb-4">
         <form method="post" asp-page-handler="Search" class="mb-0">
             <label asp-for="SearchName" class="form-label">Search username</label>
@@ -27,18 +29,14 @@
             </div>
         </form>
     </div>
-    @*
-        Feedback messages are shown centrally to give clear confirmation
-        of actions such as updates or deletions.
-    *@
+
+    @* Shows a message after actions like edit or delete *@
     @if (!string.IsNullOrEmpty(Model.Message))
-    {
-        <div class="alert alert-info">@Model.Message</div>
-    }
-    @*
-        An explicit empty-state message avoids confusion when no results
-        match the current search or filter criteria.
-    *@
+        {
+            <div class="alert alert-info">@Model.Message</div>
+        }
+
+    @* Shown when no users match the search *@
     @if (Model.Users == null || Model.Users.Count == 0)
     {
         <p>There are no users.</p>
@@ -47,10 +45,8 @@
     {
         <div class="zb-table-card">
             <div class="table-responsive">
-                @*
-                    A table layout is used here to support quick scanning
-                    and comparison of user attributes.
-                *@
+
+                @* User list table *@
                 <table class="table table-sm align-middle zb-table">
                     <thead>
                         <tr>
@@ -65,14 +61,11 @@
                         {
                             if (Model.EditUserID == user.AccountID)
                             {
-                                @*
-                                    Inline edit mode keeps administrators in context,
-                                    reducing the risk of editing the wrong account.
-                                *@
+                                @* Edit mode for one user *@
                                 <tr>
                                     <form method="post" asp-page-handler="SaveEdit">
                                     <td>
-                                        @user.AccountID
+                                            @user.AccountID
                                         <input type="hidden" asp-for="EditUser.AccountID" />
                                     </td>
 
@@ -81,10 +74,7 @@
                                     </td>
 
                                     <td>
-                                        @*
-                                                Role selection is restricted to predefined
-                                                values to prevent invalid system states.
-                                        *@
+                                            @* Only allow valid roles *@
                                         <select asp-for="EditUser.Role" class="form-select">
                                             <option value="Administrator">Administrator</option>
                                             <option value="Teacher">Teacher</option>
@@ -101,23 +91,20 @@
                             }
                             else
                             {
-                                @*
-                                    Display mode prioritizes readability while
-                                    keeping key management actions immediately accessible.
-                                *@
+                                @* Normal view mode *@
                                 <tr>
                                     <td>@user.AccountID</td>
                                     <td>@user.Username</td>
                                     <td>@user.Role</td>
                                     <td>
-                                        @*
-                                            Deletion is handled via POST to avoid
-                                            accidental actions through link navigation.
-                                        *@
-                                        <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user?')">
+                                        @* Delete via POST + confirm popup *@
+                                        <form method="post" asp-page-handler="Delete" class="d-inline"
+                                              onsubmit="return confirm('Are you sure you want to delete this user?')">
                                             <input type="hidden" name="accountID" value="@user.AccountID" />
                                             <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                                         </form>
+
+                                        @* Start inline edit *@
                                         <form method="post" asp-page-handler="StartEdit" class="d-inline">
                                             <input type="hidden" name="accountID" value="@user.AccountID" />
                                             <button type="submit" class="btn btn-warning btn-sm">Edit</button>
@@ -132,3 +119,4 @@
         </div>
     }
 </section>
+`
