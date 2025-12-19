@@ -66,7 +66,7 @@ namespace Zealand_Booking_System_Library.Service
             if (room == null)
             {
                 // Message is in Danish because it is shown to end users in the UI.
-                throw new Exception("Lokalet findes ikke.");
+                throw new Exception("The room does not exist.");
             }
 
             int maxBookingsForRoom;
@@ -109,7 +109,7 @@ namespace Zealand_Booking_System_Library.Service
                 // Rule: same user cannot have two bookings in the same time slot and day.
                 if (sameUser && sameDay && sameSlot)
                 {
-                    throw new Exception("Du har allerede en booking i dette tidsrum.");
+                    throw new Exception("You already have a booking in this time zone.");
                 }
 
                 // Count bookings for the same room, date and time slot.
@@ -122,7 +122,7 @@ namespace Zealand_Booking_System_Library.Service
             // Rule: max 5 bookings per user.
             if (userBookingCount >= 5)
             {
-                throw new Exception("Du har allerede 5 bookinger. Slet en booking, før du opretter en ny.");
+                throw new Exception("You already have 5 bookings. Delete a booking before you make a new one.");
             }
 
             // Check room capacity rule based on room type.
@@ -130,11 +130,11 @@ namespace Zealand_Booking_System_Library.Service
             {
                 if (room.RoomType == RoomType.ClassRoom)
                 {
-                    throw new Exception("Dette klasselokale er allerede booket af to brugere i dette tidsrum.");
+                    throw new Exception("This classroom is already booked by 2 users timezone.");
                 }
                 else
                 {
-                    throw new Exception("Dette mødelokale er allerede booket i dette tidsrum.");
+                    throw new Exception("This meeting room is already booked in this timezone.");
                 }
             }
 
@@ -165,7 +165,7 @@ namespace Zealand_Booking_System_Library.Service
 
             if (booking == null)
             {
-                throw new Exception("Bookingen findes ikke.");
+                throw new Exception("Booking does not exist");
             }
 
             // Kun Teacher skal have 3 dages varsel.
@@ -211,7 +211,7 @@ namespace Zealand_Booking_System_Library.Service
             Room room = _roomRepo.GetRoomById(booking.RoomID);
             if (room == null)
             {
-                throw new Exception("Lokalet findes ikke.");
+                throw new Exception("The room cannot be found.");
             }
 
             // 2) Determine max bookings based on room type.
@@ -252,11 +252,11 @@ namespace Zealand_Booking_System_Library.Service
             {
                 if (room.RoomType == RoomType.ClassRoom)
                 {
-                    throw new Exception("Dette klasselokale er allerede booket af to brugere i dette tidsrum.");
+                    throw new Exception("This classroom is already booked in this timezone.");
                 }
                 else
                 {
-                    throw new Exception("Dette mødelokale er allerede booket i dette tidsrum.");
+                    throw new Exception("This meeting room is already booked in this timezone.");
                 }
             }
 
@@ -376,7 +376,7 @@ namespace Zealand_Booking_System_Library.Service
 
             if (daysUntilBooking < 3)
             {
-                throw new Exception("Bookingen kan kun ændres eller slettes med mindst 3 dages varsel.");
+                throw new Exception("The Booking can  only be editet or deleted with 3 days warning.");
             }
         }
     }
