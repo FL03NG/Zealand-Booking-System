@@ -122,7 +122,7 @@ namespace Zealand_Booking_System_Library.Service.Tests
             var ex = Assert.ThrowsException<Exception>(() => service.Add(newBooking));
 
             // The message confirms that the correct validation rule triggered the error
-            Assert.AreEqual("Du har allerede en booking i dette tidsrum.", ex.Message);
+            Assert.AreEqual("You already have a booking in this time zone.", ex.Message);
 
             // Ensures that invalid bookings are never persisted
             bookingRepoMock.Verify(b => b.Add(It.IsAny<Booking>()), Times.Never);
